@@ -717,7 +717,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
               "value": data[key],
               "languageId": "00000000000000000000000000000000"
           }]
-        });        
+        });
       // code block
       break;
       case 'DESCRIPTION':
@@ -764,6 +764,14 @@ createMeta = async (assetID, data, ImgToken, token) => {
       // code block
       break;
       case 'INIT_NAME':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+          }]
+        });
       // code block
       break;
       case 'ORIG_BE_ID':
