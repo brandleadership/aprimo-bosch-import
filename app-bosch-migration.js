@@ -1,4 +1,6 @@
-require("dotenv").config({ debug: false });
+require("dotenv").config({
+  debug: false
+});
 const express = require("express");
 var bodyParser = require("body-parser");
 var fs = require("fs");
@@ -13,8 +15,12 @@ let Client = require("ssh2-sftp-client");
 let sftp = new Client();
 const splitFile = require("split-file");
 const csv = require("csvtojson");
-const { constants } = require("buffer");
-const { create } = require("domain");
+const {
+  constants
+} = require("buffer");
+const {
+  create
+} = require("domain");
 const axios = require("axios").default;
 const app = express();
 const classificationlist = require("./bosch-classificationlist");
@@ -28,7 +34,9 @@ let imgFolderPath = "./ftp-temp/binnery/";
 let readJSONCron = true;
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
-app.use(express.json({ limit: "150mb" }));
+app.use(express.json({
+  limit: "150mb"
+}));
 app.use("/js", express.static(__dirname + "/js"));
 app.use(
   bodyParser.urlencoded({
@@ -43,29 +51,29 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.simple(),
   transports: [
-      new winston.transports.File({
-          filename: 'bosch-app-error.log',
-          level: 'error'
-      }),
-      new winston.transports.File({
-          filename: 'bosch-classification.log',
-          level: 'warn'
-      }),
-      new winston.transports.File({
-          filename: 'bosch-app-combined.log'
-      })
+    new winston.transports.File({
+      filename: 'bosch-app-error.log',
+      level: 'error'
+    }),
+    new winston.transports.File({
+      filename: 'bosch-classification.log',
+      level: 'warn'
+    }),
+    new winston.transports.File({
+      filename: 'bosch-app-combined.log'
+    })
   ]
 });
 
 getToken = async () => {
   const resultAssets = await fetch(APR_CREDENTIALS.API_URL, {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-      "client-id": APR_CREDENTIALS.client_id,
-      Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
-    },
-  })
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "client-id": APR_CREDENTIALS.client_id,
+        Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
+      },
+    })
     .then((response) => response.json())
     .then((data) => {
       return data;
@@ -163,15 +171,15 @@ async function readJSON(token) {
         }
 
         var aprToken = await getToken();
-        if(masterRecordID !== 0){
+        if (masterRecordID !== 0) {
           let recordLinksResult = await recordLinks(masterRecordID, childRecordID, aprToken.accessToken);
           logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-          console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);  
+          console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
         } else {
           logger.error(new Date() + ': ERROR : Master Record Missing: ');
           console.log(new Date() + ': ERROR : Master Record Missing: ');
         }
-      } 
+      }
     }
   }
 
@@ -180,56 +188,55 @@ async function readJSON(token) {
 }
 
 recordLinks = async (masterRecordID, childRecordID, token) => {
-let body = {
-  "fields": {
-"addOrUpdate": [{
-  "recordLinkConditions": null,
-  "dataType": "RecordLink",
-  "fieldName": "Belongs_to",
-  "label": "Belongs_to",
-  "id": 'adb8712c2fa64a82a20eaeef00a86614',
-  "localizedValues": [
-      {
+  let body = {
+    "fields": {
+      "addOrUpdate": [{
+        "recordLinkConditions": null,
+        "dataType": "RecordLink",
+        "fieldName": "Belongs_to",
+        "label": "Belongs_to",
+        "id": 'adb8712c2fa64a82a20eaeef00a86614',
+        "localizedValues": [{
           "links": null,
           "parents": null,
           "children": [],
           "languageId": "00000000000000000000000000000000",
           "readOnly": null,
           "modifiedOn": "2022-12-12T13:55:46.37Z"
+        }],
+        "inheritanceState": null,
+        "inheritable": null
+      }]
+    }
+  }
+
+  for (let i = 0; i < childRecordID.length; i++) {
+    body.fields.addOrUpdate[0].localizedValues[0].children.push({
+      "recordId": childRecordID[i]
+    });
+  }
+
+  //console.log('recordLinks URL: ', APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID);
+  //console.log('recordLinks', JSON.stringify(body));
+  const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID,
+      JSON.stringify(body), {
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
       }
-  ],
-  "inheritanceState": null,
-  "inheritable": null
-}]}
-}
-
-for (let i = 0; i < childRecordID.length; i++) {
-  body.fields.addOrUpdate[0].localizedValues[0].children.push({
-    "recordId": childRecordID[i]
-  });  
-}
-
-//console.log('recordLinks URL: ', APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID);
-//console.log('recordLinks', JSON.stringify(body));
-const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID,
-                JSON.stringify(body), {
-                    headers: {
-                        Accept: "*/*",
-                        "Content-Type": "application/json",
-                        "API-VERSION": APR_CREDENTIALS.Api_version,
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            )
-            .then((res) => {
-                //console.log(' Result:', JSON.stringify(res.data));
-                return true;
-            })
-            .catch((err) => {
-              logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-              console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-              return false;
-            });
+    )
+    .then((res) => {
+      //console.log(' Result:', JSON.stringify(res.data));
+      return true;
+    })
+    .catch((err) => {
+      logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      return false;
+    });
   return resultAssets;
 };
 
@@ -256,7 +263,7 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
       const itemsObj = resp.data;
       logger.info(new Date() + ': INFO : Records Found: -- ' + itemsObj.totalCount);
       console.log(new Date() + ': INFO : Records Found: -- ', itemsObj.totalCount);
-    
+
 
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
@@ -268,7 +275,7 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
         logger.info(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME);
         console.log(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME);
         getFieldsResult = await getFields(itemsObj.items[0].id, token, recordsCollection);
-      } 
+      }
       return getFieldsResult;
     })
     .catch(async (err) => {
@@ -284,40 +291,40 @@ searchClassification = async (ClassID, token, data) => {
   let filterClass = ClassID.replace(/&/g, "%26");
   filterClass = filterClass.replace(/\+/g, "%2b");
   let resultID = await axios
-      .get(APR_CREDENTIALS.GetClassification + filterClass, {
-          headers: {
-              Accept: "*/*",
-              "Content-Type": "application/json",
-              "API-VERSION": APR_CREDENTIALS.Api_version,
-              Authorization: `Bearer ${token}`,
-          },
-      })
-      .then(async (resp) => {
-          console.log("resp.data.id:", resp.data.id);
-          if (resp.data.id === null) {
-            console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
-            logger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
-            return 'null';
-          } else {
-              classificationlist[ClassID] = resp.data.id;
-              await writeClassificationlist();
-              return resp.data.id;
-          }
-      })
-      .catch(async (err) => {
-          console.log(new Date() + ": WARNING : Classification Missing -- ", JSON.stringify(err));
-          logger.warn(new Date() + ': WARNING : Classification Missing URL -- ' + APR_CREDENTIALS.GetClassification + filterClass);
-          logger.warn(new Date() + ': WARNING : is ' + JSON.stringify(err));
-          return 'null';
-      });
+    .get(APR_CREDENTIALS.GetClassification + filterClass, {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        "API-VERSION": APR_CREDENTIALS.Api_version,
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(async (resp) => {
+      console.log("resp.data.id:", resp.data.id);
+      if (resp.data.id === null) {
+        console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
+        logger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
+        return 'null';
+      } else {
+        classificationlist[ClassID] = resp.data.id;
+        await writeClassificationlist();
+        return resp.data.id;
+      }
+    })
+    .catch(async (err) => {
+      console.log(new Date() + ": WARNING : Classification Missing -- ", JSON.stringify(err));
+      logger.warn(new Date() + ': WARNING : Classification Missing URL -- ' + APR_CREDENTIALS.GetClassification + filterClass);
+      logger.warn(new Date() + ': WARNING : is ' + JSON.stringify(err));
+      return 'null';
+    });
   return resultID;
 };
 
 writeClassificationlist = async () => {
   fs.writeFile("bosch-classificationlist.json", JSON.stringify(classificationlist), err => {
-      // Checking for errors
-      if (err) throw err;
-      //console.log("04 classificationlist Updated"); // Success
+    // Checking for errors
+    if (err) throw err;
+    //console.log("04 classificationlist Updated"); // Success
   });
 };
 
@@ -341,14 +348,14 @@ getFields = async (assetID, token, recordsCollection) => {
   let existImgId;
   let filename;
   let APIResult = 0;
-  
+
   if (assetID === "null") {
     //Create New
     findAssetID = APR_CREDENTIALS.tempAssetID;
     filename = recordsCollection.BINARY_FILENAME;
     existImgId = "null";
 
-    const ImageToken = await uploadAsset(token, filename);  
+    const ImageToken = await uploadAsset(token, filename);
     APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);
   } else {
     APIResult = await createMeta(assetID, recordsCollection, 'null', token);
@@ -382,17 +389,17 @@ getFieldIDs = async (token) => {
       return null;
     });
 
-    return getFieldsResult;
+  return getFieldsResult;
 };
 
 createMeta = async (assetID, data, ImgToken, token) => {
-  
+
   let APIResult = false;
   let updateObj = {
     tag: "<xml>test tag</xml>",
     classifications: {
       addOrUpdate: []
-    },    
+    },
     fields: {
       addOrUpdate: []
     },
@@ -402,21 +409,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
   if (ImgToken !== "null") {
     updateObj.files = {
       master: ImgToken,
-      addOrUpdate: [
-        {
-          versions: {
-            addOrUpdate: [
-              {
-                id: ImgToken,
-                filename: data["BINARY_FILENAME"],
-                tag: "<xml>Uploaded by Script</xml>",
-                versionLabel: "Uploaded by Script",
-                comment: "Uploaded by Script",
-              },
-            ],
-          },
+      addOrUpdate: [{
+        versions: {
+          addOrUpdate: [{
+            id: ImgToken,
+            filename: data["BINARY_FILENAME"],
+            tag: "<xml>Uploaded by Script</xml>",
+            versionLabel: "Uploaded by Script",
+            comment: "Uploaded by Script",
+          }, ],
         },
-      ],
+      }, ],
     };
   }
 
@@ -424,6 +427,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
   for (var key in data) {
     let ClassID = [];
     let tmpKey = data[key];
+    let optionVal = "false";
+    let ObjectID = '';
+
     //tmpKey = tmpKey.replace(/||/g, "/");
     tmpKey = tmpKey.replace(/&/g, "%26");
     tmpKey = tmpKey.replace(/\+/g, "%2b");
@@ -431,18 +437,28 @@ createMeta = async (assetID, data, ImgToken, token) => {
     // skip loop if the property is from prototype
     if (!data.hasOwnProperty(key)) continue;
 
+    if ((data[key] === null || data[key] === '') && key === 'INIT_NAME'){
+      ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+      updateObj.fields.addOrUpdate.push({
+        "id": ObjectID[0].id,
+        "localizedValues": [{
+          "values": [APR_CREDENTIALS.defaultAssetOwner],
+          "languageId": "00000000000000000000000000000000"
+        }]
+      });
+      continue;
+    }
+
     if (data[key] === null || data[key] === '') continue;
 
-    let optionVal = "false";
-    let ObjectID = '';
-    switch(key) {
+    switch (key) {
       case 'OBJ_ID':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'KBObjectID');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
         break;
@@ -451,18 +467,18 @@ createMeta = async (assetID, data, ImgToken, token) => {
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'OTYPE_ID':
-      // code block
-      break;
+        // code block
+        break;
       case 'OTYPE_NAME':
         APIResult = await searchClassificationName(data[key], token, data);
-        if(APIResult !== 'null'){
+        if (APIResult !== 'null') {
           ClassID.push(APIResult);
         }
 
@@ -470,40 +486,40 @@ createMeta = async (assetID, data, ImgToken, token) => {
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
           }]
         });
 
-      // code block
-      break;
+        // code block
+        break;
       case 'SYSTEM_STATUS':
-          APIResult = await searchClassificationName(data[key], token, data);
-          if(APIResult !== 'null'){
-            ClassID.push(APIResult);
-          }
+        APIResult = await searchClassificationName(data[key], token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
 
         ObjectID = findObject(tempAssetObj, 'fieldName', 'SystemStatus');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'LV_ID':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger ID');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'MASTER_RECORD':
         /*
         ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
@@ -516,51 +532,51 @@ createMeta = async (assetID, data, ImgToken, token) => {
             }]
           });  
         }*/
-      // code block
-      break;
+        // code block
+        break;
       case 'LTYPE_ID':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LTYPE ID');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'LTYPE_NAME':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LTYPE Name');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'ORIGINAL_FILENAME':
-      // code block
-      break;
+        // code block
+        break;
       case 'BINARY_FILENAME':
-      // code block
-      break;
+        // code block
+        break;
       case 'CATEGORY_TREE_NAMES':
         tmpKey = tmpKey.replace(/\|\|/g, "/");
         var str_array = tmpKey.split('\\\\');
-        for(var i = 0; i < str_array.length; i++) {
-            // Trim the excess whitespace.
-            str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
-            // Add additional code here, such as:
-            if (classificationlist.hasOwnProperty('/MPE Migration/' + str_array[i]) && classificationlist['/MPE Migration/' + str_array[i]] !== undefined) {
-              ClassID.push(classificationlist['/MPE Migration/' + str_array[i]]);
-            } else {
-              let APIResult = await searchClassification('/MPE Migration/' + str_array[i], token, data)
-              if(APIResult !== 'null'){
-                ClassID.push(APIResult);
-              }
+        for (var i = 0; i < str_array.length; i++) {
+          // Trim the excess whitespace.
+          str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
+          // Add additional code here, such as:
+          if (classificationlist.hasOwnProperty('/MPE Migration/' + str_array[i]) && classificationlist['/MPE Migration/' + str_array[i]] !== undefined) {
+            ClassID.push(classificationlist['/MPE Migration/' + str_array[i]]);
+          } else {
+            let APIResult = await searchClassification('/MPE Migration/' + str_array[i], token, data)
+            if (APIResult !== 'null') {
+              ClassID.push(APIResult);
             }
+          }
         }
         /*
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
@@ -575,102 +591,102 @@ createMeta = async (assetID, data, ImgToken, token) => {
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'CATEGORY_TREE_IDS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
-        });           
-      // code block
-      break;
+        });
+        // code block
+        break;
       case 'CSORELEASE_MASTER':
-        if(data[key] === 'x'){
+        if (data[key] === 'x') {
           optionVal = "true"
-        } 
+        }
         ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
-        if(APIResult !== 'null'){
+        if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
             }]
           });
-        }            
-      // code block
-      break;
+        }
+        // code block
+        break;
       case 'BRAND':
-          APIResult = await searchClassificationName(tmpKey, token, data);
-          if(APIResult !== 'null'){
-            ClassID.push(APIResult);
-          }
+        APIResult = await searchClassificationName(tmpKey, token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
 
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Brand');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
           }]
-        });        
-      // code block
-      break;
-      case 'INIT_DATE':      
-      // code block
-      break;
+        });
+        // code block
+        break;
+      case 'INIT_DATE':
+        // code block
+        break;
       case 'DOUBLE_WIDTH':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'DoubleWidth');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'HD_OBJECT':
-        if(data[key] === 'x'){
+        if (data[key] === 'x') {
           optionVal = "true"
-        } 
+        }
 
         ObjectID = findObject(tempAssetObj, 'fieldName', 'HD Object');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
-        if(APIResult !== 'null'){
+        if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
             }]
           });
-        }        
-      // code block
-      break;
+        }
+        // code block
+        break;
       case 'ILABEL':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ILabel');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'IMG_TYPE':
         APIResult = await searchClassificationName(tmpKey, token, data);
-        if(APIResult !== 'null'){
+        if (APIResult !== 'null') {
           ClassID.push(APIResult);
         }
 
@@ -678,170 +694,197 @@ createMeta = async (assetID, data, ImgToken, token) => {
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
           }]
-        });           
-      // code block
-      break;
+        });
+        // code block
+        break;
       case 'KEYWORDS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "values": [data[key]],
-              "languageId": "00000000000000000000000000000000"
+            "values": [data[key]],
+            "languageId": "00000000000000000000000000000000"
           }]
-        });            
-      // code block
-      break;
+        });
+        // code block
+        break;
       case 'MISSING_TTNR':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Missing_TTNR');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'FILENAME':
-      // code block
-      break;
+        // code block
+        break;
       case 'SYMBOLIMG_DESCRIPTION':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Short Describtion');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'DESCRIPTION':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'SmartDescription');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
-        });        
+        });
 
-      // code block
-      break;
+        // code block
+        break;
       case 'AGENCY':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'PostProduction');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if(APIResult !== 'null'){
+        if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
             }]
           });
         }
 
-      // code block
-      break;
+        // code block
+        break;
       case 'STATUS':
-          APIResult = await searchClassificationName(tmpKey, token, data);
-          if(APIResult !== 'null'){
-            ClassID.push(APIResult);
-          }
-        
+        APIResult = await searchClassificationName(tmpKey, token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
+
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
           }]
-        });        
-      // code block
-      break;
+        });
+        // code block
+        break;
       case 'INIT_NAME':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
+        var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
+
+        //console.log('INIT_NAME **************', firstName);
+        //console.log('INIT_NAME **************', lastName);
+        APIResult = await searchUser(firstName, lastName, token);
+        if(APIResult !== '0'){
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });          
+        } else {
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APR_CREDENTIALS.defaultAssetOwner],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+
+
+        // code block
+        break;
       case 'ORIG_BE_ID':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Original BE ID');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
-        });                
-      // code block
-      break;
+        });
+        // code block
+        break;
       case 'AC_MAIN_USAGE':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'IntendedUsage');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if(APIResult !== 'null'){
+        if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
             }]
           });
         }
-      // code block
-      break;
+        // code block
+        break;
       case 'LINKED_PRODUCTS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ReferencedProductsinPIM');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
           }]
         });
-      // code block
-      break;
+        // code block
+        break;
       case 'LAUNCH_DATE':
         let LAUNCH_DATE_VAR = new Date(data[key]);
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-              "value": LAUNCH_DATE_VAR,
-              "languageId": "00000000000000000000000000000000"
+            "value": LAUNCH_DATE_VAR,
+            "languageId": "00000000000000000000000000000000"
           }]
-        });        
-      // code block
-      break;
+        });
+        // code block
+        break;
       case 'CLIPLISTER_LINKS':
-      // code block
-      break;
+        // code block
+        break;
 
       default:
         // code block
     }
 
-    
-    if(ClassID.length > 0){
+
+    if (ClassID.length > 0) {
       for (let i = 0; i < ClassID.length; i++) {
-        if(ClassID[i].length > 0){
-          if(ClassID[i] !== 'null'){
+        if (ClassID[i].length > 0) {
+          if (ClassID[i] !== 'null') {
             ClassObj.push(ClassID[i]);
           }
         }
       }
     }
   }
-  
+
   for (let c = 0; c < ClassObj.length; c++) {
     updateObj.classifications.addOrUpdate.push({
       "id": ClassObj[c],
@@ -851,107 +894,163 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
   console.log(new Date() + ": INFO : updateObj:", JSON.stringify(updateObj));
   logger.info(new Date() + ': INFO : updateObj:' + JSON.stringify(updateObj));
-  return 0;
+
 
   if (assetID === "null") {
-  let reqCreatRequest = await axios
-  .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
-      headers: {
+    let reqCreatRequest = await axios
+      .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
+        headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
           "API-VERSION": APR_CREDENTIALS.Api_version,
           Authorization: `Bearer ${token}`,
-      },
-  })
-  .then(async (resp) => {
-      if (resp.data.id !== undefined) {
-        logger.error(new Date() + ': INFO : Record ID: ', resp.data.id);
-        console.log(new Date() + ': INFO : Record ID: ', resp.data.id);
-        return resp.data.id;
-      } else {
+        },
+      })
+      .then(async (resp) => {
+        if (resp.data.id !== undefined) {
+          logger.error(new Date() + ': INFO : Record ID: ', resp.data.id);
+          console.log(new Date() + ': INFO : Record ID: ', resp.data.id);
+          return resp.data.id;
+        } else {
+          logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+          console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+          logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
+          console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
+          return '0';
+        }
+      })
+      .catch((err) => {
         logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
         console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-        logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
-        console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));    
+        logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
+        console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
         return '0';
-      }
-  })
-  .catch((err) => {
-    logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-    console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-    logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
-    console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
-    return '0';
-  });
-  return reqCreatRequest;
+      });
+    return reqCreatRequest;
   } else {
 
     let reqCreatRequest = await axios
-    .put(APR_CREDENTIALS.GetRecord_URL + assetID, JSON.stringify(updateObj), {
+      .put(APR_CREDENTIALS.GetRecord_URL + assetID, JSON.stringify(updateObj), {
         headers: {
-            Accept: "*/*",
-            "Content-Type": "application/json",
-            "API-VERSION": APR_CREDENTIALS.Api_version,
-            Authorization: `Bearer ${token}`,
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
         },
-    })
-    .then(async (resp) => {
-      logger.error(new Date() + ': INFO : Record Updated: ' + assetID);
-      console.log(new Date() + ': INFO : Record Updated: ' + assetID);
-      //console.log(': Update Record ID: ');
-      return assetID;
-    })
-    .catch((err) => {
-      logger.error(new Date() + ': ERROR : UPDATE RECROD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-      console.log(new Date() + ': ERROR : UPDATE RECROD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-      logger.error(new Date() + ': ERROR : UPDATE RECROD API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : UPDATE RECROD API -- ' + JSON.stringify(err));
-      return '0';
-    });
+      })
+      .then(async (resp) => {
+        logger.error(new Date() + ': INFO : Record Updated: ' + assetID);
+        console.log(new Date() + ': INFO : Record Updated: ' + assetID);
+        //console.log(': Update Record ID: ');
+        return assetID;
+      })
+      .catch((err) => {
+        logger.error(new Date() + ': ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        console.log(new Date() + ': ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        logger.error(new Date() + ': ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
+        console.log(new Date() + ': ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
+        return '0';
+      });
     return reqCreatRequest;
   }
 
 };
+
+
+searchUser = async (firstName, lastName, token) => {
+  let body = {
+    "and":[
+       {
+          "contains":{
+            "fieldName": "firstName",
+            "fieldValue": firstName.trim()
+          }
+       },
+       {
+          "contains":{
+            "fieldName": "lastName",
+            "fieldValue": lastName.trim()
+          }
+       }
+    ]
+ };
+
+
+  logger.error(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
+  console.log(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
+  logger.error(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
+  console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
+  let reqCreatRequest = await axios
+      .post(APR_CREDENTIALS.SearchUser, JSON.stringify(body), {
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+          "X-Access-Token": token
+        },
+      })
+      .then(async (resp) => {        
+        if (resp.data['_total'] !== 0) {
+          logger.error(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
+          console.log(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
+          return resp.data['_embedded'].user[0].adamUserId;
+        } else {
+          logger.error(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
+          console.log(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
+          return '0';
+        }
+      })
+      .catch((err) => {
+        logger.error(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
+        console.log(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
+        logger.error(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
+        console.log(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
+        return '0';
+      });
+    return reqCreatRequest;
+};
+
 
 getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
   let filterClass = fieldURL.replace(/&/g, "%26");
   filterClass = filterClass.replace(/\+/g, "%2b");
   console.log('filterClass: ', filterClass);
   let resultID = await axios
-      .get(filterClass, {
-          headers: {
-              Accept: "*/*",
-              "Content-Type": "application/json",
-              "API-VERSION": APR_CREDENTIALS.Api_version,
-              Authorization: `Bearer ${token}`,
-          },
-      })
-      .then(async (resp) => {
-          //console.log("resp.data:--------", resp.data);
-          ObjectID = findObject(resp.data.items, 'name', fieldValue);
-          //console.log("ObjectID:--------", ObjectID);
-          if(ObjectID.length > 0){
-            //console.log(new Date() + ': ObjectID.id -- ' + ObjectID[0].id);
-            return ObjectID[0].id;
-          } else{
-            console.log(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
-            logger.error(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
-            console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
-            logger.error(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
-            
-            return 'null';
-          }
-      })
-      .catch(async (err) => {
-          console.log(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
-          console.log(new Date() + ": ERROR : Field Definition API -- ", JSON.stringify(err));          
-          logger.error(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
-          logger.error(new Date() + ': ERROR : is ' + JSON.stringify(err));
-          console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
-          logger.error(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
+    .get(filterClass, {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        "API-VERSION": APR_CREDENTIALS.Api_version,
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(async (resp) => {
+      //console.log("resp.data:--------", resp.data);
+      ObjectID = findObject(resp.data.items, 'name', fieldValue);
+      //console.log("ObjectID:--------", ObjectID);
+      if (ObjectID.length > 0) {
+        //console.log(new Date() + ': ObjectID.id -- ' + ObjectID[0].id);
+        return ObjectID[0].id;
+      } else {
+        console.log(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
+        logger.error(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
+        console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
+        logger.error(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
 
-          return 'null';
-      });
+        return 'null';
+      }
+    })
+    .catch(async (err) => {
+      console.log(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
+      console.log(new Date() + ": ERROR : Field Definition API -- ", JSON.stringify(err));
+      logger.error(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
+      logger.error(new Date() + ': ERROR : is ' + JSON.stringify(err));
+      console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
+      logger.error(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
+
+      return 'null';
+    });
   return resultID;
 };
 
@@ -961,32 +1060,32 @@ searchClassificationName = async (ClassID, token, data) => {
   filterClass = filterClass.replace(/\+/g, "%2b");
   console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
   let resultID = await axios
-      .get(APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'", {
-          headers: {
-              Accept: "*/*",
-              "Content-Type": "application/json",
-              "API-VERSION": APR_CREDENTIALS.Api_version,
-              Authorization: `Bearer ${token}`,
-          },
-      })
-      .then(async (resp) => {
-        const itemsObj = resp.data;
-        //console.log("resp.data: ", resp.data);
-        if (itemsObj.totalCount === 1) {
-          console.log("Field Value: ", itemsObj.items[0].id);
-          return itemsObj.items[0].id;
-        } else {
-          logger.error(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
-          console.log(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
-          return 'null';
-        } 
-      })
-      .catch(async (err) => {
-          logger.error(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
-          console.log(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
-          logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err));
-          return 'null';
-      });
+    .get(APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'", {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        "API-VERSION": APR_CREDENTIALS.Api_version,
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(async (resp) => {
+      const itemsObj = resp.data;
+      //console.log("resp.data: ", resp.data);
+      if (itemsObj.totalCount === 1) {
+        console.log("Field Value: ", itemsObj.items[0].id);
+        return itemsObj.items[0].id;
+      } else {
+        logger.error(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
+        console.log(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
+        return 'null';
+      }
+    })
+    .catch(async (err) => {
+      logger.error(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
+      console.log(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
+      logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err));
+      return 'null';
+    });
   return resultID;
 };
 
@@ -1022,7 +1121,7 @@ async function uploadAsset(token, filename) {
             }
             logger.info(new Date() + ": INFO : commitSegment: ");
             const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
-            
+
             return ImgToken;
           })
           .catch((err) => {
@@ -1031,7 +1130,7 @@ async function uploadAsset(token, filename) {
             return null;
             //console.log('Error: ', err);
           });
-          return APIResult;
+        return APIResult;
       } else {
         console.log("fileSize is < 20 MB:");
         logger.info(new Date() + ": fileSize is < 20 MB: ");
@@ -1065,14 +1164,14 @@ async function uploadAsset(token, filename) {
             console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
             return null;
           });
-    
+
         return reqUploadImg;
-      }      
+      }
 
 
 
     }
-  } catch(err) {
+  } catch (err) {
     logger.error(new Date() + ': ERROR : Core Error -- ' + JSON.stringify(err));
     console.log(new Date() + ': ERROR : Core Error -- ' + JSON.stringify(err));
   }
@@ -1085,7 +1184,9 @@ async function uploadAsset(token, filename) {
  * Get Segment URL for Big file upload in chunks
  */
 getSegmentURL = async (filename, token) => {
-  let body = { filename: path.basename(filename) };
+  let body = {
+    filename: path.basename(filename)
+  };
   console.log(
     "APR_CREDENTIALS.Upload_Segments_URL",
     APR_CREDENTIALS.Upload_Segments_URL
@@ -1122,18 +1223,18 @@ getSegmentURL = async (filename, token) => {
  * @returns 
  * Function to Serch Multi Dimission Array
  */
- const findObject = (obj = {}, key, value) => {
+const findObject = (obj = {}, key, value) => {
   const result = [];
   const recursiveSearch = (obj = {}) => {
-      if (!obj || typeof obj !== 'object') {
-          return;
-      };
-      if (obj[key] === value) {
-          result.push(obj);
-      };
-      Object.keys(obj).forEach(function (k) {
-          recursiveSearch(obj[k]);
-      });
+    if (!obj || typeof obj !== 'object') {
+      return;
+    };
+    if (obj[key] === value) {
+      result.push(obj);
+    };
+    Object.keys(obj).forEach(function (k) {
+      recursiveSearch(obj[k]);
+    });
   }
   recursiveSearch(obj);
   return result;
@@ -1214,18 +1315,18 @@ main = async () => {
 main();
 var task = cron.schedule("*/30 * * * *", async () => {
   //  try {
-      //if (readJSONCron) {
-        console.log("running a task every 30 Min");
-        // await main();
-      //} else {
+  //if (readJSONCron) {
+  console.log("running a task every 30 Min");
+  //await main();
+  //} else {
   //      console.log("Skip: already running ");
-      //}
-    //} catch (err) {
+  //}
+  //} catch (err) {
   ///    console.log("Error cron: ");
-      //readJSONCron = true;
-    //}
-  });
-  task.start();
+  //readJSONCron = true;
+  //}
+});
+task.start();
 
 
 app.set("port", process.env.PORT || 3012);
