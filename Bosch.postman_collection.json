@@ -1,0 +1,995 @@
+{
+	"info": {
+		"_postman_id": "6f56a383-285b-4ff8-93e7-991e141bdaeb",
+		"name": "Bosch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23374613"
+	},
+	"item": [
+		{
+			"name": "Step 1: Username Access Token",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res = pm.response.json();",
+							"pm.globals.set('aprimoauthtoken', res.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "client-id",
+						"value": "JROHFIO2-JROH",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdEFkbWluOmVkNGJjM2MwMzVkNjQxMzRhYjJkZTdjMTRiOGVlOWVl",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.aprimo.com/api/oauth/create-native-token",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"oauth",
+						"create-native-token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 2: Aprimo - Search the Asset with ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"tag\": \"<xml>test tag</xml>\",\n    \"classifications\": {\n        \"addOrUpdate\": [\n            {\n                \"id\": \"2e5c75e58391422e8afbaf7000a9c668\",\n                \"sortIndex\": 0\n            },\n            {\n                \"id\": \"8c46cfc54c654fc2b07caf5e00e06a2c\",\n                \"sortIndex\": 1\n            },\n            {\n                \"id\": \"8b7f5bb4db0a4f18bd95af6c006f686d\",\n                \"sortIndex\": 2\n            },\n            {\n                \"id\": \"2dff3e580f67444fb98eace801393fe7\",\n                \"sortIndex\": 3\n            }\n        ]\n    },\n    \"fields\": {\n        \"addOrUpdate\": [\n            {\n                \"id\": \"ce31e94391a34eb8a8d0ace8013c7939\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"360\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"a991046ddec44c2fbd23ace8013c7fbf\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"F4gd0131\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"9d05d4e5180447f2b560af3100e21c40\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"2e5c75e58391422e8afbaf7000a9c668\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"b90be741a2454b3c8587af5f006360f2\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"8c46cfc54c654fc2b07caf5e00e06a2c\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"1b2f110b0b834d27a468af3100d31752\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"1182420\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"3f2e459d9a94401eb983af3100d3724e\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"185\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"2d68f14c81b54cf79755af3100d675c3\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"LORES_PNG_RGB_WATERMARK\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"c66d2f10ee4e4244bee7af3200844348\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"Image Database||Bosch Professional||Product & Application Images||Diamond Technology||Diamond Saws||GDC 42 W Professional\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"fd3cfeeb3ed14b339b72af320084b2f5\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"2|12433|12505|12713|12728|12729\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"d77e31380a324f73baeaaeef008ff20b\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"c0cbb041f69b4c75aebfaeef0090663e\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"49bdcc45772349cf8a89ace8013c6e19\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"2dff3e580f67444fb98eace801393fe7\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"16b8726424b743cfa0d7ace8013c6b63\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"Fake Entry,blo\\\"\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"files\": {\n        \"master\": \"OGY5MWVmMzZjZmJjNDgyNWE3NmJhZjcwMDBlOTFjYjk=\",\n        \"addOrUpdate\": [\n            {\n                \"versions\": {\n                    \"addOrUpdate\": [\n                        {\n                            \"id\": \"OGY5MWVmMzZjZmJjNDgyNWE3NmJhZjcwMDBlOTFjYjk=\",\n                            \"filename\": \"BOEWMDB5_o5004v239_F4gd3089.png\",\n                            \"tag\": \"<xml>Uploaded by Script</xml>\",\n                            \"versionLabel\": \"Uploaded by Script\",\n                            \"comment\": \"Uploaded by Script\"\n                        }\n                    ]\n                }\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/records?filter=FieldName('KBObjectID')=\"361\" and FieldName(\"Title\") = \"F4gd0131\" and FieldName(\"Kittelberger ID\") = \"1079\"",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"records"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "FieldName('KBObjectID')=\"361\" and FieldName(\"Title\") = \"F4gd0131\" and FieldName(\"Kittelberger ID\") = \"1079\""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 3: Aprimo - Order with ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJEU04iOiJzdGFya2dyb3VwLXNiMS0wMDEiLCJVSUQiOiIxMyIsIkNJRCI6IjEiLCJEQiI6IjIiLCJEb21haW5JZCI6IjEiLCJMSUQiOiIxIiwiVElEIjoiNDMiLCJHTSI6IjksMTcxNiIsIlVzZXJSaWdodHMiOiIxLDEwMiw2OTUiLCJVVCI6IjEiLCJkYW0tdWlkIjoiZjE0YWVjYzEtMmQyMi00ZjI5LWFjZDYtYWRkNDAwMjExYjk3IiwiZGFtLWxvZ2luIjoidGVzdEFkbWluIiwiZGFtLXRlbmFudCI6InN0YXJrZ3JvdXAtc2IxIiwidmVyIjoiMS4yLjEiLCJjbGllbnRfaWQiOiJaOERDRUlGSi1aOERDIiwibmJmIjoxNjYzMjQxNjQxLCJleHAiOjE2NjMyNDE5NDEsImlhdCI6MTY2MzI0MTY0MSwiaXNzIjoic2VsZiIsImF1ZCI6Imh0dHBzOi8vc3Rhcmtncm91cC1zYjEuYXByaW1vLmNvbS8ifQ.HT4UuuAvKJp3NI607rVdy4P1Ro5RNEoJQr7l-M_ilMs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/17a66d1f-0dad-4306-9336-af110072dabe",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"record",
+						"17a66d1f-0dad-4306-9336-af110072dabe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 4: List of all fields",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/cb6618620a7a4492b1d9af72004f91ac/fields",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"record",
+						"cb6618620a7a4492b1d9af72004f91ac",
+						"fields"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 4: Search fields With Name",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinitions?filter=name=IntendedUsage",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"fielddefinitions"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "name=IntendedUsage"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5: Create Classification",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"parentNamePath\": \"/DAM/Country\",\n\t\"name\": \"Switzerland\",\n\t\"identifier\": \"CH\",\n\t\"labels\": [\n\t\t{\n\t\t\t\"languageId\": \"c2bd4f9bbb954bcb80c31e924c9c26dc\",\n\t\t\t\"value\": \"Switzerland\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/classifications",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"classifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5: Create Records",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"tag\": \"<xml>test tag</xml>\",\n    \"classifications\": {\n        \"addOrUpdate\": [\n            {\n                \"id\": \"2e5c75e58391422e8afbaf7000a9c668\",\n                \"sortIndex\": 0\n            },\n            {\n                \"id\": \"8c46cfc54c654fc2b07caf5e00e06a2c\",\n                \"sortIndex\": 1\n            },\n            {\n                \"id\": \"8b7f5bb4db0a4f18bd95af6c006f686d\",\n                \"sortIndex\": 2\n            },\n            {\n                \"id\": \"2dff3e580f67444fb98eace801393fe7\",\n                \"sortIndex\": 3\n            }\n        ]\n    },\n    \"fields\": {\n        \"addOrUpdate\": [\n            {\n                \"id\": \"ce31e94391a34eb8a8d0ace8013c7939\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"360\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"a991046ddec44c2fbd23ace8013c7fbf\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"F4gd0131\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"9d05d4e5180447f2b560af3100e21c40\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"2e5c75e58391422e8afbaf7000a9c668\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"b90be741a2454b3c8587af5f006360f2\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"8c46cfc54c654fc2b07caf5e00e06a2c\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"1b2f110b0b834d27a468af3100d31752\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"1182420\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"3f2e459d9a94401eb983af3100d3724e\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"185\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"2d68f14c81b54cf79755af3100d675c3\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"LORES_PNG_RGB_WATERMARK\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"c66d2f10ee4e4244bee7af3200844348\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"Image Database||Bosch Professional||Product & Application Images||Diamond Technology||Diamond Saws||GDC 42 W Professional\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"fd3cfeeb3ed14b339b72af320084b2f5\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"2|12433|12505|12713|12728|12729\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"d77e31380a324f73baeaaeef008ff20b\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"c0cbb041f69b4c75aebfaeef0090663e\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"49bdcc45772349cf8a89ace8013c6e19\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"2dff3e580f67444fb98eace801393fe7\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"16b8726424b743cfa0d7ace8013c6b63\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"Fake Entry,blo\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"files\": {\n        \"master\": \"OGY5MWVmMzZjZmJjNDgyNWE3NmJhZjcwMDBlOTFjYjk=\",\n        \"addOrUpdate\": [\n            {\n                \"versions\": {\n                    \"addOrUpdate\": [\n                        {\n                            \"id\": \"OGY5MWVmMzZjZmJjNDgyNWE3NmJhZjcwMDBlOTFjYjk=\",\n                            \"filename\": \"BOEWMDB5_o5004v239_F4gd3089.png\",\n                            \"tag\": \"<xml>Uploaded by Script</xml>\",\n                            \"versionLabel\": \"Uploaded by Script\",\n                            \"comment\": \"Uploaded by Script\"\n                        }\n                    ]\n                }\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/records",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"records"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5: Update Records",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"tag\": \"<xml>test tag</xml>\",\n    \"fields\": {\n        \"addOrUpdate\": [\n            {\n                \"id\": \"ce31e94391a34eb8a8d0ace8013c7939\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"361\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"a991046ddec44c2fbd23ace8013c7fbf\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"F4gd0131\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"9d05d4e5180447f2b560af3100e21c40\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"e2315e14310549628481af3100dd4212\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"b90be741a2454b3c8587af5f006360f2\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"8c46cfc54c654fc2b07caf5e00e06a2c\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"1b2f110b0b834d27a468af3100d31752\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"418718\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"3f2e459d9a94401eb983af3100d3724e\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"102\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"2d68f14c81b54cf79755af3100d675c3\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"PRODUCT_STAGE\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"c66d2f10ee4e4244bee7af3200844348\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"Image Database||Bosch Professional||Product & Application Images||Diamond Technology||Diamond Saws||GDC 42 W Professional\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"fd3cfeeb3ed14b339b72af320084b2f5\",\n                \"localizedValues\": [\n                    {\n                        \"value\": \"2|12433|12505|12713|12728|12729\",\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"16b8726424b743cfa0d7ace8013c6b63\",\n                \"localizedValues\": [\n                    {\n                        \"values\": [\n                            \"Fake Entry,blo\\\"\"\n                        ],\n                        \"languageId\": \"00000000000000000000000000000000\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/5cb2efad0acd44649fc8af6c00ea09d6",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"record",
+						"5cb2efad0acd44649fc8af6c00ea09d6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5: Get Records",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"recordLinkConditions\": null,\n    \"dataType\": \"RecordLink\",\n    \"fieldName\": \"Belongs_to\",\n    \"label\": \"Belongs_to\",\n    \"id\": \"bf64fca19fe54ce4b282af6b0108e6a9\",\n    \"localizedValues\": [\n        {\n            \"links\": null,\n            \"parents\": null,\n            \"children\": [\n                {\n                    \"recordId\": \"eb0225b4fe734409a528af6b010b0fe9\"\n                },\n                {\n                    \"recordId\": \"45e8037ca5bb40b2b44aaf6b010b181e\"\n                },\n                {\n                    \"recordId\": \"ee4e9eb93efa4e1499ccaf6b010b211c\"\n                }\n            ],\n            \"languageId\": \"00000000000000000000000000000000\",\n            \"readOnly\": null,\n            \"modifiedOn\": \"2022-12-12T13:55:46.37Z\"\n        }\n    ],\n    \"inheritanceState\": null,\n    \"inheritable\": null\n}"
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/00bfbad524cc4b53b534af14008f3ec4",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"record",
+						"00bfbad524cc4b53b534af14008f3ec4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 7: Search Classifiction",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.dam.aprimo.com/api/core/classifications?filter=name='Images Bosch'",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"classifications"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "name='Images Bosch'"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 8: Search User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X-Access-Token",
+						"value": "{{aprimoauthtoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"equals\": {\n        \"fieldName\": \"Group.Name\",\n        \"fieldValue\": \"*Asset Owners\"\n    }\n}"
+				},
+				"url": {
+					"raw": "https://boschpowertools-sb1.aprimo.com/api/users/search",
+					"protocol": "https",
+					"host": [
+						"boschpowertools-sb1",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"users",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 9: Get Classification",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{aprimoauthtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "api-version",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "dGVzdGFkbWluOmI3NWJjNTZhMzlmMzRjZTA5YjgyY2Q2MzU2M2QzNWFj",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "masterfilelatestversion",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-key",
+						"value": "fields",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "preview",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "select-record",
+						"value": "master",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://bp.dam.aprimo.com/api/core/classification/7179cbf82f8b4ac887d7af7000959b16",
+					"protocol": "https",
+					"host": [
+						"bp",
+						"dam",
+						"aprimo",
+						"com"
+					],
+					"path": [
+						"api",
+						"core",
+						"classification",
+						"7179cbf82f8b4ac887d7af7000959b16"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
