@@ -26,7 +26,7 @@ const app = express();
 const classificationlist = require("./bosch-classificationlist");
 
 //Server Path
-let imgFolderPath = "./ftp-temp/binnery/";
+let imgFolderPath = "./ftp-temp/binary/";
 
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
@@ -427,7 +427,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
   for (var key in data) {
     let ClassID = [];
     let tmpKey = data[key];
-    let optionVal = "false";
+    let optionVal = "False";
     let ObjectID = '';
 
     //tmpKey = tmpKey.replace(/||/g, "/");
@@ -610,7 +610,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         break;
       case 'CSORELEASE_MASTER':
         if (data[key] === 'x') {
-          optionVal = "true"
+          optionVal = "True"
         }
         ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
@@ -657,7 +657,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         break;
       case 'HD_OBJECT':
         if (data[key] === 'x') {
-          optionVal = "true"
+          optionVal = "True"
         }
 
         ObjectID = findObject(tempAssetObj, 'fieldName', 'HD Object');
@@ -868,7 +868,18 @@ createMeta = async (assetID, data, ImgToken, token) => {
       case 'CLIPLISTER_LINKS':
         // code block
         break;
-
+      case 'COLOR_SPACE':
+        // code block
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'ColorSpace');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });        
+        break;
+  
       default:
         // code block
     }
