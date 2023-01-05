@@ -11,6 +11,8 @@ var path = require("path");
 const mime = require("mime-types");
 var FormData = require("form-data");
 const winston = require("winston");
+require('winston-daily-rotate-file');
+
 let Client = require("ssh2-sftp-client");
 let sftp = new Client();
 const splitFile = require("split-file");
@@ -24,6 +26,9 @@ const {
 const axios = require("axios").default;
 const app = express();
 const classificationlist = require("./bosch-classificationlist");
+const uploadedFileTokens = require("./uploaded-file-tokens");
+const uploadedProtocolsLog = require("./upload-protocols");
+
 
 //Server Path
 let imgFolderPath = "./ftp-temp/binary/";
@@ -47,22 +52,33 @@ app.use(
 /**
  * Log File
  */
+var appError = new winston.transports.DailyRotateFile({
+  level: 'error',
+  filename: './logs/bosch-app-error-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  zippedArchive: false,
+  maxSize: '20m',
+  maxFiles: '1d'
+});
+var appClassification = new winston.transports.DailyRotateFile({
+  level: 'warn',
+  filename: './logs/bosch-classification-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  zippedArchive: false,
+  maxSize: '20m',
+  maxFiles: '1d'
+});
+var appCombined = new winston.transports.DailyRotateFile({
+  filename: './logs/bosch-app-combined-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  zippedArchive: false,
+  maxSize: '20m',
+  maxFiles: '1d'
+});
+
 const logger = winston.createLogger({
   level: 'info',
-  format: winston.format.simple(),
-  transports: [
-    new winston.transports.File({
-      filename: 'bosch-app-error.log',
-      level: 'error'
-    }),
-    new winston.transports.File({
-      filename: 'bosch-classification.log',
-      level: 'warn'
-    }),
-    new winston.transports.File({
-      filename: 'bosch-app-combined.log'
-    })
-  ]
+  transports: [appError, appClassification, appCombined]
 });
 
 getToken = async () => {
@@ -88,27 +104,26 @@ getToken = async () => {
 downloadFtpData = async (token) => {
   //await readJSON(token);
   //return false;
-
+  
   var jsonData;
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
-  try {
-    await sftp.connect(ftpConfig);
-    sftp.on("download", async (info) => {
-      console.log(`Listener: Download ${info.source}`);
-    });
-    jsonData = await sftp.downloadDir(src, dst);
-    console.log(jsonData);
-    console.log("Download Done");
-
-    var aprToken = await getToken();
-    await readJSON(aprToken.accessToken);
-  } finally {
-    sftp.end();
-  }
-
+  jsonData = await sftp.connect(ftpConfig)
+    .then(async () => {
+      const files = await sftp.list(src + '/.');
+      for (var i = 0, len = files.length; i < len; i++) {
+        if(files[i].name.match(/.+(\.csv)$/)){
+          console.log("FTP:", files[i]);
+          await sftp.fastGet(src + '/' + files[i].name, dst + '/' + files[i].name);
+        }
+      }
+      var aprToken = await getToken();
+      await readJSON(aprToken.accessToken);  
+      sftp.end();
+    }).catch(e => {
+      console.error(e.message);
+    });    
   return jsonData;
-
   //await readJSON(token);
 };
 
@@ -328,6 +343,11 @@ writeClassificationlist = async () => {
   });
 };
 
+writeFileTokens = async () => {
+  fs.writeFile("uploaded-file-tokens.json", JSON.stringify(uploadedFileTokens), err => {
+    if (err) throw err;
+  });
+};
 
 getFilesizeInMegabytes = async (filename) => {
   var stats = fs.statSync(filename);
@@ -919,8 +939,24 @@ createMeta = async (assetID, data, ImgToken, token) => {
       })
       .then(async (resp) => {
         if (resp.data.id !== undefined) {
-          logger.error(new Date() + ': INFO : Record ID: ', resp.data.id);
-          console.log(new Date() + ': INFO : Record ID: ', resp.data.id);
+          logger.info(new Date() + ': INFO : Record ID: ' + resp.data.id);
+          console.log(new Date() + ': INFO : Record ID: ' + resp.data.id);
+
+          
+          
+          uploadedFileTokens.push({
+            'filename': data['BINARY_FILENAME'],
+            'title': data['NAME'],
+            'filepath': data['BINARY_FILENAME'],
+            'recordID': resp.data.id,
+            'KBObjectID': data['OBJ_ID'],
+            'OTYPEID': data['OTYPE_ID'],
+            'LTYPEID': data['LTYPE_ID'],
+            'Kittelberger ID': data['LV_ID'],
+            'token': ImgToken
+          });
+          await writeFileTokens();
+
           return resp.data.id;
         } else {
           logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
@@ -950,7 +986,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         },
       })
       .then(async (resp) => {
-        logger.error(new Date() + ': INFO : Record Updated: ' + assetID);
+        logger.info(new Date() + ': INFO : Record Updated: ' + assetID);
         console.log(new Date() + ': INFO : Record Updated: ' + assetID);
         //console.log(': Update Record ID: ');
         return assetID;
@@ -1103,9 +1139,21 @@ searchClassificationName = async (ClassID, token, data) => {
 
 async function uploadAsset(token, filename) {
   let BINARY_FILENAME = filename
+  let remotePath = APR_CREDENTIALS.sourcePath + '/binary/' + filename;
   filename = imgFolderPath + filename;
 
-  try {
+
+  await sftp.connect(ftpConfig)
+    .then(async () => {
+      await sftp.fastGet(remotePath, filename);
+    }).then(async () => {
+      sftp.end();
+    }).catch(e => {
+      logger.error(new Date() + ': ERROR : File Not Found in the FTP -- ');
+      console.log(new Date() + ': ERROR : File Not Found in the FTP -- ');
+    });
+
+
     if (fs.existsSync(filename)) {
       let varFileSize = await getFilesizeInMegabytes(filename);
       let varFileSizeByte = varFileSize * (1024 * 1024);
@@ -1130,9 +1178,9 @@ async function uploadAsset(token, filename) {
                 token
               );
             }
-            logger.info(new Date() + ": INFO : commitSegment: ");
+            
             const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
-
+            logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
             return ImgToken;
           })
           .catch((err) => {
@@ -1182,10 +1230,7 @@ async function uploadAsset(token, filename) {
 
 
     }
-  } catch (err) {
-    logger.error(new Date() + ': ERROR : Core Error -- ' + JSON.stringify(err));
-    console.log(new Date() + ': ERROR : Core Error -- ' + JSON.stringify(err));
-  }
+
 
 
 
