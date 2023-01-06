@@ -26,9 +26,7 @@ const {
 const axios = require("axios").default;
 const app = express();
 const classificationlist = require("./bosch-classificationlist");
-const uploadedFileTokens = require("./uploaded-file-tokens");
-const uploadedProtocolsLog = require("./upload-protocols");
-
+//const uploadedFileTokens = require("./uploaded-file-tokens");
 
 //Server Path
 let imgFolderPath = "./ftp-temp/binary/";
@@ -54,31 +52,60 @@ app.use(
  */
 var appError = new winston.transports.DailyRotateFile({
   level: 'error',
+  name: 'error',
   filename: './logs/bosch-app-error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD-HH',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m',
   maxFiles: '1d'
 });
 var appClassification = new winston.transports.DailyRotateFile({
-  level: 'warn',
-  filename: './logs/bosch-classification-%DATE%.log',
-  datePattern: 'YYYY-MM-DD-HH',
+  level: 'info',
+  filename: './logs/bosch-app-classification-error-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m',
   maxFiles: '1d'
 });
 var appCombined = new winston.transports.DailyRotateFile({
+  name: 'info',
   filename: './logs/bosch-app-combined-%DATE%.log',
-  datePattern: 'YYYY-MM-DD-HH',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxSize: '20m',
+  maxFiles: '1d'
+});
+var protocolsLogs = new winston.transports.DailyRotateFile({
+  filename: './logs/bosch-app-protocols-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxSize: '20m',
+  maxFiles: '1d'
+});
+var tokensLogs = new winston.transports.DailyRotateFile({
+  filename: './logs/bosch-app-uploaded-file-tokens-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m',
   maxFiles: '1d'
 });
 
+
 const logger = winston.createLogger({
   level: 'info',
-  transports: [appError, appClassification, appCombined]
+  transports: [appError, appCombined]
+});
+const plogger = winston.createLogger({
+  level: 'info',
+  transports: [protocolsLogs]
+});
+const clogger = winston.createLogger({
+  level: 'info',
+  transports: [appClassification]
+});
+const tlogger = winston.createLogger({
+  level: 'info',
+  transports: [tokensLogs]
 });
 
 getToken = async () => {
@@ -118,20 +145,28 @@ downloadFtpData = async (token) => {
         }
       }
       var aprToken = await getToken();
-      await readJSON(aprToken.accessToken);  
-      sftp.end();
+      if(aprToken?.accessToken !== undefined){
+        await readJSON(aprToken.accessToken);  
+      }
     }).catch(e => {
       console.error(e.message);
-    });    
+    });
+    sftp.end();
   return jsonData;
   //await readJSON(token);
 };
 
 async function readJSON(token) {
+
+  plogger.info('####### Import Started at ' + new Date() + ' #########');
+
   const csvInDir = fs
     .readdirSync(APR_CREDENTIALS.targetPath)
     .filter((file) => path.extname(file) === ".csv");
   let jsonArray = [];
+  plogger.info('Total files to Import ' + csvInDir.length);
+
+
   for (var i = 0, len = csvInDir.length; i < len; i++) {
     var file = csvInDir[i];
     //console.log(file);
@@ -140,8 +175,8 @@ async function readJSON(token) {
       const filePath = APR_CREDENTIALS.targetPath + "/" + file;
       const jsonFileArray = await csv().fromFile(filePath);
       jsonArray = jsonFileArray;
-    }
-  }
+
+      plogger.info('Total rows ' + jsonArray.length + ' in csv ' + filePath);
 
   const masterIDS = [...new Set(jsonArray.map((item) => item.OBJ_ID))];
   //console.log(masterIDS);
@@ -167,36 +202,68 @@ async function readJSON(token) {
     }
   }
 
-
+  
+  let masterCount = 0;
+  let masterErr = 0;
+  let childCount = 0;
   for (let j = 0; j < recordObj.arr.length; j++) {
     const tt = recordObj.arr[j];
     for (let p = 0; p < tt.length; p++) {
       //console.log("Nested", tt[p].MASTER_RECORD);
       if (tt[p]?.MASTER_RECORD !== undefined && tt[p].MASTER_RECORD === "x") {
+        masterCount++;
         var aprToken = await getToken();
+        if(aprToken?.accessToken !== undefined){
+
+        
+
         let masterRecordID = await searchAsset(aprToken.accessToken, tt[p].BINARY_FILENAME, tt[p]);
         //let masterRecordID = tt[p].LV_ID;
         let childRecordID = [];
         for (let c = 0; c < tt.length; c++) {
           if (tt[c].MASTER_RECORD !== "x" && tt[p].OBJ_ID === tt[c].OBJ_ID) {
+            childCount++;
             var aprToken = await getToken();
-            childRecordID.push(await searchAsset(aprToken.accessToken, tt[c].BINARY_FILENAME, tt[c]));
+            if(aprToken?.accessToken !== undefined){
+              childRecordID.push(await searchAsset(aprToken.accessToken, tt[c].BINARY_FILENAME, tt[c]));
+            }
             //childRecordID.push(tt[c].LV_ID);
           }
         }
 
-        var aprToken = await getToken();
+
         if (masterRecordID !== 0) {
-          let recordLinksResult = await recordLinks(masterRecordID, childRecordID, aprToken.accessToken);
-          logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-          console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+          var aprToken = await getToken();
+          if(aprToken?.accessToken !== undefined){
+            let recordLinksResult = await recordLinks(masterRecordID, childRecordID, aprToken.accessToken);
+            logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+            console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+          }
         } else {
+          masterErr++;
           logger.error(new Date() + ': ERROR : Master Record Missing: ');
           console.log(new Date() + ': ERROR : Master Record Missing: ');
         }
+
+
+        }
+
       }
     }
   }
+  plogger.info('Total Master Records ' + masterCount );
+  plogger.info('Total Child Records ' + childCount );
+  plogger.info('Total Master Records Successfully Processed ' + (masterCount - masterErr));
+  plogger.info('Total Master Records Not Processed ' + masterErr);
+
+
+
+    }
+  }
+
+
+  plogger.info('####### Import Ended at ' + new Date() + ' #########');
+
 
   logger.info(new Date() + ': INFO : ideal waiting for next cron:');
   console.log(new Date() + ': INFO : ideal waiting for next cron:');
@@ -262,6 +329,9 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
   filterFileName = filterFileName.replace(/\+/g, "%2b");
 
+  logger.info(new Date() + ': INFO : ###################################');
+  logger.info(new Date() + ': INFO : Start Processing Row');
+
   logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + '"' + recordsCollection.OBJ_ID + '"' + ' and FieldName("Title") = "' + recordsCollection.NAME + '"' + ' and FieldName("Kittelberger ID") = "' + recordsCollection.LV_ID + '"');
   console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + '"' + recordsCollection.OBJ_ID + '"' + ' and FieldName("Title") = "' + recordsCollection.NAME + '"' + ' and FieldName("Kittelberger ID") = "' + recordsCollection.LV_ID + '"');
 
@@ -276,19 +346,18 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
     })
     .then(async (resp) => {
       const itemsObj = resp.data;
-      logger.info(new Date() + ': INFO : Records Found: -- ' + itemsObj.totalCount);
-      console.log(new Date() + ': INFO : Records Found: -- ', itemsObj.totalCount);
-
+      //logger.info(new Date() + ': INFO : Records Found: -- ' + itemsObj.totalCount);
+      //console.log(new Date() + ': INFO : Records Found: -- ', itemsObj.totalCount);
 
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME);
-        console.log(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME);
+        logger.info(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
+        console.log(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
 
         getFieldsResult = await getFields("null", token, recordsCollection);
       } else if (itemsObj.totalCount === 1) {
-        logger.info(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME);
-        console.log(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME);
+        logger.info(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
+        console.log(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, token, recordsCollection);
       }
       return getFieldsResult;
@@ -298,6 +367,11 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
       console.log(new Date() + ': ERROR : Search Asset API -- ' + JSON.stringify(err));
       return 0;
     });
+
+    logger.info(new Date() + ': INFO : End Processing Row');
+    logger.info(new Date() + ': INFO : ###################################');
+    logger.info(new Date() + ' ');    
+  
   //console.log(searchClass);
   return APIResult;
 };
@@ -318,7 +392,7 @@ searchClassification = async (ClassID, token, data) => {
       console.log("resp.data.id:", resp.data.id);
       if (resp.data.id === null) {
         console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
-        logger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
+        clogger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
         return 'null';
       } else {
         classificationlist[ClassID] = resp.data.id;
@@ -328,8 +402,8 @@ searchClassification = async (ClassID, token, data) => {
     })
     .catch(async (err) => {
       console.log(new Date() + ": WARNING : Classification Missing -- ", JSON.stringify(err));
-      logger.warn(new Date() + ': WARNING : Classification Missing URL -- ' + APR_CREDENTIALS.GetClassification + filterClass);
-      logger.warn(new Date() + ': WARNING : is ' + JSON.stringify(err));
+      clogger.warn(new Date() + ': WARNING : Classification Missing URL -- ' + APR_CREDENTIALS.GetClassification + filterClass);
+      clogger.warn(new Date() + ': WARNING : is ' + JSON.stringify(err));
       return 'null';
     });
   return resultID;
@@ -340,12 +414,6 @@ writeClassificationlist = async () => {
     // Checking for errors
     if (err) throw err;
     //console.log("04 classificationlist Updated"); // Success
-  });
-};
-
-writeFileTokens = async () => {
-  fs.writeFile("uploaded-file-tokens.json", JSON.stringify(uploadedFileTokens), err => {
-    if (err) throw err;
   });
 };
 
@@ -923,8 +991,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
     });
   }
 
-  console.log(new Date() + ": INFO : updateObj:", JSON.stringify(updateObj));
-  logger.info(new Date() + ': INFO : updateObj:' + JSON.stringify(updateObj));
+  console.log(new Date() + ": INFO : Update JSON:", JSON.stringify(updateObj));
+  logger.info(new Date() + ': INFO : Update JSON:' + JSON.stringify(updateObj));
 
 
   if (assetID === "null") {
@@ -942,9 +1010,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
           logger.info(new Date() + ': INFO : Record ID: ' + resp.data.id);
           console.log(new Date() + ': INFO : Record ID: ' + resp.data.id);
 
-          
-          
-          uploadedFileTokens.push({
+          tlogger.info({
             'filename': data['BINARY_FILENAME'],
             'title': data['NAME'],
             'filepath': data['BINARY_FILENAME'],
@@ -955,7 +1021,6 @@ createMeta = async (assetID, data, ImgToken, token) => {
             'Kittelberger ID': data['LV_ID'],
             'token': ImgToken
           });
-          await writeFileTokens();
 
           return resp.data.id;
         } else {
@@ -1023,9 +1088,9 @@ searchUser = async (firstName, lastName, token) => {
  };
 
 
-  logger.error(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
+  logger.error(new Date() + ': INFO : Search USER ID: ' + JSON.stringify(body));
   console.log(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
-  logger.error(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
+  logger.error(new Date() + ': INFO : Search USER URL: ' + APR_CREDENTIALS.SearchUser);
   console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
   let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.SearchUser, JSON.stringify(body), {
@@ -1146,20 +1211,18 @@ async function uploadAsset(token, filename) {
   await sftp.connect(ftpConfig)
     .then(async () => {
       await sftp.fastGet(remotePath, filename);
-    }).then(async () => {
-      sftp.end();
     }).catch(e => {
-      logger.error(new Date() + ': ERROR : File Not Found in the FTP -- ');
-      console.log(new Date() + ': ERROR : File Not Found in the FTP -- ');
+      logger.error(new Date() + ': ERROR : in the FTP Connection -- ' + e);
+      console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
     });
-
+    
 
     if (fs.existsSync(filename)) {
       let varFileSize = await getFilesizeInMegabytes(filename);
       let varFileSizeByte = varFileSize * (1024 * 1024);
       let getMimeType = mime.lookup(filename);
       //console.log("varFileSize:", varFileSize);
-      logger.info(new Date() + ": getMimeType: " + getMimeType);
+      //logger.info(new Date() + ": getMimeType: " + getMimeType);
       //logger.info(new Date() + ': FileSize: ' + varFileSize);
       let APIResult = null;
       if (varFileSize > 1) {
@@ -1171,16 +1234,18 @@ async function uploadAsset(token, filename) {
             for (let start = 0; start < names.length; start++) {
               console.log("splitFileBySize: ", start, names[start]);
               const aprToken = await getToken();
-              token = aprToken.accessToken;
-              await uploadSegment(
-                SegmentURI + "?index=" + start,
-                names[start],
-                token
-              );
+              if(aprToken?.accessToken !== undefined){
+                token = aprToken.accessToken;
+                await uploadSegment(
+                  SegmentURI + "?index=" + start,
+                  names[start],
+                  token
+                );
+              }
             }
             
             const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
-            logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
+            //logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
             return ImgToken;
           })
           .catch((err) => {
@@ -1191,8 +1256,8 @@ async function uploadAsset(token, filename) {
           });
         return APIResult;
       } else {
-        console.log("fileSize is < 20 MB:");
-        logger.info(new Date() + ": fileSize is < 20 MB: ");
+        //console.log("fileSize is < 20 MB:");
+        //logger.info(new Date() + ": fileSize is < 20 MB: ");
         let form = new FormData();
         form.append("file", fs.createReadStream(filename), {
           contentType: getMimeType,
@@ -1229,10 +1294,11 @@ async function uploadAsset(token, filename) {
 
 
 
+    }else{
+      logger.error(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
+      console.log(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
     }
-
-
-
+    sftp.end();
 
 }
 
@@ -1247,10 +1313,9 @@ getSegmentURL = async (filename, token) => {
     "APR_CREDENTIALS.Upload_Segments_URL",
     APR_CREDENTIALS.Upload_Segments_URL
   );
-  logger.info(
-    new Date() + ": Upload_Segments_URL: " + APR_CREDENTIALS.Upload_Segments_URL
-  );
-  logger.info(new Date() + ": Body: " + JSON.stringify(body));
+  //logger.info(new Date() + ": Upload_Segments_URL: " + APR_CREDENTIALS.Upload_Segments_URL);
+  //logger.info(new Date() + ": Body: " + JSON.stringify(body));
+
   const resultSegmentURI = await axios
     .post(APR_CREDENTIALS.Upload_Segments_URL, JSON.stringify(body), {
       headers: {
@@ -1330,7 +1395,7 @@ uploadSegment = async (SegmentURI, chunkFileName, token) => {
  * commitSegment
  */
 commitSegment = async (SegmentURI, filename, segmentcount, token) => {
-  logger.info(new Date() + ": commitSegment: ");
+  //logger.info(new Date() + ": commitSegment: ");
   let APIResult = false;
   let body = {
     filename: path.basename(filename),
@@ -1363,7 +1428,9 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
 
 main = async () => {
   var aprToken = await getToken();
-  var getFile = await downloadFtpData(aprToken.accessToken);
+  if(aprToken?.accessToken !== undefined){
+    var getFile = await downloadFtpData(aprToken.accessToken);
+  }
 };
 
 
