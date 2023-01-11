@@ -28,14 +28,16 @@ const app = express();
 const classificationlist = require("./bosch-classificationlist");
 //const uploadedFileTokens = require("./uploaded-file-tokens");
 
-//Server Path
-let imgFolderPath = "./ftp-temp/binary/";
 
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
 
 let readJSONCron = true;
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
+
+//FTP Server Binary Path
+let imgFolderPath = APR_CREDENTIALS.imgFolderPath;
+
 const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 app.use(express.json({
   limit: "150mb"
