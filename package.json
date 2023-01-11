@@ -1,8 +1,8 @@
 {
-  "name": "tuktuk",
+  "name": "aprimo-bosch-import",
   "version": "1.0.0",
   "description": "",
-  "main": "aprimo-tuk-tuk.js",
+  "main": "aprimo-bosch-import.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
