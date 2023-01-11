@@ -4,6 +4,7 @@ require("dotenv").config({
 const express = require("express");
 var bodyParser = require("body-parser");
 var fs = require("fs");
+
 request = require("request");
 const cron = require("node-cron");
 const fetch = require("node-fetch");
@@ -48,6 +49,20 @@ app.use(
     extended: true,
   })
 );
+
+
+let ftpDirectory = APR_CREDENTIALS.targetPath;
+fs.readdir(ftpDirectory, (err, files) => {
+  if (err) throw err;
+
+  for (const file of files) {    
+      if(file.match(/.+(\.csv)$/)){
+        fs.unlink(path.join(ftpDirectory, file), (err) => {
+          if (err) throw err;
+        });    
+      }
+  }
+});
 
 /**
  * Log File
@@ -1442,7 +1457,7 @@ var task = cron.schedule("*/30 * * * *", async () => {
   //  try {
   //if (readJSONCron) {
   console.log("running a task every 30 Min");
-  //await main();
+  await main();
   //} else {
   //      console.log("Skip: already running ");
   //}
