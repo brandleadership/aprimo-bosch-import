@@ -19,6 +19,7 @@ npm install pm2 -g
 npm install
 pm2 start aprimo-bosch-import.js
 ```
+Use: node_modules.zip to skip the installation. (Recommendation: Always install Node packages to avoid unseen error.)
 
 ## Usage
 App is default set to 30 Min Cron and run immediately when you start/restart.
