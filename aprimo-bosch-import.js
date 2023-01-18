@@ -1,3 +1,16 @@
+/**
+ * 
+ * Connect FTP
+ * Download CSV file
+ * Read CSV for Master/Child Records
+ * Download binary file
+ * Search for Record in a combination of KBObjectID and Title and Kittelberger ID
+ * Search for Classification IDs
+ * Create/Update Record
+ * 
+ */
+
+
 require("dotenv").config({
   debug: false
 });
@@ -15,7 +28,6 @@ const winston = require("winston");
 require('winston-daily-rotate-file');
 
 let Client = require("ssh2-sftp-client");
-let sftp = new Client();
 const splitFile = require("split-file");
 const csv = require("csvtojson");
 const {
@@ -27,18 +39,16 @@ const {
 const axios = require("axios").default;
 const app = express();
 const classificationlist = require("./bosch-classificationlist");
-//const uploadedFileTokens = require("./uploaded-file-tokens");
-
 
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
-
 let readJSONCron = true;
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 
 //FTP Server Binary Path
 let imgFolderPath = APR_CREDENTIALS.imgFolderPath;
 
+//FTP Config
 const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 app.use(express.json({
   limit: "150mb"
@@ -125,33 +135,37 @@ const tlogger = winston.createLogger({
   transports: [tokensLogs]
 });
 
+/**
+ * Generating Token
+ */
 getToken = async () => {
-  const resultAssets = await fetch(APR_CREDENTIALS.API_URL, {
-      method: "post",
+  const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
+      proxy: APR_CREDENTIALS.proxyServerInfo,
       headers: {
-        "Content-Type": "application/json",
-        "client-id": APR_CREDENTIALS.client_id,
-        Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
+      "Content-Type": "application/json",
+      "client-id": APR_CREDENTIALS.client_id,
+      Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
       },
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      return data;
-    })
-    .catch((error) => {
-      logger.error(new Date() + ': getToken error -- ' + error);
-      console.log('ERROR' + new Date() + ': getToken error -- ', error);
-    });
+    }
+  )
+  .then((resp) => {
+    return resp.data;
+  })
+  .catch((err) => {    
+    logger.error(new Date() + ': getToken error -- ' + err);
+    console.log('ERROR' + new Date() + ': getToken error -- ', err);
+  });
   return resultAssets;
 };
 
+/**
+ * Download CSV files from the FTP
+ */
 downloadFtpData = async (token) => {
-  //await readJSON(token);
-  //return false;
-  
   var jsonData;
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
+  let sftp = new Client();
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
@@ -170,13 +184,16 @@ downloadFtpData = async (token) => {
     });
     sftp.end();
   return jsonData;
-  //await readJSON(token);
 };
 
+/**
+ * Read the CSV file.
+ * @param {*} token 
+ */
 async function readJSON(token) {
 
   plogger.info('####### Import Started at ' + new Date() + ' #########');
-
+  console.log('####### Import Started at ' + new Date() + ' #########');
   const csvInDir = fs
     .readdirSync(APR_CREDENTIALS.targetPath)
     .filter((file) => path.extname(file) === ".csv");
@@ -194,13 +211,14 @@ async function readJSON(token) {
       jsonArray = jsonFileArray;
 
       plogger.info('Total rows ' + jsonArray.length + ' in csv ' + filePath);
-
+      console.log(jsonArray);
   const masterIDS = [...new Set(jsonArray.map((item) => item.OBJ_ID))];
-  //console.log(masterIDS);
+  console.log(masterIDS);
   const recordObj = {};
   recordObj.arr = new Array();
   for (let k = 0; k < masterIDS.length; k++) {
     const mID = masterIDS[k];
+    
     const singleRecordObj = jsonArray.filter((val) => val.OBJ_ID === mID);
 
     let indexOfX = -1;
@@ -285,7 +303,10 @@ async function readJSON(token) {
   logger.info(new Date() + ': INFO : ideal waiting for next cron:');
   console.log(new Date() + ': INFO : ideal waiting for next cron:');
 }
-
+/**
+ * Link Master and Child Records
+ * @param {*} masterRecordID, childRecordID, token
+ */
 recordLinks = async (masterRecordID, childRecordID, token) => {
   let body = {
     "fields": {
@@ -315,10 +336,9 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
     });
   }
 
-  //console.log('recordLinks URL: ', APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID);
-  //console.log('recordLinks', JSON.stringify(body));
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID,
       JSON.stringify(body), {
+        proxy: APR_CREDENTIALS.proxyServerInfo,
         headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
@@ -328,7 +348,6 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
       }
     )
     .then((res) => {
-      //console.log(' Result:', JSON.stringify(res.data));
       return true;
     })
     .catch((err) => {
@@ -338,23 +357,26 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
     });
   return resultAssets;
 };
-
+/**
+ * Search for The Records in a combination of KBObjectID and Title and Kittelberger ID
+ * @param {*} File Name, CSV Row Data, token
+ */
 searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
-  //console.log(token);
-  //console.log("recordsCollection:", recordsCollection);
-
   let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
   filterFileName = filterFileName.replace(/\+/g, "%2b");
 
   logger.info(new Date() + ': INFO : ###################################');
   logger.info(new Date() + ': INFO : Start Processing Row');
 
-  logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + '"' + recordsCollection.OBJ_ID + '"' + ' and FieldName("Title") = "' + recordsCollection.NAME + '"' + ' and FieldName("Kittelberger ID") = "' + recordsCollection.LV_ID + '"');
-  console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + '"' + recordsCollection.OBJ_ID + '"' + ' and FieldName("Title") = "' + recordsCollection.NAME + '"' + ' and FieldName("Kittelberger ID") = "' + recordsCollection.LV_ID + '"');
+  logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'");
+  console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'");
 
   let APIResult = await axios
-    .get(APR_CREDENTIALS.SearchAsset + '"' + recordsCollection.OBJ_ID + '"' + ' and FieldName("Title") = "' + recordsCollection.NAME + '"' + ' and FieldName("Kittelberger ID") = "' + recordsCollection.LV_ID + '"', {
-      headers: {
+    .get(APR_CREDENTIALS.SearchAsset + "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'", 
+    {
+      
+      proxy: APR_CREDENTIALS.proxyServerInfo,
+    headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
         "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -363,9 +385,6 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
     })
     .then(async (resp) => {
       const itemsObj = resp.data;
-      //logger.info(new Date() + ': INFO : Records Found: -- ' + itemsObj.totalCount);
-      //console.log(new Date() + ': INFO : Records Found: -- ', itemsObj.totalCount);
-
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
         logger.info(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
@@ -389,16 +408,20 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
     logger.info(new Date() + ': INFO : ###################################');
     logger.info(new Date() + ' ');    
   
-  //console.log(searchClass);
   return APIResult;
 };
 
+/**
+ * Search for Classification ID
+ * @param {*} Class Name, CSV Row Data, token
+ */
 searchClassification = async (ClassID, token, data) => {
   let filterClass = ClassID.replace(/&/g, "%26");
   filterClass = filterClass.replace(/\+/g, "%2b");
   let resultID = await axios
     .get(APR_CREDENTIALS.GetClassification + filterClass, {
-      headers: {
+      proxy: APR_CREDENTIALS.proxyServerInfo,
+    headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
         "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -426,6 +449,10 @@ searchClassification = async (ClassID, token, data) => {
   return resultID;
 };
 
+/**
+ * 
+ * Write Classification in local DB for reduce API Call
+ */
 writeClassificationlist = async () => {
   fs.writeFile("bosch-classificationlist.json", JSON.stringify(classificationlist), err => {
     // Checking for errors
@@ -434,20 +461,23 @@ writeClassificationlist = async () => {
   });
 };
 
+/**
+ * Check File Size
+ * @param {*} File Name
+ */
 getFilesizeInMegabytes = async (filename) => {
   var stats = fs.statSync(filename);
-  //console.log("stats:", stats);
   var fileSizeInBytes = stats.size;
   var fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
   console.log("fileSizeInMegabytes:", fileSizeInMegabytes);
   return fileSizeInMegabytes;
 };
-// updateRecord = async (token, AssetName, recordsCollection) => {
 
-// };
-/*
-  getFields to get the Fields ID to use for updating.
-*/
+/**
+ * 
+ * Check fields Create/Update. 
+ * @param {*} assetID, token, Row Data
+ */  
 getFields = async (assetID, token, recordsCollection) => {
   let findAssetID;
   let existImgId;
@@ -460,7 +490,7 @@ getFields = async (assetID, token, recordsCollection) => {
     filename = recordsCollection.BINARY_FILENAME;
     existImgId = "null";
 
-    const ImageToken = await uploadAsset(token, filename);
+    const ImageToken = await uploadAsset(token, filename);    
     APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);
   } else {
     APIResult = await createMeta(assetID, recordsCollection, 'null', token);
@@ -468,10 +498,17 @@ getFields = async (assetID, token, recordsCollection) => {
   return APIResult;
 };
 
+/**
+ * 
+ * Find fields IDs for updating records. 
+ * @param {*} token
+ */  
 getFieldIDs = async (token) => {
   let getFieldsResult = await axios
-    .get(APR_CREDENTIALS.GetRecord_URL + APR_CREDENTIALS.tempAssetID + "/fields", {
-      headers: {
+    .get(APR_CREDENTIALS.GetRecord_URL + APR_CREDENTIALS.tempAssetID + '/fields', {
+      
+      proxy: APR_CREDENTIALS.proxyServerInfo,
+    headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
         "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -479,7 +516,6 @@ getFieldIDs = async (token) => {
       },
     })
     .then(async (resp) => {
-      //console.log("getFields Items:", resp.data.items);
       if (resp.data.items.length > 0) {
         return resp.data.items;
       } else {
@@ -493,10 +529,14 @@ getFieldIDs = async (token) => {
       console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
       return null;
     });
-
   return getFieldsResult;
 };
 
+/**
+ * 
+ * createMeta for updating records. 
+ * @param {*} assetID, Row data, ImgToken, token
+ */  
 createMeta = async (assetID, data, ImgToken, token) => {
 
   let APIResult = false;
@@ -1015,7 +1055,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
   if (assetID === "null") {
     let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
-        headers: {
+        
+        proxy: APR_CREDENTIALS.proxyServerInfo,
+      headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
           "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1060,7 +1102,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
     let reqCreatRequest = await axios
       .put(APR_CREDENTIALS.GetRecord_URL + assetID, JSON.stringify(updateObj), {
-        headers: {
+        proxy: APR_CREDENTIALS.proxyServerInfo,
+      headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
           "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1085,7 +1128,11 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
 };
 
-
+/**
+ * 
+ * Search for User Data
+ * @param {*} firstName, lastName, token
+ */ 
 searchUser = async (firstName, lastName, token) => {
   let body = {
     "and":[
@@ -1111,7 +1158,8 @@ searchUser = async (firstName, lastName, token) => {
   console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
   let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.SearchUser, JSON.stringify(body), {
-        headers: {
+        proxy: APR_CREDENTIALS.proxyServerInfo,
+      headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
           "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1140,20 +1188,28 @@ searchUser = async (firstName, lastName, token) => {
     return reqCreatRequest;
 };
 
-
+/**
+ * 
+ * Get Template Field for definition
+ * @param {*} fieldURL, fieldValue, token, keyValue
+ */ 
 getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
   let filterClass = fieldURL.replace(/&/g, "%26");
   filterClass = filterClass.replace(/\+/g, "%2b");
   console.log('filterClass: ', filterClass);
   let resultID = await axios
-    .get(filterClass, {
+    .get(filterClass,
+      
+      {
+        proxy: APR_CREDENTIALS.proxyServerInfo,
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
         "API-VERSION": APR_CREDENTIALS.Api_version,
         Authorization: `Bearer ${token}`,
       },
-    })
+    }
+    )
     .then(async (resp) => {
       //console.log("resp.data:--------", resp.data);
       ObjectID = findObject(resp.data.items, 'name', fieldValue);
@@ -1183,14 +1239,19 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
   return resultID;
 };
 
-
+/**
+ * 
+ * Search for Classificate Name
+ * @param {*} ClassID, token, data
+ */ 
 searchClassificationName = async (ClassID, token, data) => {
   let filterClass = ClassID.replace(/&/g, "%26");
   filterClass = filterClass.replace(/\+/g, "%2b");
   console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
   let resultID = await axios
     .get(APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'", {
-      headers: {
+      proxy: APR_CREDENTIALS.proxyServerInfo,
+    headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
         "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1199,7 +1260,6 @@ searchClassificationName = async (ClassID, token, data) => {
     })
     .then(async (resp) => {
       const itemsObj = resp.data;
-      //console.log("resp.data: ", resp.data);
       if (itemsObj.totalCount === 1) {
         console.log("Field Value: ", itemsObj.items[0].id);
         return itemsObj.items[0].id;
@@ -1218,16 +1278,23 @@ searchClassificationName = async (ClassID, token, data) => {
   return resultID;
 };
 
-
+/**
+ * Upload file into Aprimo
+ * @param {*} token, filename 
+ */
 async function uploadAsset(token, filename) {
   let BINARY_FILENAME = filename
   let remotePath = APR_CREDENTIALS.sourcePath + '/binary/' + filename;
   filename = imgFolderPath + filename;
-
-
+  
+  console.log("File Downloading Started:: ", remotePath, " :: ", filename);
+  let sftp = new Client();
   await sftp.connect(ftpConfig)
     .then(async () => {
+      
       await sftp.fastGet(remotePath, filename);
+
+      console.log("File Downloading Ended:: ", remotePath, " :: ", filename);
     }).catch(e => {
       logger.error(new Date() + ': ERROR : in the FTP Connection -- ' + e);
       console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
@@ -1283,7 +1350,8 @@ async function uploadAsset(token, filename) {
         console.log("varFileSizeByte: ", varFileSizeByte);
         let reqUploadImg = await axios
           .post(APR_CREDENTIALS.Upload_URL, form, {
-            headers: {
+            proxy: APR_CREDENTIALS.proxyServerInfo,
+          headers: {
               Accept: "*/*",
               "Content-Type": "multipart/form-data",
               "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1335,7 +1403,8 @@ getSegmentURL = async (filename, token) => {
 
   const resultSegmentURI = await axios
     .post(APR_CREDENTIALS.Upload_Segments_URL, JSON.stringify(body), {
-      headers: {
+      proxy: APR_CREDENTIALS.proxyServerInfo,
+    headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
         "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1390,7 +1459,8 @@ uploadSegment = async (SegmentURI, chunkFileName, token) => {
   });
   let reqUploadImg = await axios
     .post(SegmentURI, form, {
-      headers: {
+      proxy: APR_CREDENTIALS.proxyServerInfo,
+    headers: {
         Accept: "*/*",
         "Content-Type": "multipart/form-data",
         "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1420,7 +1490,8 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
   };
   console.log("Commit body: ", body);
   let reqUploadImg = await axios
-    .post(SegmentURI + "/commit", body, {
+    .post(SegmentURI + '/commit', body, {
+      proxy: APR_CREDENTIALS.proxyServerInfo,
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
@@ -1443,28 +1514,23 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
   return reqUploadImg;
 };
 
+/**
+ * Entry point
+ */
 main = async () => {
   var aprToken = await getToken();
   if(aprToken?.accessToken !== undefined){
     var getFile = await downloadFtpData(aprToken.accessToken);
   }
 };
-
-
-
 main();
-var task = cron.schedule("*/30 * * * *", async () => {
-  //  try {
-  //if (readJSONCron) {
-  console.log("running a task every 30 Min");
+
+/**
+ * Cron to call Main
+ * @param {*} token, filename 
+ */
+var task = cron.schedule(APR_CREDENTIALS.cronIntv, async () => {
   await main();
-  //} else {
-  //      console.log("Skip: already running ");
-  //}
-  //} catch (err) {
-  ///    console.log("Error cron: ");
-  //readJSONCron = true;
-  //}
 });
 task.start();
 
