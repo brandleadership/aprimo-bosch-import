@@ -207,7 +207,7 @@ async function readJSON(token) {
     if (file) {
       //console.log(APR_CREDENTIALS.targetPath + "/" + file);
       const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-      const jsonFileArray = await csv().fromFile(filePath);
+      const jsonFileArray = await csv({'delimiter':[';',',']}).fromFile(filePath);
       jsonArray = jsonFileArray;
 
       plogger.info('Total rows ' + jsonArray.length + ' in csv ' + filePath);
@@ -368,11 +368,13 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   logger.info(new Date() + ': INFO : ###################################');
   logger.info(new Date() + ': INFO : Start Processing Row');
 
-  logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'");
-  console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'");
+  let queryString = "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'";
+
+  logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
+  console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
 
   let APIResult = await axios
-    .get(APR_CREDENTIALS.SearchAsset + "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'", 
+    .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
     {
       
       proxy: APR_CREDENTIALS.proxyServerInfo,
@@ -416,10 +418,8 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
  * @param {*} Class Name, CSV Row Data, token
  */
 searchClassification = async (ClassID, token, data) => {
-  let filterClass = ClassID.replace(/&/g, "%26");
-  filterClass = filterClass.replace(/\+/g, "%2b");
   let resultID = await axios
-    .get(APR_CREDENTIALS.GetClassification + filterClass, {
+    .get(APR_CREDENTIALS.GetClassification +encodeURI(ClassID), {
       proxy: APR_CREDENTIALS.proxyServerInfo,
     headers: {
         Accept: "*/*",
@@ -1194,11 +1194,11 @@ searchUser = async (firstName, lastName, token) => {
  * @param {*} fieldURL, fieldValue, token, keyValue
  */ 
 getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
-  let filterClass = fieldURL.replace(/&/g, "%26");
-  filterClass = filterClass.replace(/\+/g, "%2b");
-  console.log('filterClass: ', filterClass);
+  //let filterClass = fieldURL.replace(/&/g, "%26");
+  //filterClass = filterClass.replace(/\+/g, "%2b");
+  //console.log('filterClass: ', filterClass);
   let resultID = await axios
-    .get(filterClass,
+    .get(encodeURI(fieldURL),
       
       {
         proxy: APR_CREDENTIALS.proxyServerInfo,
@@ -1245,11 +1245,11 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
  * @param {*} ClassID, token, data
  */ 
 searchClassificationName = async (ClassID, token, data) => {
-  let filterClass = ClassID.replace(/&/g, "%26");
-  filterClass = filterClass.replace(/\+/g, "%2b");
-  console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
+  //let filterClass = ClassID.replace(/&/g, "%26");
+  //filterClass = filterClass.replace(/\+/g, "%2b");
+  //console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
   let resultID = await axios
-    .get(APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'", {
+    .get(APR_CREDENTIALS.GetClassificationByName + "'" + encodeURI(ClassID) + "'", {
       proxy: APR_CREDENTIALS.proxyServerInfo,
     headers: {
         Accept: "*/*",
