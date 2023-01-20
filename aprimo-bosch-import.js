@@ -20,7 +20,7 @@ var fs = require("fs");
 
 request = require("request");
 const cron = require("node-cron");
-const fetch = require("node-fetch");
+//const fetch = require("node-fetch");
 var path = require("path");
 const mime = require("mime-types");
 var FormData = require("form-data");
@@ -30,6 +30,7 @@ require('winston-daily-rotate-file');
 let Client = require("ssh2-sftp-client");
 const splitFile = require("split-file");
 const csv = require("csvtojson");
+
 const {
   constants
 } = require("buffer");
@@ -37,6 +38,7 @@ const {
   create
 } = require("domain");
 const axios = require("axios").default;
+const HttpsProxyAgent = require('https-proxy-agent');
 const app = express();
 const classificationlist = require("./bosch-classificationlist");
 
@@ -44,6 +46,13 @@ const classificationlist = require("./bosch-classificationlist");
 //let imgFolderPath = "ftp-temp\\binnery\\";
 let readJSONCron = true;
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
+
+var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
+if(APR_CREDENTIALS.proxyServerInfo.auth.username!="")
+{
+  fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+APR_CREDENTIALS.proxyServerInfo.auth.username +":"+ APR_CREDENTIALS.proxyServerInfo.auth.password+"@"+APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
+}
+
 
 //FTP Server Binary Path
 let imgFolderPath = APR_CREDENTIALS.imgFolderPath;
@@ -140,7 +149,8 @@ const tlogger = winston.createLogger({
  */
 getToken = async () => {
   const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
-      proxy: APR_CREDENTIALS.proxyServerInfo,
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL),
       headers: {
       "Content-Type": "application/json",
       "client-id": APR_CREDENTIALS.client_id,
@@ -338,7 +348,8 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
 
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID,
       JSON.stringify(body), {
-        proxy: APR_CREDENTIALS.proxyServerInfo,
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),  
         headers: {
           Accept: "*/*",
           "Content-Type": "application/json",
@@ -372,21 +383,23 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
 
   logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
   console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
+  console.log("fullProxyURL:: " + fullProxyURL);
 
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
-    {
-      
-      proxy: APR_CREDENTIALS.proxyServerInfo,
-    headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
+    {      
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
     })
     .then(async (resp) => {
       const itemsObj = resp.data;
+      console.log(resp.data);
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
         logger.info(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
@@ -418,15 +431,20 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
  * @param {*} Class Name, CSV Row Data, token
  */
 searchClassification = async (ClassID, token, data) => {
+  let filterClass = ClassID.replace(/&/g, "%26");
+  filterClass = filterClass.replace(/\+/g, "%2b");
+
   let resultID = await axios
-    .get(APR_CREDENTIALS.GetClassification +encodeURI(ClassID), {
-      proxy: APR_CREDENTIALS.proxyServerInfo,
-    headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
+    .get(APR_CREDENTIALS.GetClassification + filterClass, {
+      //proxy: APR_CREDENTIALS.proxyServerInfo,
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL),
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
     })
     .then(async (resp) => {
       console.log("resp.data.id:", resp.data.id);
@@ -506,15 +524,15 @@ getFields = async (assetID, token, recordsCollection) => {
 getFieldIDs = async (token) => {
   let getFieldsResult = await axios
     .get(APR_CREDENTIALS.GetRecord_URL + APR_CREDENTIALS.tempAssetID + '/fields', {
-      
-      proxy: APR_CREDENTIALS.proxyServerInfo,
-    headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
-    })
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+      })
     .then(async (resp) => {
       if (resp.data.items.length > 0) {
         return resp.data.items;
@@ -1054,15 +1072,15 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
   if (assetID === "null") {
     let reqCreatRequest = await axios
-      .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
-        
-        proxy: APR_CREDENTIALS.proxyServerInfo,
-      headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-        },
+      .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {        
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),
+        headers: {
+            Accept: "*/*",
+            "Content-Type": "application/json",
+            "API-VERSION": APR_CREDENTIALS.Api_version,
+            Authorization: `Bearer ${token}`,
+          },
       })
       .then(async (resp) => {
         if (resp.data.id !== undefined) {
@@ -1102,13 +1120,14 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
     let reqCreatRequest = await axios
       .put(APR_CREDENTIALS.GetRecord_URL + assetID, JSON.stringify(updateObj), {
-        proxy: APR_CREDENTIALS.proxyServerInfo,
-      headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-        },
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),  
+        headers: {
+            Accept: "*/*",
+            "Content-Type": "application/json",
+            "API-VERSION": APR_CREDENTIALS.Api_version,
+            Authorization: `Bearer ${token}`,
+          },
       })
       .then(async (resp) => {
         logger.info(new Date() + ': INFO : Record Updated: ' + assetID);
@@ -1158,14 +1177,15 @@ searchUser = async (firstName, lastName, token) => {
   console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
   let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.SearchUser, JSON.stringify(body), {
-        proxy: APR_CREDENTIALS.proxyServerInfo,
-      headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-          "X-Access-Token": token
-        },
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),
+        headers: {
+            Accept: "*/*",
+            "Content-Type": "application/json",
+            "API-VERSION": APR_CREDENTIALS.Api_version,
+            Authorization: `Bearer ${token}`,
+            "X-Access-Token": token
+          },
       })
       .then(async (resp) => {        
         if (resp.data['_total'] !== 0) {
@@ -1198,10 +1218,10 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
   //filterClass = filterClass.replace(/\+/g, "%2b");
   //console.log('filterClass: ', filterClass);
   let resultID = await axios
-    .get(encodeURI(fieldURL),
-      
+    .get(encodeURI(fieldURL),      
       {
-        proxy: APR_CREDENTIALS.proxyServerInfo,
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
@@ -1250,13 +1270,14 @@ searchClassificationName = async (ClassID, token, data) => {
   //console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
   let resultID = await axios
     .get(APR_CREDENTIALS.GetClassificationByName + "'" + encodeURI(ClassID) + "'", {
-      proxy: APR_CREDENTIALS.proxyServerInfo,
-    headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
     })
     .then(async (resp) => {
       const itemsObj = resp.data;
@@ -1350,8 +1371,9 @@ async function uploadAsset(token, filename) {
         console.log("varFileSizeByte: ", varFileSizeByte);
         let reqUploadImg = await axios
           .post(APR_CREDENTIALS.Upload_URL, form, {
-            proxy: APR_CREDENTIALS.proxyServerInfo,
-          headers: {
+            proxy: false,
+            httpsAgent: new HttpsProxyAgent(fullProxyURL),
+            headers: {
               Accept: "*/*",
               "Content-Type": "multipart/form-data",
               "API-VERSION": APR_CREDENTIALS.Api_version,
@@ -1403,13 +1425,14 @@ getSegmentURL = async (filename, token) => {
 
   const resultSegmentURI = await axios
     .post(APR_CREDENTIALS.Upload_Segments_URL, JSON.stringify(body), {
-      proxy: APR_CREDENTIALS.proxyServerInfo,
-    headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
     })
     .then((res) => {
       return res.data.uri;
@@ -1459,13 +1482,14 @@ uploadSegment = async (SegmentURI, chunkFileName, token) => {
   });
   let reqUploadImg = await axios
     .post(SegmentURI, form, {
-      proxy: APR_CREDENTIALS.proxyServerInfo,
-    headers: {
-        Accept: "*/*",
-        "Content-Type": "multipart/form-data",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "multipart/form-data",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
     })
@@ -1491,7 +1515,8 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
   console.log("Commit body: ", body);
   let reqUploadImg = await axios
     .post(SegmentURI + '/commit', body, {
-      proxy: APR_CREDENTIALS.proxyServerInfo,
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
