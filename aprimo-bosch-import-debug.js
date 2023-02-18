@@ -10,12 +10,7 @@
  * 
  */
 
-const {
-  Worker,
-  isMainThread,
-  parentPort,
-  workerData
-} = require("worker_threads");
+
 require("dotenv").config({
   debug: false
 });
@@ -35,7 +30,7 @@ require('winston-daily-rotate-file');
 let Client = require("ssh2-sftp-client");
 const splitFile = require("split-file");
 const csv = require("csvtojson");
-const XLSX = require('xlsx');
+
 const {
   constants
 } = require("buffer");
@@ -50,6 +45,7 @@ const classificationlist = require("./bosch-classificationlist");
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
 let readJSONCron = true;
+
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 
 var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
@@ -75,20 +71,6 @@ app.use(
 );
 
 
-let ftpDirectory = APR_CREDENTIALS.targetPath;
-fs.readdir(ftpDirectory, (err, files) => {
-  if (err) throw err;
-
-  for (const file of files) {    
-      if(file.match(/.+(\.csv)$/)){
-        /*
-        fs.unlink(path.join(ftpDirectory, file), (err) => {
-          if (err) throw err;
-        });    
-        */
-      }
-  }
-});
 
 /**
  * Log File
@@ -99,35 +81,41 @@ var appError = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  maxSize: '20m'
+  maxSize: '20m',
+  maxFiles: '1d'
 });
 var appClassification = new winston.transports.DailyRotateFile({
   level: 'info',
   filename: './logs/bosch-app-classification-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  maxSize: '20m'
+  maxSize: '20m',
+  maxFiles: '1d'
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
   filename: './logs/bosch-app-combined-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  maxSize: '20m'
+  maxSize: '20m',
+  maxFiles: '1d'
 });
 var protocolsLogs = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-protocols-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  maxSize: '20m'
+  maxSize: '20m',
+  maxFiles: '1d'
 });
 var tokensLogs = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-uploaded-file-tokens-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   json: true,
-  maxSize: '20m'
+  maxSize: '20m',
+  maxFiles: '1d'
 });
+
 
 const logger = winston.createLogger({
   level: 'info',
@@ -145,39 +133,27 @@ const tlogger = winston.createLogger({
   level: 'info',
   transports: [tokensLogs]
 });
+
+
 const options = {
-  from: new Date() - (168 * 60 * 60 * 1000),
+  from: new Date() - (72 * 60 * 60 * 1000),
   until: new Date(),
-  limit: 100000,
+  limit: 10,
   start: 0,
   order: 'desc',
   fields: ['message']
 };
 
-/**
- * Read the TLogger file.
- * @param {*} token 
- */
-async function readTransactionLog(token) {
-  let tloggerData = await tlogger.query(options, function (err, result) {
-    if (err) {
-      /* TODO: handle me */
-      logger.error(new Date() + ': tlogger error -- ' + err);
-      console.log('ERROR' + new Date() + ': tlogger error -- ', err);
-      throw err;
-    }else{
-      //console.log("tloggerData:", result);
-      readJSON(token, result);
-    }
-  });
-}
+//
+// Find items logged between today and yesterday.
+//
+
 
 /**
  * Generating Token
  */
 getToken = async () => {
   const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
-      timeout: 30000,
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL),
       headers: {
@@ -187,14 +163,12 @@ getToken = async () => {
       },
     }
   )
-  .then(async (resp) => {
+  .then((resp) => {
     return resp.data;
   })
-  .catch(async (err) => {    
+  .catch((err) => {    
     logger.error(new Date() + ': getToken error -- ' + err);
     console.log('ERROR' + new Date() + ': getToken error -- ', err);
-    var aprToken = await getToken();
-    return aprToken;
   });
   return resultAssets;
 };
@@ -202,7 +176,7 @@ getToken = async () => {
 /**
  * Download CSV files from the FTP
  */
-downloadCSVFromFtp = async () => {
+downloadFtpData = async (token) => {
   var jsonData;
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
@@ -216,8 +190,10 @@ downloadCSVFromFtp = async () => {
           await sftp.fastGet(src + '/' + files[i].name, dst + '/' + files[i].name);
         }
       }
-
-      await JSONtoCheckInData();
+      var aprToken = await getToken();
+      if(aprToken?.accessToken !== undefined){
+        await readJSON(aprToken.accessToken);  
+      }
     }).catch(e => {
       console.error(e.message);
     });
@@ -225,51 +201,26 @@ downloadCSVFromFtp = async () => {
   return jsonData;
 };
 
+downloadFtpData = async (token) => {
 
-async function JSONtoCheckInData() {
-  console.log("Start");
-  const csvInDir = fs
-    .readdirSync(APR_CREDENTIALS.targetPath)
-    .filter((file) => path.extname(file) === ".csv");
-  
-  let jsonArray = [];
-  for (var i = 0, len = csvInDir.length; i < len; i++) {
-    var file = csvInDir[i];  
-    if (file) {
-      const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-      const csvFileData = await csv({'delimiter':[';',',']}).fromFile(filePath);
-      jsonArray.push(csvFileData);
-    }
-  } 
-
-  await writeExcel(jsonArray);
 };
 
-async function writeExcel(jsonArray){
-  //console.log("jsonArray", jsonArray);
-  //console.log("jsonArray", jsonArray.length);
-  //return;
-
-  var keys = [];
-  for (var k in jsonArray[0][0]) keys.push(k);
-  //keys.push("status", "recordID", "processdate");
-
-  // Create a new workbook and worksheet
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.json_to_sheet([],{ header: keys});
-  
-  for (var i = 0, len = jsonArray.length; i < len; i++) {
-    jsonArray[i].forEach((row) => {
-      XLSX.utils.sheet_add_json(worksheet, [row], { skipHeader: true, origin: -1 });
-    });
-  }
-
-  // Add the worksheet to the workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-  // Write the workbook to a file
-  XLSX.writeFile(workbook, APR_CREDENTIALS.checkin);
+/**
+ * Read the TLogger file.
+ * @param {*} token 
+ */
+async function readTLogger(token) {
+  let tloggerData = await tlogger.query(options, function (err, result) {
+    if (err) {
+      /* TODO: handle me */
+      logger.error(new Date() + ': tlogger error -- ' + err);
+      console.log('ERROR' + new Date() + ': tlogger error -- ', err);
+      throw err;
+    }else{
+      readJSON(token, result);
+    }
+  });
 }
-
 
 /**
  * Read the CSV file.
@@ -294,124 +245,91 @@ async function readJSON(token, tloggerData) {
       const filePath = APR_CREDENTIALS.targetPath + "/" + file;
       const jsonFileArray = await csv({'delimiter':[';',',']}).fromFile(filePath);
       jsonArray = jsonFileArray;
-
-      console.log(jsonArray);
-      return false;
-
-
+    
       plogger.info('Total rows ' + jsonArray.length + ' in csv ' + filePath);
       //console.log(jsonArray);
-      const masterIDS = [...new Set(jsonArray.map((item) => item.OBJ_ID))];
-      //console.log(masterIDS);
-      const recordObj = {};
-      recordObj.arr = new Array();
-      for (let k = 0; k < masterIDS.length; k++) {
-        const mID = masterIDS[k];
-        
-        const singleRecordObj = jsonArray.filter((val) => val.OBJ_ID === mID);
+  const masterIDS = [...new Set(jsonArray.map((item) => item.OBJ_ID))];
+  //console.log(masterIDS);
+  const recordObj = {};
+  recordObj.arr = new Array();
+  for (let k = 0; k < masterIDS.length; k++) {
+    const mID = masterIDS[k];
+    
+    const singleRecordObj = jsonArray.filter((val) => val.OBJ_ID === mID);
 
-        let indexOfX = -1;
-          for (let i = 0; i < singleRecordObj.length; i++) {
-            if (singleRecordObj[i].MASTER_RECORD === "x") {
-              indexOfX = i;
-              break;
-            }
-          }
-
-        let temp = singleRecordObj[0];
-        singleRecordObj[0] = singleRecordObj[indexOfX];
-        singleRecordObj[indexOfX] = temp;
-        if (singleRecordObj.length > 0) {
-          recordObj.arr.push(singleRecordObj);
-        }
+    let indexOfX = -1;
+    for (let i = 0; i < singleRecordObj.length; i++) {
+      if (singleRecordObj[i].MASTER_RECORD === "x") {
+        indexOfX = i;
+        break;
       }
+    }
 
-  //console.log("tloggerData length:", tloggerData.length);
+    let temp = singleRecordObj[0];
+    singleRecordObj[0] = singleRecordObj[indexOfX];
+    singleRecordObj[indexOfX] = temp;
+    if (singleRecordObj.length > 0) {
+      recordObj.arr.push(singleRecordObj);
+    }
+  }
+  
+
+  console.log("childCount: ", recordObj.arr.length);
+  return false;
+
   let masterCount = 0;
   let masterErr = 0;
   let childCount = 0;
-
-  const workers = [];
-
   for (let j = 0; j < recordObj.arr.length; j++) {
+    console.log("Data J: ", j);  
     const tt = recordObj.arr[j];
     for (let p = 0; p < tt.length; p++) {
+      //console.log("Nested", tt[p].MASTER_RECORD);
+      if (tt[p]?.MASTER_RECORD !== undefined && tt[p].MASTER_RECORD === "x") {
+        masterCount++;
+        console.log("masterCount: ", masterCount);
+        var aprToken = await getToken();
+        if(aprToken?.accessToken !== undefined){
 
-        //console.log("Nested", tt[p].MASTER_RECORD);        
-        if (tt[p]?.MASTER_RECORD !== undefined && tt[p].MASTER_RECORD === "x") {
+          let tmpData = await findObject(tloggerData, 'KBObjectID', '254462');
+          console.log("tloggerData:", tloggerData);
+          console.log("tmpData:", tmpData);
+                
 
+        //let masterRecordID = await searchAsset(aprToken.accessToken, tt[p].BINARY_FILENAME, tt[p]);
+        //let masterRecordID = tt[p].LV_ID;
+        //let childRecordID = [];
+        for (let c = 0; c < tt.length; c++) {
+          if (tt[c].MASTER_RECORD !== "x" && tt[p].OBJ_ID === tt[c].OBJ_ID) {
+            childCount++;
+            console.log("childCount: ", c);
 
-
-
-        
-
-
-
-
-
-
-
-          let KBObjectData = findObject(tloggerData, 'KBObjectID', tt[p].OBJ_ID);
-          let KittelbergerData = findObject(KBObjectData, 'Kittelberger ID', tt[p].LV_ID);
-          
-          //console.log("Search KBObjectID:", tt[p].OBJ_ID);
-          //console.log("Search KBObjectData:", KBObjectData);
-          //console.log("Search Kittelberger ID:", tt[p].LV_ID);
-          //console.log("Search KBObjectData:", KittelbergerData);
-          //console.log("KittelbergerData length:", KittelbergerData.length);
-          if(KittelbergerData.length === 0){
-            //console.log("KBObjectID:", tt[p].OBJ_ID);
-            console.log('####### KBObjectID ' + new Date() + tt[p].OBJ_ID);
-
-/*            
-
-            masterCount++;
-            var aprToken = await getToken();
-            if(aprToken?.accessToken !== undefined){
-              let masterRecordID = await searchAsset(aprToken.accessToken, tt[p].BINARY_FILENAME, tt[p]);
-              let childRecordID = [];
-              for (let c = 0; c < tt.length; c++) {
-                if (tt[c].MASTER_RECORD !== "x" && tt[p].OBJ_ID === tt[c].OBJ_ID) {
-                  childCount++;
-                  var aprToken = await getToken();
-                  if(aprToken?.accessToken !== undefined){
-                    childRecordID.push(await searchAsset(aprToken.accessToken, tt[c].BINARY_FILENAME, tt[c]));
-                  }
-                }
-              }
-              if (masterRecordID !== 0) {
-                var aprToken = await getToken();
-                if(aprToken?.accessToken !== undefined){
-                  let recordLinksResult = await recordLinks(masterRecordID, childRecordID, aprToken.accessToken);
-                  logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-                  console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-                }
-              } else {
-                masterErr++;
-                logger.error(new Date() + ': ERROR : Master Record Missing: ');
-                console.log(new Date() + ': ERROR : Master Record Missing: ');
-              }
-            }
-*/
-
-              let sum = 0;
-              for (let i = 0; i < 100000000; i++) {
-                sum += i;
-              }
-              console.log('####### Break ' + new Date());
-            break;
-          }else{
-            //console.log("Record Skipping: *****************");
+          //  var aprToken = await getToken();
+            //if(aprToken?.accessToken !== undefined){
+              //childRecordID.push(await searchAsset(aprToken.accessToken, tt[c].BINARY_FILENAME, tt[c]));
+            //}
+            //childRecordID.push(tt[c].LV_ID);
           }
+        }
 
-
-
-
-
-
+        /*
+        if (masterRecordID !== 0) {
+          var aprToken = await getToken();
+          if(aprToken?.accessToken !== undefined){
+            let recordLinksResult = await recordLinks(masterRecordID, childRecordID, aprToken.accessToken);
+            logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+            console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+          }
+        } else {
+          masterErr++;
+          logger.error(new Date() + ': ERROR : Master Record Missing: ');
+          console.log(new Date() + ': ERROR : Master Record Missing: ');
+        }*/
 
 
         }
+
+      }
     }
   }
   plogger.info('Total Master Records ' + masterCount );
@@ -496,13 +414,8 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
 
   logger.info(new Date() + ': INFO : ###################################');
   logger.info(new Date() + ': INFO : Start Processing Row');
-  let queryString = '';
-  if(recordsCollection.LV_ID === ''){
-    queryString = "'" + recordsCollection.OBJ_ID + "'";
-  }else{
-    queryString = "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'";
-  }
-  
+
+  let queryString = "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Title') = '" + recordsCollection.NAME + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'";
 
   logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
   console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
@@ -510,8 +423,7 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
 
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
-    { 
-      timeout: 30000,
+    {      
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -526,13 +438,13 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
       console.log(resp.data);
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
-        console.log(new Date() + ': INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.info(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
+        console.log(new Date() + ': INFO : Records Creating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
 
         getFieldsResult = await getFields("null", token, recordsCollection);
       } else if (itemsObj.totalCount === 1) {
-        logger.info(new Date() + ': INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
-        console.log(new Date() + ': INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.info(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
+        console.log(new Date() + ': INFO : Records Updating: -- ' + recordsCollection.NAME + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, token, recordsCollection);
       }
       return getFieldsResult;
@@ -543,7 +455,7 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
       return 0;
     });
 
-    logger.info(new Date() + ': INFO : End Processing Row');    
+    logger.info(new Date() + ': INFO : End Processing Row');
     logger.info(new Date() + ': INFO : ###################################');
     logger.info(new Date() + ' ');    
   
@@ -633,21 +545,9 @@ getFields = async (assetID, token, recordsCollection) => {
     existImgId = "null";
 
     const ImageToken = await uploadAsset(token, filename);    
-    console.log(new Date() + ": INFO : Create Meta:");
-    logger.info(new Date() + ': INFO : Create Meta:');
-    try {
-      APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);      
-    } catch (error) {
-      console.log(new Date() + ": Error : Create Meta: "+ error);
-      logger.info(new Date() + ': Error : Create Meta: '+ error);        
-    }
+    APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);
   } else {
-    try {
-      APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
-    } catch (error) {
-      console.log(new Date() + ": Error : Create Meta: "+ error);
-      logger.info(new Date() + ': Error : Create Meta: '+ error);
-    }
+    APIResult = await createMeta(assetID, recordsCollection, 'null', token);
   }
   return APIResult;
 };
@@ -729,10 +629,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
     let optionVal = "False";
     let ObjectID = '';
 
-    if (typeof tmpKey === 'string') {
-      tmpKey = tmpKey.replace(/&/g, "%26");
-      tmpKey = tmpKey.replace(/\+/g, "%2b");
-    }
+    //tmpKey = tmpKey.replace(/||/g, "/");
+    tmpKey = tmpKey.replace(/&/g, "%26");
+    tmpKey = tmpKey.replace(/\+/g, "%2b");
 
     // skip loop if the property is from prototype
     if (!data.hasOwnProperty(key)) continue;
@@ -863,9 +762,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'CATEGORY_TREE_NAMES':
-        if (typeof tmpKey === 'string') {        
-          tmpKey = tmpKey.replace(/\|\|/g, "/");
-        
+        tmpKey = tmpKey.replace(/\|\|/g, "/");
         var str_array = tmpKey.split('\\\\');
         for (var i = 0; i < str_array.length; i++) {
           // Trim the excess whitespace.
@@ -880,7 +777,6 @@ createMeta = async (assetID, data, ImgToken, token) => {
             }
           }
         }
-      }
         /*
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
         updateObj.fields.addOrUpdate.push({
@@ -1241,16 +1137,16 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
           return resp.data.id;
         } else {
-          logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-          console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+          logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+          console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
           logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
           console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
           return '0';
         }
       })
       .catch((err) => {
-        logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-        console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+        logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
         logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
         console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
         return '0';
@@ -1272,19 +1168,6 @@ createMeta = async (assetID, data, ImgToken, token) => {
       .then(async (resp) => {
         logger.info(new Date() + ': INFO : Record Updated: ' + assetID);
         console.log(new Date() + ': INFO : Record Updated: ' + assetID);
-
-        tlogger.info({
-          'filename': data['BINARY_FILENAME'],
-          'title': data['NAME'],
-          'filepath': data['BINARY_FILENAME'],
-          'recordID': assetID,
-          'KBObjectID': data['OBJ_ID'],
-          'OTYPEID': data['OTYPE_ID'],
-          'LTYPEID': data['LTYPE_ID'],
-          'Kittelberger ID': data['LV_ID'],
-          'token': 'meta updated only'
-        });        //ImgToken
-    
         //console.log(': Update Record ID: ');
         return assetID;
       })
@@ -1438,14 +1321,14 @@ searchClassificationName = async (ClassID, token, data) => {
         console.log("Field Value: ", itemsObj.items[0].id);
         return itemsObj.items[0].id;
       } else {
-        logger.error(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
-        console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        logger.error(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
+        console.log(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
         return 'null';
       }
     })
     .catch(async (err) => {
-      logger.error(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
-      console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+      logger.error(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
+      console.log(new Date() + ': ERROR : Classification is missing: -- ' + filterClass);
       logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err));
       return 'null';
     });
@@ -1475,7 +1358,7 @@ async function uploadAsset(token, filename) {
     });
     
 
-    if (fs.existsSync(filename) && BINARY_FILENAME !== '') {
+    if (fs.existsSync(filename)) {
       let varFileSize = await getFilesizeInMegabytes(filename);
       let varFileSizeByte = varFileSize * (1024 * 1024);
       let getMimeType = mime.lookup(filename);
@@ -1696,99 +1579,24 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
  * Entry point
  */
 main = async () => {
-
-  if (fs.existsSync(APR_CREDENTIALS.checkin)) {
-    console.log("0001");
-    const file = XLSX.readFile(APR_CREDENTIALS.checkin);
-    let data = [];
-    const sheets = file.SheetNames;
-    for (let i = 0; i < sheets.length; i++) {
-        const temp = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]]);
-        let index = 0;
-        for (const res of temp) {
-          if(res?.status !== 'checkin'){
-            data.push(res);
-            break; 
-          }
-          index++;
-        }
-
-        //console.log("index: " + index);
-        //console.log("temp.length: " + temp.length);
-        if(index < temp.length){
-          for (let i = 0; i < APR_CREDENTIALS.worker; i++) {
-            //console.log("I am IN: ");
-            //const worker = new Worker(__filename, { workerData: { value: 0 } });
-          }
-        }
-
-        console.log("checkin index: ", index);
-        temp[index].status = 'checkin';
-        temp[index].recordID = '';
-        temp[index].processdate = '';
-        await writeExcel([temp]);
-    }
-    //console.log("data:", data.length);
-  } else {
-    //await downloadCSVFromFtp();
-    await JSONtoCheckInData();
-  }
-  //process.exit(0);
-
-  // Create a new workbook and worksheet
-
-
-/*
   var aprToken = await getToken();
   if(aprToken?.accessToken !== undefined){
-    var getFile = await downloadCSVFromFtp(aprToken.accessToken);
+    var getFile = await downloadFtpData(aprToken.accessToken);
   }
-  */
 };
-
-module.exports = async (rowdata) => {
-  //console.log("Data:", rowdata.rowdata.OBJ_ID);
-  var aprToken = await getToken();
-  let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata.BINARY_FILENAME, rowdata.rowdata);
-  rowdata.recordID = RecordID;
-  return Promise.resolve(rowdata);
-}
-
-/*
-try {
-  main();
-} catch (error) {
-  logger.error(new Date() + ': System Error -- ' + error);
-}  
-*/
-
-
-
-
-
-
-
-
-
-
+//main();
+readTLogger('sadasdasd');
 /**
  * Cron to call Main
  * @param {*} token, filename 
  */
-var task = cron.schedule(APR_CREDENTIALS.cronIntv, async () => {  
-  try {
-    //await main();
-  } catch (error) {
-    logger.error(new Date() + ': System Error -- ' + error);
-  }
+var task = cron.schedule(APR_CREDENTIALS.cronIntv, async () => {
+  await main();
 });
 task.start();
 
-/*
 
 app.set("port", process.env.PORT || 3012);
 app.listen(app.get("port"), function () {
   console.log("server started on port" + app.get("port"));
 });
-
-*/

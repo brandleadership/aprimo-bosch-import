@@ -18,11 +18,13 @@
     "https-proxy-agent": "5.0.1",
     "mime-types": "2.1.35",
     "node-cron": "3.0.2",
+    "piscina": "^3.2.0",
     "request": "^2.88.2",
     "split-file": "2.3.0",
     "ssh2-sftp-client": "9.0.4",
     "uuid": "8.3.2",
     "winston": "3.8.2",
-    "winston-daily-rotate-file": "4.7.1"
+    "winston-daily-rotate-file": "4.7.1",
+    "xlsx": "^0.18.5"
   }
 }
