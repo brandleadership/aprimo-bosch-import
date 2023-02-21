@@ -10,15 +10,6 @@
  * 
  */
 
-const {
-  Worker,
-  isMainThread,
-  parentPort,
-  workerData
-} = require("worker_threads");
-require("dotenv").config({
-  debug: false
-});
 const express = require("express");
 var bodyParser = require("body-parser");
 var fs = require("fs");
@@ -36,12 +27,6 @@ let Client = require("ssh2-sftp-client");
 const splitFile = require("split-file");
 const csv = require("csvtojson");
 const XLSX = require('xlsx');
-const {
-  constants
-} = require("buffer");
-const {
-  create
-} = require("domain");
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const app = express();
@@ -431,6 +416,7 @@ async function readJSON(token, tloggerData) {
   logger.info(new Date() + ': INFO : ideal waiting for next cron:');
   console.log(new Date() + ': INFO : ideal waiting for next cron:');
 }
+
 /**
  * Link Master and Child Records
  * @param {*} masterRecordID, childRecordID, token
@@ -486,6 +472,7 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
     });
   return resultAssets;
 };
+
 /**
  * Search for The Records in a combination of KBObjectID and Title and Kittelberger ID
  * @param {*} File Name, CSV Row Data, token
@@ -1747,11 +1734,22 @@ main = async () => {
 };
 
 module.exports = async (rowdata) => {
-  //console.log("Data:", rowdata.rowdata.OBJ_ID);
+  console.log("Data:", rowdata);
   var aprToken = await getToken();
-  let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata.BINARY_FILENAME, rowdata.rowdata);
-  rowdata.recordID = RecordID;
-  return Promise.resolve(rowdata);
+  if(rowdata.mode === 'createRecords'){
+    let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata.BINARY_FILENAME, rowdata.rowdata);
+    rowdata.recordID = RecordID;
+    return Promise.resolve(rowdata);
+  } else if(rowdata.mode === 'linkRecords'){
+
+    console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+
+    let recordLinksResult = await recordLinks(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
+    logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    return Promise.resolve(recordLinksResult);
+  }
 }
 
 /*
