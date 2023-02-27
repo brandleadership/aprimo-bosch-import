@@ -9,14 +9,8 @@
  * Create/Update Record
  * 
  */
-
-const express = require("express");
-var bodyParser = require("body-parser");
 var fs = require("fs");
-
 request = require("request");
-const cron = require("node-cron");
-//const fetch = require("node-fetch");
 var path = require("path");
 const mime = require("mime-types");
 var FormData = require("form-data");
@@ -25,11 +19,8 @@ require('winston-daily-rotate-file');
 
 let Client = require("ssh2-sftp-client");
 const splitFile = require("split-file");
-const csv = require("csvtojson");
-const XLSX = require('xlsx');
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
-const app = express();
 const classificationlist = require("./bosch-classificationlist");
 
 // Window System Path
@@ -49,31 +40,6 @@ let imgFolderPath = APR_CREDENTIALS.imgFolderPath;
 
 //FTP Config
 const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
-app.use(express.json({
-  limit: "150mb"
-}));
-app.use("/js", express.static(__dirname + "/js"));
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
-
-
-let ftpDirectory = APR_CREDENTIALS.targetPath;
-fs.readdir(ftpDirectory, (err, files) => {
-  if (err) throw err;
-
-  for (const file of files) {    
-      if(file.match(/.+(\.csv)$/)){
-        /*
-        fs.unlink(path.join(ftpDirectory, file), (err) => {
-          if (err) throw err;
-        });    
-        */
-      }
-  }
-});
 
 /**
  * Log File
@@ -130,32 +96,7 @@ const tlogger = winston.createLogger({
   level: 'info',
   transports: [tokensLogs]
 });
-const options = {
-  from: new Date() - (168 * 60 * 60 * 1000),
-  until: new Date(),
-  limit: 100000,
-  start: 0,
-  order: 'desc',
-  fields: ['message']
-};
 
-/**
- * Read the TLogger file.
- * @param {*} token 
- */
-async function readTransactionLog(token) {
-  let tloggerData = await tlogger.query(options, function (err, result) {
-    if (err) {
-      /* TODO: handle me */
-      logger.error(new Date() + ': tlogger error -- ' + err);
-      console.log('ERROR' + new Date() + ': tlogger error -- ', err);
-      throw err;
-    }else{
-      //console.log("tloggerData:", result);
-      readJSON(token, result);
-    }
-  });
-}
 
 /**
  * Generating Token
@@ -183,239 +124,6 @@ getToken = async () => {
   });
   return resultAssets;
 };
-
-/**
- * Download CSV files from the FTP
- */
-downloadCSVFromFtp = async () => {
-  var jsonData;
-  const dst = APR_CREDENTIALS.targetPath;
-  const src = APR_CREDENTIALS.sourcePath;
-  let sftp = new Client();
-  jsonData = await sftp.connect(ftpConfig)
-    .then(async () => {
-      const files = await sftp.list(src + '/.');
-      for (var i = 0, len = files.length; i < len; i++) {
-        if(files[i].name.match(/.+(\.csv)$/)){
-          console.log("FTP:", files[i]);
-          await sftp.fastGet(src + '/' + files[i].name, dst + '/' + files[i].name);
-        }
-      }
-
-      await JSONtoCheckInData();
-    }).catch(e => {
-      console.error(e.message);
-    });
-    sftp.end();
-  return jsonData;
-};
-
-
-async function JSONtoCheckInData() {
-  console.log("Start");
-  const csvInDir = fs
-    .readdirSync(APR_CREDENTIALS.targetPath)
-    .filter((file) => path.extname(file) === ".csv");
-  
-  let jsonArray = [];
-  for (var i = 0, len = csvInDir.length; i < len; i++) {
-    var file = csvInDir[i];  
-    if (file) {
-      const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-      const csvFileData = await csv({'delimiter':[';',',']}).fromFile(filePath);
-      jsonArray.push(csvFileData);
-    }
-  } 
-
-  await writeExcel(jsonArray);
-};
-
-async function writeExcel(jsonArray){
-  //console.log("jsonArray", jsonArray);
-  //console.log("jsonArray", jsonArray.length);
-  //return;
-
-  var keys = [];
-  for (var k in jsonArray[0][0]) keys.push(k);
-  //keys.push("status", "recordID", "processdate");
-
-  // Create a new workbook and worksheet
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.json_to_sheet([],{ header: keys});
-  
-  for (var i = 0, len = jsonArray.length; i < len; i++) {
-    jsonArray[i].forEach((row) => {
-      XLSX.utils.sheet_add_json(worksheet, [row], { skipHeader: true, origin: -1 });
-    });
-  }
-
-  // Add the worksheet to the workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-  // Write the workbook to a file
-  XLSX.writeFile(workbook, APR_CREDENTIALS.checkin);
-}
-
-
-/**
- * Read the CSV file.
- * @param {*} token 
- */
-async function readJSON(token, tloggerData) {
-
-  plogger.info('####### Import Started at ' + new Date() + ' #########');
-  console.log('####### Import Started at ' + new Date() + ' #########');
-  const csvInDir = fs
-    .readdirSync(APR_CREDENTIALS.targetPath)
-    .filter((file) => path.extname(file) === ".csv");
-  let jsonArray = [];
-  plogger.info('Total files to Import ' + csvInDir.length);
-
-
-  for (var i = 0, len = csvInDir.length; i < len; i++) {
-    var file = csvInDir[i];
-    //console.log(file);
-    if (file) {
-      //console.log(APR_CREDENTIALS.targetPath + "/" + file);
-      const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-      const jsonFileArray = await csv({'delimiter':[';',',']}).fromFile(filePath);
-      jsonArray = jsonFileArray;
-
-      console.log(jsonArray);
-      return false;
-
-
-      plogger.info('Total rows ' + jsonArray.length + ' in csv ' + filePath);
-      //console.log(jsonArray);
-      const masterIDS = [...new Set(jsonArray.map((item) => item.OBJ_ID))];
-      //console.log(masterIDS);
-      const recordObj = {};
-      recordObj.arr = new Array();
-      for (let k = 0; k < masterIDS.length; k++) {
-        const mID = masterIDS[k];
-        
-        const singleRecordObj = jsonArray.filter((val) => val.OBJ_ID === mID);
-
-        let indexOfX = -1;
-          for (let i = 0; i < singleRecordObj.length; i++) {
-            if (singleRecordObj[i].MASTER_RECORD === "x") {
-              indexOfX = i;
-              break;
-            }
-          }
-
-        let temp = singleRecordObj[0];
-        singleRecordObj[0] = singleRecordObj[indexOfX];
-        singleRecordObj[indexOfX] = temp;
-        if (singleRecordObj.length > 0) {
-          recordObj.arr.push(singleRecordObj);
-        }
-      }
-
-  //console.log("tloggerData length:", tloggerData.length);
-  let masterCount = 0;
-  let masterErr = 0;
-  let childCount = 0;
-
-  const workers = [];
-
-  for (let j = 0; j < recordObj.arr.length; j++) {
-    const tt = recordObj.arr[j];
-    for (let p = 0; p < tt.length; p++) {
-
-        //console.log("Nested", tt[p].MASTER_RECORD);        
-        if (tt[p]?.MASTER_RECORD !== undefined && tt[p].MASTER_RECORD === "x") {
-
-
-
-
-        
-
-
-
-
-
-
-
-          let KBObjectData = findObject(tloggerData, 'KBObjectID', tt[p].OBJ_ID);
-          let KittelbergerData = findObject(KBObjectData, 'Kittelberger ID', tt[p].LV_ID);
-          
-          //console.log("Search KBObjectID:", tt[p].OBJ_ID);
-          //console.log("Search KBObjectData:", KBObjectData);
-          //console.log("Search Kittelberger ID:", tt[p].LV_ID);
-          //console.log("Search KBObjectData:", KittelbergerData);
-          //console.log("KittelbergerData length:", KittelbergerData.length);
-          if(KittelbergerData.length === 0){
-            //console.log("KBObjectID:", tt[p].OBJ_ID);
-            console.log('####### KBObjectID ' + new Date() + tt[p].OBJ_ID);
-
-/*            
-
-            masterCount++;
-            var aprToken = await getToken();
-            if(aprToken?.accessToken !== undefined){
-              let masterRecordID = await searchAsset(aprToken.accessToken, tt[p].BINARY_FILENAME, tt[p]);
-              let childRecordID = [];
-              for (let c = 0; c < tt.length; c++) {
-                if (tt[c].MASTER_RECORD !== "x" && tt[p].OBJ_ID === tt[c].OBJ_ID) {
-                  childCount++;
-                  var aprToken = await getToken();
-                  if(aprToken?.accessToken !== undefined){
-                    childRecordID.push(await searchAsset(aprToken.accessToken, tt[c].BINARY_FILENAME, tt[c]));
-                  }
-                }
-              }
-              if (masterRecordID !== 0) {
-                var aprToken = await getToken();
-                if(aprToken?.accessToken !== undefined){
-                  let recordLinksResult = await recordLinks(masterRecordID, childRecordID, aprToken.accessToken);
-                  logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-                  console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-                }
-              } else {
-                masterErr++;
-                logger.error(new Date() + ': ERROR : Master Record Missing: ');
-                console.log(new Date() + ': ERROR : Master Record Missing: ');
-              }
-            }
-*/
-
-              let sum = 0;
-              for (let i = 0; i < 100000000; i++) {
-                sum += i;
-              }
-              console.log('####### Break ' + new Date());
-            break;
-          }else{
-            //console.log("Record Skipping: *****************");
-          }
-
-
-
-
-
-
-
-
-        }
-    }
-  }
-  plogger.info('Total Master Records ' + masterCount );
-  plogger.info('Total Child Records ' + childCount );
-  plogger.info('Total Master Records Successfully Processed ' + (masterCount - masterErr));
-  plogger.info('Total Master Records Not Processed ' + masterErr);
-
-
-
-    }
-  }
-
-
-  plogger.info('####### Import Ended at ' + new Date() + ' #########');
-
-
-  logger.info(new Date() + ': INFO : ideal waiting for next cron:');
-  console.log(new Date() + ': INFO : ideal waiting for next cron:');
-}
 
 /**
  * Link Master and Child Records
@@ -473,13 +181,15 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
   return resultAssets;
 };
 
+
+
 /**
  * Search for The Records in a combination of KBObjectID and Title and Kittelberger ID
  * @param {*} File Name, CSV Row Data, token
  */
 searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
-  let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
-  filterFileName = filterFileName.replace(/\+/g, "%2b");
+  ///let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
+  //filterFileName = filterFileName.replace(/\+/g, "%2b");
 
   logger.info(new Date() + ': INFO : ###################################');
   logger.info(new Date() + ': INFO : Start Processing Row');
@@ -542,8 +252,11 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
  * @param {*} Class Name, CSV Row Data, token
  */
 searchClassification = async (ClassID, token, data) => {
-  let filterClass = ClassID.replace(/&/g, "%26");
-  filterClass = filterClass.replace(/\+/g, "%2b");
+  let filterClass = '';
+  if (typeof ClassID === 'string') {
+    filterClass = ClassID.replace(/&/g, "%26");
+    filterClass = filterClass.replace(/\+/g, "%2b");
+  }
 
   let resultID = await axios
     .get(APR_CREDENTIALS.GetClassification + filterClass, {
@@ -619,11 +332,15 @@ getFields = async (assetID, token, recordsCollection) => {
     filename = recordsCollection.BINARY_FILENAME;
     existImgId = "null";
 
-    const ImageToken = await uploadAsset(token, filename);    
-    console.log(new Date() + ": INFO : Create Meta:");
-    logger.info(new Date() + ': INFO : Create Meta:');
     try {
-      APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);      
+      if(recordsCollection.BINARY_FILENAME === '' && recordsCollection.LV_ID === ''){
+        APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+      } else {
+        const ImageToken = await uploadAsset(token, filename);    
+        console.log(new Date() + ": INFO : Create Meta:");
+        logger.info(new Date() + ': INFO : Create Meta:');
+        APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);      
+      }
     } catch (error) {
       console.log(new Date() + ": Error : Create Meta: "+ error);
       logger.info(new Date() + ': Error : Create Meta: '+ error);        
@@ -1680,59 +1397,104 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
 };
 
 /**
- * Entry point
+ * languageRelationParent
+ * @param {*} masterRecordID, childRecordID, token
  */
-main = async () => {
-
-  if (fs.existsSync(APR_CREDENTIALS.checkin)) {
-    console.log("0001");
-    const file = XLSX.readFile(APR_CREDENTIALS.checkin);
-    let data = [];
-    const sheets = file.SheetNames;
-    for (let i = 0; i < sheets.length; i++) {
-        const temp = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]]);
-        let index = 0;
-        for (const res of temp) {
-          if(res?.status !== 'checkin'){
-            data.push(res);
-            break; 
-          }
-          index++;
-        }
-
-        //console.log("index: " + index);
-        //console.log("temp.length: " + temp.length);
-        if(index < temp.length){
-          for (let i = 0; i < APR_CREDENTIALS.worker; i++) {
-            //console.log("I am IN: ");
-            //const worker = new Worker(__filename, { workerData: { value: 0 } });
-          }
-        }
-
-        console.log("checkin index: ", index);
-        temp[index].status = 'checkin';
-        temp[index].recordID = '';
-        temp[index].processdate = '';
-        await writeExcel([temp]);
+languageRelationParent = async (masterRecordID, childRecordID, token) => {
+  let body = {
+    "fields": {
+      "addOrUpdate": [{
+        "id": "71476f4d1c854d0fa0e9af9500f3445c",
+        "localizedValues": [{
+          "parents": [],
+          "languageId": "00000000000000000000000000000000"
+        }]
+      }]
     }
-    //console.log("data:", data.length);
-  } else {
-    //await downloadCSVFromFtp();
-    await JSONtoCheckInData();
   }
-  //process.exit(0);
 
-  // Create a new workbook and worksheet
-
-
-/*
-  var aprToken = await getToken();
-  if(aprToken?.accessToken !== undefined){
-    var getFile = await downloadCSVFromFtp(aprToken.accessToken);
+  for (let i = 0; i < childRecordID.length; i++) {
+    body.fields.addOrUpdate[0].localizedValues[0].parents.push({
+      "recordId": childRecordID[i]
+    });
   }
-  */
+  console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
+  console.log("Post: ", JSON.stringify(body));
+
+  const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
+      JSON.stringify(body), {
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),  
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((res) => {
+      return true;
+    })
+    .catch((err) => {
+      logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      return false;
+    });
+  return resultAssets;
 };
 
+/**
+ * languageRelationParent
+ * @param {*} masterRecordID, childRecordID, token
+ */
+languageRelationChild = async (masterRecordID, childRecordID, token) => {
+  let body = {
+    "fields": {
+      "addOrUpdate": [{
+        "id": "71476f4d1c854d0fa0e9af9500f3445c",
+        "localizedValues": [{
+          "children": [],
+          "languageId": "00000000000000000000000000000000"
+        }]
+      }]
+    }
+  }
+
+  for (let i = 0; i < childRecordID.length; i++) {
+    body.fields.addOrUpdate[0].localizedValues[0].children.push({
+      "recordId": childRecordID[i]
+    });
+  }
+
+  console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
+  console.log("Post: ", JSON.stringify(body));
+  const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
+      JSON.stringify(body), {
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),  
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((res) => {
+      return true;
+    })
+    .catch((err) => {
+      logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      return false;
+    });
+  return resultAssets;
+};
+
+/**
+ * Entry point
+ */
 module.exports = async (rowdata) => {
   console.log("Data:", rowdata);
   var aprToken = await getToken();
@@ -1741,52 +1503,28 @@ module.exports = async (rowdata) => {
     rowdata.recordID = RecordID;
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){
+    //console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    //console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+    let recordLinksResult = await recordLinks(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
+    //logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    //console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    return Promise.resolve(recordLinksResult);
+  } else if(rowdata.mode === 'LanguageRelationParent'){
 
     console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
-    let recordLinksResult = await recordLinks(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
+    let recordLinksResult = await languageRelationParent(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
+    //logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    //console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    return Promise.resolve(recordLinksResult);    
+  } else if(rowdata.mode === 'LanguageRelationChild'){
+
+    console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+
+    let recordLinksResult = await languageRelationChild(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
     logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-    return Promise.resolve(recordLinksResult);
-  }
+    return Promise.resolve(recordLinksResult);   }
 }
-
-/*
-try {
-  main();
-} catch (error) {
-  logger.error(new Date() + ': System Error -- ' + error);
-}  
-*/
-
-
-
-
-
-
-
-
-
-
-/**
- * Cron to call Main
- * @param {*} token, filename 
- */
-var task = cron.schedule(APR_CREDENTIALS.cronIntv, async () => {  
-  try {
-    //await main();
-  } catch (error) {
-    logger.error(new Date() + ': System Error -- ' + error);
-  }
-});
-task.start();
-
-/*
-
-app.set("port", process.env.PORT || 3012);
-app.listen(app.get("port"), function () {
-  console.log("server started on port" + app.get("port"));
-});
-
-*/

@@ -17,7 +17,7 @@ nvm install v18.12.1
 nvm use v18.12.1
 npm install pm2 -g
 npm install
-pm2 start aprimo-bosch-import.js
+pm2 start index.js
 ```
 Use: node_modules.zip to skip the installation. (Recommendation: Always install Node packages to avoid unseen error.)
 
