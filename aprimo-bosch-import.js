@@ -174,8 +174,8 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
       return true;
     })
     .catch((err) => {
-      logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
       return false;
     });
   return resultAssets;
@@ -191,8 +191,8 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   ///let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
   //filterFileName = filterFileName.replace(/\+/g, "%2b");
 
-  logger.info(new Date() + ': INFO : ###################################');
-  logger.info(new Date() + ': INFO : Start Processing Row');
+  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : ###################################');
+  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Start Processing Row');
   let queryString = '';
   if(recordsCollection.LV_ID === ''){
     queryString = "'" + recordsCollection.OBJ_ID + "'";
@@ -201,9 +201,9 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   }
   
 
-  logger.info(new Date() + ': INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
-  console.log(new Date() + ': INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
-  console.log("fullProxyURL:: " + fullProxyURL);
+  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
+  console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
+  //console.log("fullProxyURL:: " + fullProxyURL);
 
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
@@ -223,25 +223,25 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
       console.log(resp.data);
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
-        console.log(new Date() + ': INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
 
         getFieldsResult = await getFields("null", token, recordsCollection);
       } else if (itemsObj.totalCount === 1) {
-        logger.info(new Date() + ': INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
-        console.log(new Date() + ': INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, token, recordsCollection);
       }
       return getFieldsResult;
     })
     .catch(async (err) => {
-      logger.error(new Date() + ': ERROR : Search Asset API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : Search Asset API -- ' + JSON.stringify(err));
+      logger.error(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err));
       return 0;
     });
 
-    logger.info(new Date() + ': INFO : End Processing Row');    
-    logger.info(new Date() + ': INFO : ###################################');
+    logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : End Processing Row');    
+    logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : ###################################');
     logger.info(new Date() + ' ');    
   
   return APIResult;
@@ -271,7 +271,7 @@ searchClassification = async (ClassID, token, data) => {
         },
     })
     .then(async (resp) => {
-      console.log("resp.data.id:", resp.data.id);
+      //console.log("resp.data.id:", resp.data.id);
       if (resp.data.id === null) {
         console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
         clogger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
@@ -349,8 +349,8 @@ getFields = async (assetID, token, recordsCollection) => {
     try {
       APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
     } catch (error) {
-      console.log(new Date() + ": Error : Create Meta: "+ error);
-      logger.info(new Date() + ': Error : Create Meta: '+ error);
+      console.log(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
+      logger.info(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
     }
   }
   return APIResult;
@@ -692,6 +692,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'IMG_TYPE':
+        
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
@@ -705,6 +706,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
             "languageId": "00000000000000000000000000000000"
           }]
         });
+        
         // code block
         break;
       case 'KEYWORDS':
@@ -910,9 +912,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
     });
   }
 
-  console.log(new Date() + ": INFO : Update JSON:", JSON.stringify(updateObj));
-  logger.info(new Date() + ': INFO : Update JSON:' + JSON.stringify(updateObj));
-
+  console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
+  logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
+  
 
   if (assetID === "null") {
     let reqCreatRequest = await axios
@@ -928,8 +930,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
       })
       .then(async (resp) => {
         if (resp.data.id !== undefined) {
-          logger.info(new Date() + ': INFO : Record ID: ' + resp.data.id);
-          console.log(new Date() + ': INFO : Record ID: ' + resp.data.id);
+          logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record ID: ' + resp.data.id);
+          console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record ID: ' + resp.data.id);
 
           tlogger.info({
             'filename': data['BINARY_FILENAME'],
@@ -945,18 +947,18 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
           return resp.data.id;
         } else {
-          logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-          console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-          logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
-          console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+          console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
+          console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
           return '0';
         }
       })
       .catch((err) => {
-        logger.error(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-        console.log(new Date() + ': ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-        logger.error(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
-        console.log(new Date() + ': ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
+        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
+        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
         return '0';
       });
     return reqCreatRequest;
@@ -974,8 +976,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
           },
       })
       .then(async (resp) => {
-        logger.info(new Date() + ': INFO : Record Updated: ' + assetID);
-        console.log(new Date() + ': INFO : Record Updated: ' + assetID);
+        logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record Updated: ' + assetID);
+        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record Updated: ' + assetID);
 
         tlogger.info({
           'filename': data['BINARY_FILENAME'],
@@ -993,10 +995,10 @@ createMeta = async (assetID, data, ImgToken, token) => {
         return assetID;
       })
       .catch((err) => {
-        logger.error(new Date() + ': ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-        console.log(new Date() + ': ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-        logger.error(new Date() + ': ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
-        console.log(new Date() + ': ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
+        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
+        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
         return '0';
       });
     return reqCreatRequest;
@@ -1207,6 +1209,17 @@ async function uploadAsset(token, filename) {
             }
             
             const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
+
+            for (let start = 0; start < names.length; start++) {
+              fs.unlink(names[start], (err) => {
+                if (err){
+                  logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                  console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
+                  //throw err;
+                } 
+              });  
+            }
+
             //logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
             return ImgToken;
           })
@@ -1244,6 +1257,16 @@ async function uploadAsset(token, filename) {
             console.log("ImgToken: ", ImgToken);
             // logger.info(new Date() + ": ImgToken: " + ImgToken);
             //APIResult = await getFields("null", token, ImgToken);
+
+              fs.unlink(filename, (err) => {
+                if (err){
+                  logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                  console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
+                  //throw err;
+                } 
+              });  
+
+
             return ImgToken;
             //await createAsset(ImgToken, data, token);
           })
@@ -1369,7 +1392,7 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
     filename: path.basename(filename),
     segmentcount: segmentcount,
   };
-  console.log("Commit body: ", body);
+  //console.log("Commit body: ", body);
   let reqUploadImg = await axios
     .post(SegmentURI + '/commit', body, {
       proxy: false,
@@ -1418,8 +1441,8 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
       "recordId": childRecordID[i]
     });
   }
-  console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
-  console.log("Post: ", JSON.stringify(body));
+  //console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
+  //console.log("Post: ", JSON.stringify(body));
 
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
@@ -1437,8 +1460,8 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
       return true;
     })
     .catch((err) => {
-      logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
       return false;
     });
   return resultAssets;
@@ -1467,8 +1490,8 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
     });
   }
 
-  console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
-  console.log("Post: ", JSON.stringify(body));
+  //console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
+  //console.log("Post: ", JSON.stringify(body));
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
         proxy: false,
@@ -1485,8 +1508,8 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
       return true;
     })
     .catch((err) => {
-      logger.error(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
       return false;
     });
   return resultAssets;
@@ -1511,8 +1534,8 @@ module.exports = async (rowdata) => {
     return Promise.resolve(recordLinksResult);
   } else if(rowdata.mode === 'LanguageRelationParent'){
 
-    console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
-    console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+    //console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    //console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
     let recordLinksResult = await languageRelationParent(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
     //logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
@@ -1520,8 +1543,8 @@ module.exports = async (rowdata) => {
     return Promise.resolve(recordLinksResult);    
   } else if(rowdata.mode === 'LanguageRelationChild'){
 
-    console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
-    console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+    //console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    //console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
     let recordLinksResult = await languageRelationChild(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
     logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
