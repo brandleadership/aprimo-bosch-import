@@ -103,7 +103,7 @@ const tlogger = winston.createLogger({
  */
 getToken = async () => {
   const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
-      timeout: 30000,
+      timeout: 60000,
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL),
       headers: {
@@ -117,8 +117,13 @@ getToken = async () => {
     return resp.data;
   })
   .catch(async (err) => {    
-    logger.error(new Date() + ': getToken error -- ' + err);
-    console.log('ERROR' + new Date() + ': getToken error -- ', err);
+    if(err.response !== undefined && err.response.data !== undefined){
+      logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err.response.data));
+    } else {
+      logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err));
+    }      
+
+    //console.log('ERROR' + new Date() + ': getToken error -- ', JSON.stringify(err.response.data));
     var aprToken = await getToken();
     return aprToken;
   });
@@ -174,8 +179,13 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
       return true;
     })
     .catch((err) => {
-      logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
+        console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+        console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      }  
       return false;
     });
   return resultAssets;
@@ -191,8 +201,8 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   ///let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
   //filterFileName = filterFileName.replace(/\+/g, "%2b");
 
-  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : ###################################');
-  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Start Processing Row');
+  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : ###################################');
+  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Start Processing Row');
   let queryString = '';
   if(recordsCollection.LV_ID === ''){
     queryString = "'" + recordsCollection.OBJ_ID + "'";
@@ -201,14 +211,15 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   }
   
 
-  logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
-  console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
+  logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
+  console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID);
+  //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
   //console.log("fullProxyURL:: " + fullProxyURL);
 
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
     { 
-      timeout: 30000,
+      timeout: 60000,
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -220,28 +231,34 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
     })
     .then(async (resp) => {
       const itemsObj = resp.data;
-      console.log(resp.data);
+      //console.log(resp.data);
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
-        console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
 
         getFieldsResult = await getFields("null", token, recordsCollection);
       } else if (itemsObj.totalCount === 1) {
-        logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
-        console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  +  ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, token, recordsCollection);
       }
       return getFieldsResult;
     })
     .catch(async (err) => {
-      logger.error(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err));
-      return 0;
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err.response.data));
+        return {'result': 0, 'message': JSON.stringify(err.response.data)};
+      } else {
+        logger.error(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err));
+        return {'result': 0, 'message': JSON.stringify(err)};
+      }
+      //console.log(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' ERROR : Search Asset API -- ' + JSON.stringify(err.response.data));
+      
     });
 
-    logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : End Processing Row');    
-    logger.info(new Date() + ': PID: '+ recordsCollection.OBJ_ID  + ' INFO : ###################################');
+    logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  +  ' INFO : End Processing Row');    
+    logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  +  ' INFO : ###################################');
     logger.info(new Date() + ' ');    
   
   return APIResult;
@@ -273,7 +290,7 @@ searchClassification = async (ClassID, token, data) => {
     .then(async (resp) => {
       //console.log("resp.data.id:", resp.data.id);
       if (resp.data.id === null) {
-        console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
+        //console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
         clogger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
         return 'null';
       } else {
@@ -283,9 +300,13 @@ searchClassification = async (ClassID, token, data) => {
       }
     })
     .catch(async (err) => {
-      console.log(new Date() + ": WARNING : Classification Missing -- ", JSON.stringify(err));
+      //console.log(new Date() + ": WARNING : Classification Missing -- ", JSON.stringify(err.response.data));
       clogger.warn(new Date() + ': WARNING : Classification Missing URL -- ' + APR_CREDENTIALS.GetClassification + filterClass);
-      clogger.warn(new Date() + ': WARNING : is ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        clogger.warn(new Date() + ': WARNING : ' + JSON.stringify(err.response.data));
+      } else {
+        clogger.warn(new Date() + ': WARNING : ' + JSON.stringify(err));
+      }
       return 'null';
     });
   return resultID;
@@ -311,7 +332,7 @@ getFilesizeInMegabytes = async (filename) => {
   var stats = fs.statSync(filename);
   var fileSizeInBytes = stats.size;
   var fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
-  console.log("fileSizeInMegabytes:", fileSizeInMegabytes);
+  //console.log("fileSizeInMegabytes:", fileSizeInMegabytes);
   return fileSizeInMegabytes;
 };
 
@@ -334,23 +355,38 @@ getFields = async (assetID, token, recordsCollection) => {
 
     try {
       if(recordsCollection.BINARY_FILENAME === '' && recordsCollection.LV_ID === ''){
-        APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+        const aprToken = await getToken();
+        if(aprToken?.accessToken !== undefined){
+            token = aprToken.accessToken;
+            APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+        }
       } else {
-        const ImageToken = await uploadAsset(token, filename);    
-        console.log(new Date() + ": INFO : Create Meta:");
+        const ImageToken = await uploadAsset(token, filename, recordsCollection.JOB_ID);
+        //console.log(new Date() + ": INFO : Create Meta:");
         logger.info(new Date() + ': INFO : Create Meta:');
-        APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);      
+
+        const aprToken = await getToken();
+        if(aprToken?.accessToken !== undefined){
+            token = aprToken.accessToken;
+            APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);      
+        }
       }
     } catch (error) {
       console.log(new Date() + ": Error : Create Meta: "+ error);
-      logger.info(new Date() + ': Error : Create Meta: '+ error);        
+      logger.info(new Date() + ': Error : Create Meta: '+ error);
+      APIResult = {'result': 0, 'message': error};
     }
   } else {
     try {
-      APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+      const aprToken = await getToken();
+      if(aprToken?.accessToken !== undefined){
+          token = aprToken.accessToken;
+          APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+      }
     } catch (error) {
       console.log(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
       logger.info(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
+      APIResult = {'result': assetID, 'message': error};
     }
   }
   return APIResult;
@@ -378,13 +414,18 @@ getFieldIDs = async (token) => {
         return resp.data.items;
       } else {
         logger.error(new Date() + ': ERROR : tempAssetID Missing --');
-        console.log(new Date() + ': ERROR : tempAssetID Missing --');
+        //console.log(new Date() + ': ERROR : tempAssetID Missing --');
         return null;
       }
     })
     .catch(async (err) => {
-      logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
       return null;
     });
   return getFieldsResult;
@@ -426,6 +467,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
     };
   }
 
+
+  try {
+    
   let ClassObj = [];
   for (var key in data) {
     let ClassID = [];
@@ -457,7 +501,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
     switch (key) {
       case 'OBJ_ID':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'KBObjectID');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_obj_id');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -486,7 +530,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
           ClassID.push(APIResult);
         }
 
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Object Type');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_object_type');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -539,7 +583,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'LTYPE_ID':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'LTYPE ID');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_id');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -550,7 +594,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'LTYPE_NAME':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'LTYPE Name');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_name');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -604,7 +648,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;
-      case 'CATEGORY_TREE_IDS':
+      case 'CATEGORY_TREE_IDS'://text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
@@ -632,20 +676,18 @@ createMeta = async (assetID, data, ImgToken, token) => {
         }
         // code block
         break;
-      case 'BRAND':
-        APIResult = await searchClassificationName(tmpKey, token, data);
+      case 'BRAND'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_brand');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
         if (APIResult !== 'null') {
-          ClassID.push(APIResult);
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
         }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Brand');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
         // code block
         break;
       case 'INIT_DATE':
@@ -681,7 +723,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'ILABEL':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'ILabel');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ilabel');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -691,14 +733,14 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;
-      case 'IMG_TYPE':
+      case 'IMG_TYPE': //Classification (Hierarchical)
         
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
         }
 
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetType');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -709,6 +751,24 @@ createMeta = async (assetID, data, ImgToken, token) => {
         
         // code block
         break;
+      case 'IMG_TYPE_HAWERA': //Classification (Hierarchical)
+        
+        APIResult = await searchClassificationName(tmpKey, token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
+
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type_hawera');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        
+        // code block
+        break;        
       case 'KEYWORDS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
         updateObj.fields.addOrUpdate.push({
@@ -758,7 +818,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'AGENCY':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'PostProduction');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_agency');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
         if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
@@ -797,6 +857,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
             "languageId": "00000000000000000000000000000000"
           }]
         });
+
         var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
         var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
 
@@ -826,8 +887,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
         // code block
         break;
-      case 'ORIG_BE_ID':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Original BE ID');
+      case 'ORIG_BE_ID'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_orig_be_id');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -888,7 +949,276 @@ createMeta = async (assetID, data, ImgToken, token) => {
           }]
         });        
         break;
-  
+
+      case 'CONTACT'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_contact');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'DEPT'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'ResponsibleDepartment');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+
+      case 'DESC'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_desc');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'DESCRIPTION'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'DESCRIPTION_POD'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description_pod');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'DESCRIPTION_POD'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description_pod');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'HEADLINE'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_headline');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+
+      case 'LANGUAGE'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetLanguage');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+
+      case 'PERSPECTIVE'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_perspective');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'PRODUCTION_AGENCY'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_production_agency');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+
+
+      case 'PHOTOGRAPHER'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_photographer');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'SYMBOLIMG_DESCRIPTION'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_symbolimg_description');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+
+      case 'TITLE'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_title');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'TRADE_LABEL_AGENCY'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_agency');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'TRADE_LABEL_BRAND'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_brand');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'TRADE_LABEL_DEPT'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_dept');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'TRADE_LABEL_PERSPECTIVE'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_perspective');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'TRADE_LABEL_CONTACT'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_contact');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'TRADE_LABEL_EAN'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_ean');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'TRADE_LABEL_KEYWORDS'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_keywords');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'BU': //Classification (Hierarchical)
+        
+        APIResult = await searchClassificationName(tmpKey, token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
+
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        
+        // code block
+        break;        
+
       default:
         // code block
     }
@@ -912,7 +1242,12 @@ createMeta = async (assetID, data, ImgToken, token) => {
     });
   }
 
-  console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
+  } catch (error) {
+    logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : META:' + JSON.stringify(error));
+  }
+
+
+  //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
   logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
   
 
@@ -930,8 +1265,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
       })
       .then(async (resp) => {
         if (resp.data.id !== undefined) {
-          logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record ID: ' + resp.data.id);
-          console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record ID: ' + resp.data.id);
+          logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' INFO : Record ID: ' + resp.data.id);
+          //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record ID: ' + resp.data.id);
 
           tlogger.info({
             'filename': data['BINARY_FILENAME'],
@@ -945,21 +1280,30 @@ createMeta = async (assetID, data, ImgToken, token) => {
             'token': ImgToken
           });
 
-          return resp.data.id;
+          return {'result': resp.data.id, 'message': 'RECORD CREATED'};
         } else {
-          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-          console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
-          console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(resp));
-          return '0';
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : GETTING RECORD ID -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+          //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : GETTING RECORD ID -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : GETTING RECORD ID -- ' + JSON.stringify(resp));
+          //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : GETTING RECORD ID -- ' + JSON.stringify(resp));
+          return {'result': 0, 'message': JSON.stringify(resp)};
         }
       })
       .catch((err) => {
-        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
-        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
-        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
-        return '0';
+        if(err.response !== undefined && err.response.data !== undefined){
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err.response.data));        
+          return {'result': 0, 'message': JSON.stringify(err.response.data)};
+        } else {
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
+          return {'result': 0, 'message': JSON.stringify(err)};
+        }
+  
+        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+        //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : CREATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
+        //logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
+        //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err));
+        
+        //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : CREATE RECORD API -- ' + JSON.stringify(err.response.data));
       });
     return reqCreatRequest;
   } else {
@@ -976,8 +1320,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
           },
       })
       .then(async (resp) => {
-        logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record Updated: ' + assetID);
-        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Record Updated: ' + assetID);
+        logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' INFO : Record Updated: ' + assetID);
+        //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' INFO : Record Updated: ' + assetID);
 
         tlogger.info({
           'filename': data['BINARY_FILENAME'],
@@ -991,19 +1335,23 @@ createMeta = async (assetID, data, ImgToken, token) => {
           'token': 'meta updated only'
         });        //ImgToken
     
-        //console.log(': Update Record ID: ');
-        return assetID;
+        ////console.log(': Update Record ID: ');
+        return {'result': assetID, 'message': 'RECORD UPDATED'};
       })
       .catch((err) => {
-        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
-        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
-        console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
-        return '0';
+        logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        if(err.response !== undefined && err.response.data !== undefined){
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err.response.data));
+          return {'result': 0, 'message': JSON.stringify(err.response.data)};
+        } else {
+          logger.error(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
+          return {'result': 0, 'message': JSON.stringify(err)};
+        }
+        //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err.response.data));
       });
     return reqCreatRequest;
   }
-
 };
 
 /**
@@ -1031,9 +1379,9 @@ searchUser = async (firstName, lastName, token) => {
 
 
   logger.error(new Date() + ': INFO : Search USER ID: ' + JSON.stringify(body));
-  console.log(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
+  //console.log(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
   logger.error(new Date() + ': INFO : Search USER URL: ' + APR_CREDENTIALS.SearchUser);
-  console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
+  //console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
   let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.SearchUser, JSON.stringify(body), {
         proxy: false,
@@ -1049,19 +1397,25 @@ searchUser = async (firstName, lastName, token) => {
       .then(async (resp) => {        
         if (resp.data['_total'] !== 0) {
           logger.error(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
-          console.log(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
+          //console.log(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
           return resp.data['_embedded'].user[0].adamUserId;
         } else {
           logger.error(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
-          console.log(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
+          //console.log(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
           return '0';
         }
       })
       .catch((err) => {
         logger.error(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
-        console.log(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
-        logger.error(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
-        console.log(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
+        //console.log(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
+
+        if(err.response !== undefined && err.response.data !== undefined){
+          logger.error(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err.response.data));
+        } else {
+          logger.error(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
+        }
+
+        //console.log(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err.response.data));
         return '0';
       });
     return reqCreatRequest;
@@ -1075,7 +1429,7 @@ searchUser = async (firstName, lastName, token) => {
 getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
   //let filterClass = fieldURL.replace(/&/g, "%26");
   //filterClass = filterClass.replace(/\+/g, "%2b");
-  //console.log('filterClass: ', filterClass);
+  ////console.log('filterClass: ', filterClass);
   let resultID = await axios
     .get(encodeURI(fieldURL),      
       {
@@ -1090,27 +1444,32 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
     }
     )
     .then(async (resp) => {
-      //console.log("resp.data:--------", resp.data);
+      ////console.log("resp.data:--------", resp.data);
       ObjectID = findObject(resp.data.items, 'name', fieldValue);
-      //console.log("ObjectID:--------", ObjectID);
+      ////console.log("ObjectID:--------", ObjectID);
       if (ObjectID.length > 0) {
-        //console.log(new Date() + ': ObjectID.id -- ' + ObjectID[0].id);
+        ////console.log(new Date() + ': ObjectID.id -- ' + ObjectID[0].id);
         return ObjectID[0].id;
       } else {
-        console.log(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
+        //console.log(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
         logger.error(new Date() + ': ERROR : Field Definition -- ' + fieldURL);
-        console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
+        //console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
         logger.error(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
 
         return 'null';
       }
     })
     .catch(async (err) => {
-      console.log(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
-      console.log(new Date() + ": ERROR : Field Definition API -- ", JSON.stringify(err));
+      //console.log(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
+      //console.log(new Date() + ": ERROR : Field Definition API -- ", JSON.stringify(err.response.data));
       logger.error(new Date() + ': ERROR : Field Definition API -- ' + fieldURL);
-      logger.error(new Date() + ': ERROR : is ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : is ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : is ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
       logger.error(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
 
       return 'null';
@@ -1126,7 +1485,7 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
 searchClassificationName = async (ClassID, token, data) => {
   //let filterClass = ClassID.replace(/&/g, "%26");
   //filterClass = filterClass.replace(/\+/g, "%2b");
-  //console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
+  ////console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
   let resultID = await axios
     .get(APR_CREDENTIALS.GetClassificationByName + "'" + encodeURI(ClassID) + "'", {
       proxy: false,
@@ -1141,18 +1500,23 @@ searchClassificationName = async (ClassID, token, data) => {
     .then(async (resp) => {
       const itemsObj = resp.data;
       if (itemsObj.totalCount === 1) {
-        console.log("Field Value: ", itemsObj.items[0].id);
+        //console.log("Field Value: ", itemsObj.items[0].id);
         return itemsObj.items[0].id;
       } else {
         logger.error(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
-        console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
         return 'null';
       }
     })
     .catch(async (err) => {
       logger.error(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
-      console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
-      logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err));
+      //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err.response.data));
+      } else {
+        logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err));
+      }
+
       return 'null';
     });
   return resultID;
@@ -1162,22 +1526,23 @@ searchClassificationName = async (ClassID, token, data) => {
  * Upload file into Aprimo
  * @param {*} token, filename 
  */
-async function uploadAsset(token, filename) {
+async function uploadAsset(token, filename, processPath) {
+
   let BINARY_FILENAME = filename
-  let remotePath = APR_CREDENTIALS.sourcePath + '/binary/' + filename;
+  let remotePath = APR_CREDENTIALS.sourcePath + '/'+ processPath + '/binary/' + filename;
   filename = imgFolderPath + filename;
   
-  console.log("File Downloading Started:: ", remotePath, " :: ", filename);
+  //console.log("File Downloading Started:: ", remotePath, " :: ", filename);
   let sftp = new Client();
   await sftp.connect(ftpConfig)
     .then(async () => {
       
       await sftp.fastGet(remotePath, filename);
 
-      console.log("File Downloading Ended:: ", remotePath, " :: ", filename);
+      //console.log("File Downloading Ended:: ", remotePath, " :: ", filename);
     }).catch(e => {
       logger.error(new Date() + ': ERROR : in the FTP Connection -- ' + e);
-      console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
+      //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
     });
     
 
@@ -1185,60 +1550,80 @@ async function uploadAsset(token, filename) {
       let varFileSize = await getFilesizeInMegabytes(filename);
       let varFileSizeByte = varFileSize * (1024 * 1024);
       let getMimeType = mime.lookup(filename);
-      //console.log("varFileSize:", varFileSize);
+      ////console.log("varFileSize:", varFileSize);
       //logger.info(new Date() + ": getMimeType: " + getMimeType);
       //logger.info(new Date() + ': FileSize: ' + varFileSize);
       let APIResult = null;
       if (varFileSize > 1) {
-        let SegmentURI = await getSegmentURL(filename, token);
-        console.log("SegmentURI: ", SegmentURI);
-        APIResult = await splitFile
-          .splitFileBySize(filename, 10000000)
-          .then(async (names) => {
-            for (let start = 0; start < names.length; start++) {
-              console.log("splitFileBySize: ", start, names[start]);
-              const aprToken = await getToken();
-              if(aprToken?.accessToken !== undefined){
-                token = aprToken.accessToken;
-                await uploadSegment(
-                  SegmentURI + "?index=" + start,
-                  names[start],
-                  token
-                );
-              }
-            }
-            
-            const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
 
-            for (let start = 0; start < names.length; start++) {
-              fs.unlink(names[start], (err) => {
-                if (err){
-                  logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
-                  console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
-                  //throw err;
-                } 
-              });  
-            }
 
-            //logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
-            return ImgToken;
-          })
-          .catch((err) => {
-            logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
-            console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
-            return null;
-            //console.log('Error: ', err);
-          });
-        return APIResult;
+        const aprToken = await getToken();
+        if(aprToken?.accessToken !== undefined){
+            token = aprToken.accessToken;
+
+            let SegmentURI = await getSegmentURL(filename, token);
+            //console.log("SegmentURI: ", SegmentURI);
+            APIResult = await splitFile
+              .splitFileBySize(filename, 10000000)
+              .then(async (names) => {
+                for (let start = 0; start < names.length; start++) {
+                  //console.log("splitFileBySize: ", start, names[start]);
+                  const aprToken = await getToken();
+                  if(aprToken?.accessToken !== undefined){
+                    token = aprToken.accessToken;
+                    await uploadSegment(
+                      SegmentURI + "?index=" + start,
+                      names[start],
+                      token
+                    );
+                  }
+                }
+                
+                const aprToken = await getToken();
+                if(aprToken?.accessToken !== undefined){
+                  token = aprToken.accessToken;
+                  const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
+
+                  for (let start = 0; start < names.length; start++) {
+                    fs.unlink(names[start], (err) => {
+                      if (err){
+                        logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                        //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
+                        //throw err;
+                      } 
+                    });  
+                  }
+
+                  return ImgToken;  
+                } else {
+                  return null;
+                }    
+                //logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
+              })
+              .catch((err) => {
+                if(err.response !== undefined && err.response.data !== undefined){
+                  logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
+                } else {
+                  logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
+                }
+          
+                //console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
+                return null;
+                ////console.log('Error: ', err);
+              });
+            return APIResult;
+        }else{
+          return null;
+        }
       } else {
-        //console.log("fileSize is < 20 MB:");
+        ////console.log("fileSize is < 20 MB:");
         //logger.info(new Date() + ": fileSize is < 20 MB: ");
         let form = new FormData();
         form.append("file", fs.createReadStream(filename), {
           contentType: getMimeType,
           filename: BINARY_FILENAME,
         });
-        console.log("varFileSizeByte: ", varFileSizeByte);
+        //console.log("varFileSizeByte: ", varFileSizeByte);
         let reqUploadImg = await axios
           .post(APR_CREDENTIALS.Upload_URL, form, {
             proxy: false,
@@ -1254,14 +1639,14 @@ async function uploadAsset(token, filename) {
           })
           .then(async (resp) => {
             let ImgToken = resp.data.token;
-            console.log("ImgToken: ", ImgToken);
+            //console.log("ImgToken: ", ImgToken);
             // logger.info(new Date() + ": ImgToken: " + ImgToken);
             //APIResult = await getFields("null", token, ImgToken);
 
               fs.unlink(filename, (err) => {
                 if (err){
                   logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
-                  console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
+                  //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
                   //throw err;
                 } 
               });  
@@ -1271,8 +1656,13 @@ async function uploadAsset(token, filename) {
             //await createAsset(ImgToken, data, token);
           })
           .catch((err) => {
-            logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
-            console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
+            if(err.response !== undefined && err.response.data !== undefined){
+              logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
+            } else {
+              logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
+            }
+        
+            //console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
             return null;
           });
 
@@ -1283,7 +1673,7 @@ async function uploadAsset(token, filename) {
 
     }else{
       logger.error(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
-      console.log(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
+      //console.log(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
     }
     sftp.end();
 
@@ -1296,10 +1686,12 @@ getSegmentURL = async (filename, token) => {
   let body = {
     filename: path.basename(filename)
   };
+  /*
   console.log(
     "APR_CREDENTIALS.Upload_Segments_URL",
     APR_CREDENTIALS.Upload_Segments_URL
   );
+  */
   //logger.info(new Date() + ": Upload_Segments_URL: " + APR_CREDENTIALS.Upload_Segments_URL);
   //logger.info(new Date() + ": Body: " + JSON.stringify(body));
 
@@ -1318,8 +1710,13 @@ getSegmentURL = async (filename, token) => {
       return res.data.uri;
     })
     .catch((err) => {
-      logger.error(new Date() + ': ERROR : getSegment -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : getSegment -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : getSegment -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : getSegment -- ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : getSegment -- ' + JSON.stringify(err.response.data));
     });
   return resultSegmentURI;
 };
@@ -1374,11 +1771,16 @@ uploadSegment = async (SegmentURI, chunkFileName, token) => {
       maxBodyLength: Infinity,
     })
     .then(async (resp) => {
-      console.log("Segment Upload Done for:", chunkFileName);
+      //console.log("Segment Upload Done for:", chunkFileName);
     })
     .catch((err) => {
-      logger.error(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err.response.data));
     });
 };
 
@@ -1392,7 +1794,7 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
     filename: path.basename(filename),
     segmentcount: segmentcount,
   };
-  //console.log("Commit body: ", body);
+  ////console.log("Commit body: ", body);
   let reqUploadImg = await axios
     .post(SegmentURI + '/commit', body, {
       proxy: false,
@@ -1406,13 +1808,18 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
     })
     .then(async (resp) => {
       let ImgToken = resp.data.token;
-      console.log("Image Token===", ImgToken);
+      //console.log("Image Token===", ImgToken);
       //APIResult = await getFields('null', data, token, ImgToken);
       return ImgToken;
     })
     .catch((err) => {
-      logger.error(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err));
-      console.log(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err.response.data));
 
       return false;
     });
@@ -1424,10 +1831,19 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
  * @param {*} masterRecordID, childRecordID, token
  */
 languageRelationParent = async (masterRecordID, childRecordID, token) => {
+  let tempAssetObj = await getFieldIDs(token);
+  let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
+  //fall back
+  if(ObjectID[0].id === null){
+    ObjectID = '71476f4d1c854d0fa0e9af9500f3445c';
+  }else{
+    ObjectID = ObjectID[0].id;
+  }  
+
   let body = {
     "fields": {
       "addOrUpdate": [{
-        "id": "71476f4d1c854d0fa0e9af9500f3445c",
+        "id": ObjectID,
         "localizedValues": [{
           "parents": [],
           "languageId": "00000000000000000000000000000000"
@@ -1441,8 +1857,8 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
       "recordId": childRecordID[i]
     });
   }
-  //console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
-  //console.log("Post: ", JSON.stringify(body));
+  ////console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
+  ////console.log("Post: ", JSON.stringify(body));
 
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
@@ -1460,8 +1876,12 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
       return true;
     })
     .catch((err) => {
-      logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      }
+      //console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
       return false;
     });
   return resultAssets;
@@ -1472,10 +1892,19 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
  * @param {*} masterRecordID, childRecordID, token
  */
 languageRelationChild = async (masterRecordID, childRecordID, token) => {
+  let tempAssetObj = await getFieldIDs(token);  
+  let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
+  //fall back
+  if(ObjectID[0].id === null){
+    ObjectID = '71476f4d1c854d0fa0e9af9500f3445c';
+  }else{
+    ObjectID = ObjectID[0].id;
+  }
+
   let body = {
     "fields": {
       "addOrUpdate": [{
-        "id": "71476f4d1c854d0fa0e9af9500f3445c",
+        "id": ObjectID,
         "localizedValues": [{
           "children": [],
           "languageId": "00000000000000000000000000000000"
@@ -1490,8 +1919,8 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
     });
   }
 
-  //console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
-  //console.log("Post: ", JSON.stringify(body));
+  ////console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
+  ////console.log("Post: ", JSON.stringify(body));
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
         proxy: false,
@@ -1508,8 +1937,12 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
       return true;
     })
     .catch((err) => {
-      logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+      }
+      //console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
       return false;
     });
   return resultAssets;
@@ -1519,35 +1952,37 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
  * Entry point
  */
 module.exports = async (rowdata) => {
-  console.log("Data:", rowdata);
+  //console.log("Data:", rowdata);
   var aprToken = await getToken();
   if(rowdata.mode === 'createRecords'){
     let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata.BINARY_FILENAME, rowdata.rowdata);
-    rowdata.recordID = RecordID;
+    console.log("RecordID: ", RecordID);
+    rowdata.recordID = RecordID.result;
+    rowdata.message = RecordID.message;
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){
-    //console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
-    //console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+    ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
     let recordLinksResult = await recordLinks(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
     //logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-    //console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    ////console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);
   } else if(rowdata.mode === 'LanguageRelationParent'){
 
-    //console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
-    //console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+    ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
     let recordLinksResult = await languageRelationParent(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
     //logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-    //console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    ////console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);    
   } else if(rowdata.mode === 'LanguageRelationChild'){
 
-    //console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
-    //console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
+    ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
+    ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
     let recordLinksResult = await languageRelationChild(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID, aprToken.accessToken);
     logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
-    console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
+    //console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);   }
 }

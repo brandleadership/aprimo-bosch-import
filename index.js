@@ -7,6 +7,8 @@ var fs = require("fs");
 const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 const winston = require("winston");
 require('winston-daily-rotate-file');
+const arrayApp = require('lodash');
+
 const {
   v4: uuidv4
 } = require('uuid');
@@ -19,22 +21,29 @@ const options = {
   filename: 'aprimo-bosch-import.js'
 }
 
-async function JSONtoCheckInData() {
-  //console.log("Start");
+async function JSONtoCheckInData(processPath) {
+  console.log("Start: ", processPath);
   const csvInDir = fs
     .readdirSync(APR_CREDENTIALS.targetPath)
     .filter((file) => path.extname(file) === ".csv");
 
+  let csvFileData = [];
   for (var i = 0, len = csvInDir.length; i < len; i++) {
     var file = csvInDir[i];
     if (file) {
       const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-      const csvFileData = await csv({
+      //console.log("filePath:", filePath);
+      const csvFileDataTmp = await csv({
         'delimiter': [';', ',']
       }).fromFile(filePath);
-      await writeExcel(csvFileData);
+      //console.log("currData:", csvFileDataTmp);
+
+      csvFileData = arrayApp.concat(csvFileData, csvFileDataTmp);
     }
   }
+  //console.log("Data:", csvFileData);
+  await writeExcel(csvFileData, processPath);
+
 };
 
 
@@ -109,18 +118,37 @@ downloadCSVFromFtp = async () => {
     .then(async () => {
       const files = await sftp.list(src + '/.');
       for (var i = 0, len = files.length; i < len; i++) {
-        if (files[i].name.match(/.+(\.csv)$/)) {
-          console.log("FTP:", files[i]);
-          await sftp.fastGet(src + '/' + files[i].name, dst + '/' + files[i].name);
+        if (files[i].name.match(/.+(\.finished)$/)) {
+
+
+          let processPath = path.parse(files[i].name).name;
+          let fd = fs.openSync(dst + '/' + processPath + '.finished', 'w');
+
+          //console.log("FTP:", processPath);
+          const csvfiles = await sftp.list(src + '/' + processPath + '/.');
+          //console.log("FTP:", src + '/' + processPath + '/.');
+
+          for (var i = 0, len = csvfiles.length; i < len; i++) {
+            if (csvfiles[i].name.match(/.+(\.csv)$/)) {    
+              //console.log("FTP File:", src + '/' + processPath + '/' + csvfiles[i].name);
+              //console.log("FTP Download:", dst + '/' + csvfiles[i].name);
+              await sftp.fastGet(src + '/' + processPath + '/' + csvfiles[i].name, dst + '/' + csvfiles[i].name);
+              //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
+            }
+          }
+
+          await JSONtoCheckInData(processPath);
+          await readExcel();
+          await createRelation();
+          await createLanguageRelationParent();
+          await createLanguageRelationChild();
+          await endProcess();
+        
+          //await sftp.fastGet(src + '/' + processPath, dst + '/');
+          //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
         }
       }
 
-      await JSONtoCheckInData();
-      await readExcel();
-      await createRelation();
-      //await createLanguageRelationParent();
-      //await createLanguageRelationChild();
-      await endProcess();
 
     }).catch(e => {
       logger.info(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
@@ -157,8 +185,9 @@ async function readExcel() {
             for (let r = 0; r < result.length; r++) {
               csvData[result[r].rowdata.index].recordID = result[r].recordID;
               csvData[result[r].rowdata.index].processdate = new Date();
+              csvData[result[r].rowdata.index].message = result[r].message;
             }
-            await writeExcel(csvData);
+            await writeExcel(csvData, 'null');
           }
         }
         index++;
@@ -170,9 +199,10 @@ async function readExcel() {
         for (let r = 0; r < result.length; r++) {
           csvData[result[r].rowdata.index].recordID = result[r].recordID;
           csvData[result[r].rowdata.index].processdate = new Date();
+          csvData[result[r].rowdata.index].message = result[r].message;
         }
         poolArray = [];
-        await writeExcel(csvData);
+        await writeExcel(csvData, 'null');
       }
     }
 
@@ -220,7 +250,7 @@ async function createRelation() {
             console.log("result", result);
             cpuIndex = 0;
             poolArray = [];
-            await writeExcel(csvData);
+            await writeExcel(csvData, 'null');
           }
         }
         index++;
@@ -230,7 +260,7 @@ async function createRelation() {
         const result = await Promise.all(poolArray);
         console.log("result", result);
         poolArray = [];
-        await writeExcel(csvData);
+        await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
@@ -287,7 +317,7 @@ async function createLanguageRelationParent() {
         const result = await Promise.all(poolArray);
         console.log("result", result);
         poolArray = [];
-        await writeExcel(csvData);
+        await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
@@ -348,7 +378,7 @@ async function createLanguageRelationChild() {
         const result = await Promise.all(poolArray);
         console.log("result", result);
         poolArray = [];
-        await writeExcel(csvData);
+        await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
@@ -364,6 +394,44 @@ async function endProcess() {
       if (err) throw err;
       console.log('File Renamed.');
     });
+
+
+    let ftpDirectory = APR_CREDENTIALS.targetPath;
+    await fs.readdir(ftpDirectory, async (err, files) => {
+      if (err) throw err;
+  
+      for (const file of files) {
+        console.log("File: ", file);
+        if (file.match(/.+(\.finished)$/)) {
+
+
+          let jsonData;
+          const src = APR_CREDENTIALS.sourcePath;
+          let sftp = new Client();
+
+          console.log("FTP001: ", src + '/' + file);
+          console.log("FTP002: ", src + '/' + path.parse(file).name  + '.importFinished');
+
+          jsonData = await sftp.connect(ftpConfig)
+            .then(async () => {        
+              await sftp.rename(src + '/' + file, src + '/' + path.parse(file).name  + '.importFinished');        
+            }).catch(e => {
+              logger.info(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
+              console.log(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
+            });
+          sftp.end();
+
+          fs.unlink(path.join(ftpDirectory, file), (err) => {
+            if (err) throw err;
+          });
+
+        }
+      }
+    });
+
+    
+
+
   } catch (e) {
     logger.info(new Date() + ': Error: endProcess: ' + e.message);
     console.log(new Date() + ': Error: endProcess: ' + e.message);
@@ -371,13 +439,26 @@ async function endProcess() {
 }
 
 
-async function writeExcel(jsonArray) {
-  //console.log("jsonArray", jsonArray);
+async function writeExcel(jsonArray, processPath) {
+  console.log("writeExcel processPath", processPath);
   //console.log("jsonArray", jsonArray.length);
   try {
+    if(processPath !== 'null'){
+      console.log("writeExcel processPath -0000001", processPath);
+      jsonArray[0].JOB_ID = '';
+    }
 
-    var keys = [];
-    for (var k in jsonArray[0]) keys.push(k);
+
+    let arrayKeys = [];
+    jsonArray.forEach((row) => {
+      //console.log("keys:", row);
+      arrayKeys = arrayApp.concat(arrayKeys, arrayApp.keys(row));
+    });
+    let keys = arrayApp.uniq(arrayKeys); 
+    console.log('keys: ', keys);
+    //const keys = arrayApp.keys(jsonArray[0]);
+    //console.log("keys:", keys);
+    //for (var k in jsonArray[0]) keys.push(k);
     //keys.push("status", "recordID", "processdate");
 
     // Create a new workbook and worksheet
@@ -388,7 +469,16 @@ async function writeExcel(jsonArray) {
 
 
     jsonArray.forEach((row) => {
-      XLSX.utils.sheet_add_json(worksheet, [row], {
+      let objData = {};
+      keys.forEach((keyval) => {
+        if(keyval==='JOB_ID' && processPath !== 'null'){
+          objData[keyval] = processPath;
+        }else{
+          objData[keyval] = row[keyval];
+        }        
+      });
+
+      XLSX.utils.sheet_add_json(worksheet, [objData], {
         skipHeader: true,
         origin: -1
       });
@@ -410,23 +500,24 @@ async function writeExcel(jsonArray) {
 
 
 main = async () => {
-  plogger.info('####### Import Started at ' + new Date() + ' #########');
   console.log('####### Import Started at ' + new Date() + ' #########');
 
+  
   if (fs.existsSync(APR_CREDENTIALS.checkin)) {
     await readExcel();
     await createRelation();
-    //await createLanguageRelationParent();
-    //await createLanguageRelationChild();
+    await createLanguageRelationParent();
+    await createLanguageRelationChild();
     await endProcess();
   } else {
     await downloadCSVFromFtp();
   }
-
+  /*
   plogger.info('####### Import Ended at ' + new Date() + ' #########');
   console.log('####### Import Ended at ' + new Date() + ' #########');
-  logger.info(new Date() + ': INFO : ideal waiting for next cron:');
-  console.log(new Date() + ': INFO : ideal waiting for next cron:');
+  //logger.info(new Date() + ': INFO : ideal waiting for next cron:');
+  //console.log(new Date() + ': INFO : ideal waiting for next cron:');
+  */
 };
 
 try {
