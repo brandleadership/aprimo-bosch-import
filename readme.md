@@ -4,8 +4,8 @@ This package provides the way to CSV from FTP and Import values into Aprimo with
 
 ## Table of Contents
 - [Installation](#installation)
-- [Usage](#usage)
-- [Important Config Files/Folders](#Important Config Files/Folders)
+- [Usa ge](#usage)
+- [Important Config Files and Folders](#important-config-files-and-folders)
 - [Support](#support)
 
 ## Installation
