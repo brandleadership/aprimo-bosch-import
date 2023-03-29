@@ -54,20 +54,20 @@ var appError = new winston.transports.DailyRotateFile({
   level: 'error',
   name: 'error',
   filename: './logs/bosch-app-error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
   filename: './logs/bosch-app-combined-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
 var protocolsLogs = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-protocols-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
@@ -117,33 +117,39 @@ downloadCSVFromFtp = async () => {
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
+      console.log("files:", files);
       for (var i = 0, len = files.length; i < len; i++) {
         if (files[i].name.match(/.+(\.finished)$/)) {
-
-
           let processPath = path.parse(files[i].name).name;
-          let fd = fs.openSync(dst + '/' + processPath + '.finished', 'w');
-
-          //console.log("FTP:", processPath);
-          const csvfiles = await sftp.list(src + '/' + processPath + '/.');
-          //console.log("FTP:", src + '/' + processPath + '/.');
-
-          for (var i = 0, len = csvfiles.length; i < len; i++) {
-            if (csvfiles[i].name.match(/.+(\.csv)$/)) {    
-              //console.log("FTP File:", src + '/' + processPath + '/' + csvfiles[i].name);
-              //console.log("FTP Download:", dst + '/' + csvfiles[i].name);
-              await sftp.fastGet(src + '/' + processPath + '/' + csvfiles[i].name, dst + '/' + csvfiles[i].name);
-              //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
+          let importFinished = false;
+          importFinished = arrayApp.find(files, function(obj) {
+            if (obj.name === processPath + '.importFinished') {
+                return true;
             }
-          }
+          });
+          if(!importFinished){          
+            let fd = fs.openSync(dst + '/' + processPath + '.finished', 'w');
 
-          await JSONtoCheckInData(processPath);
-          await readExcel();
-          await createRelation();
-          await createLanguageRelationParent();
-          await createLanguageRelationChild();
-          await endProcess();
-        
+            //console.log("FTP:", processPath);
+            const csvfiles = await sftp.list(src + '/' + processPath + '/.');
+            //console.log("FTP:", src + '/' + processPath + '/.');
+
+            for (var i = 0, len = csvfiles.length; i < len; i++) {
+              if (csvfiles[i].name.match(/.+(\.csv)$/)) {    
+                //console.log("FTP File:", src + '/' + processPath + '/' + csvfiles[i].name);
+                //console.log("FTP Download:", dst + '/' + csvfiles[i].name);
+                await sftp.fastGet(src + '/' + processPath + '/' + csvfiles[i].name, dst + '/' + csvfiles[i].name);
+                //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
+              }
+            }
+
+            await JSONtoCheckInData(processPath);
+            await readExcel();
+            await createRelation();
+            await createLanguageRelationParent();
+            await createLanguageRelationChild();
+            await endProcess();
+          }
           //await sftp.fastGet(src + '/' + processPath, dst + '/');
           //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
         }
@@ -406,21 +412,22 @@ async function endProcess() {
 
 
           let jsonData;
+          const dst = APR_CREDENTIALS.targetPath;
           const src = APR_CREDENTIALS.sourcePath;
           let sftp = new Client();
 
-          console.log("FTP001: ", src + '/' + file);
-          console.log("FTP002: ", src + '/' + path.parse(file).name  + '.importFinished');
-
+          //console.log("FTP001: ", src + '/' + file);
+          //console.log("FTP002: ", src + '/' + path.parse(file).name  + '.importFinished');
+          let fd = fs.openSync(dst + '/' + path.parse(file).name  + '.importFinished', 'w');
           jsonData = await sftp.connect(ftpConfig)
             .then(async () => {        
-              await sftp.rename(src + '/' + file, src + '/' + path.parse(file).name  + '.importFinished');        
+              await sftp.put(dst + '/' + path.parse(file).name  + '.importFinished', src + '/' + path.parse(file).name  + '.importFinished');
             }).catch(e => {
               logger.info(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
               console.log(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
             });
           sftp.end();
-
+          
           fs.unlink(path.join(ftpDirectory, file), (err) => {
             if (err) throw err;
           });

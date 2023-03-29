@@ -48,33 +48,33 @@ var appError = new winston.transports.DailyRotateFile({
   level: 'error',
   name: 'error',
   filename: './logs/bosch-app-error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appClassification = new winston.transports.DailyRotateFile({
   level: 'info',
   filename: './logs/bosch-app-classification-error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
   filename: './logs/bosch-app-combined-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
 var protocolsLogs = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-protocols-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   maxSize: '20m'
 });
 var tokensLogs = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-uploaded-file-tokens-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
+  datePattern: 'YYYY-MM',
   zippedArchive: false,
   json: true,
   maxSize: '20m'
@@ -1584,12 +1584,19 @@ async function uploadAsset(token, filename, processPath) {
                   token = aprToken.accessToken;
                   const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
 
+                  // Delete Main File 
+                  fs.unlink(filename, (err) => {
+                    if (err){
+                      logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                      //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
+                    } 
+                  });
+                  // Delete Segment Files
                   for (let start = 0; start < names.length; start++) {
                     fs.unlink(names[start], (err) => {
                       if (err){
                         logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
                         //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
-                        //throw err;
                       } 
                     });  
                   }
