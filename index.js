@@ -34,7 +34,9 @@ async function JSONtoCheckInData(processPath) {
       const filePath = APR_CREDENTIALS.targetPath + "/" + file;
       //console.log("filePath:", filePath);
       const csvFileDataTmp = await csv({
-        'delimiter': [';', ',']
+        'delimiter': [';', ','],
+        'quote': '"',
+        preserveLineEndings: true
       }).fromFile(filePath);
       //console.log("currData:", csvFileDataTmp);
 

@@ -500,171 +500,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
     if (data[key] === null || data[key] === '') continue;
 
     switch (key) {
-      case 'OBJ_ID':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_obj_id');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        break;
-      case 'NAME':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Title');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'OTYPE_ID':
-        // code block
-        break;
-      case 'OTYPE_NAME':
-        APIResult = await searchClassificationName(data[key], token, data);
-        if (APIResult !== 'null') {
-          ClassID.push(APIResult);
-        }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_object_type');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-
-        // code block
-        break;
-      case 'SYSTEM_STATUS':
-        APIResult = await searchClassificationName(data[key], token, data);
-        if (APIResult !== 'null') {
-          ClassID.push(APIResult);
-        }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'SystemStatus');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'LV_ID':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger ID');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'MASTER_RECORD':
-        /*
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
-        if(data[key] === 'x'){
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-                "values": ['c0cbb041f69b4c75aebfaeef0090663e'],
-                "languageId": "00000000000000000000000000000000"
-            }]
-          });  
-        }*/
-        // code block
-        break;
-      case 'LTYPE_ID':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_id');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'LTYPE_NAME':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_name');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'ORIGINAL_FILENAME':
-        // code block
-        break;
-      case 'BINARY_FILENAME':
-        // code block
-        break;
-      case 'CATEGORY_TREE_NAMES':
-        if (typeof tmpKey === 'string') {        
-          tmpKey = tmpKey.replace(/\|\|/g, "/");
-        
-        var str_array = tmpKey.split('\\\\');
-        for (var i = 0; i < str_array.length; i++) {
-          // Trim the excess whitespace.
-          str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
-          // Add additional code here, such as:
-          if (classificationlist.hasOwnProperty('/MPE Migration/' + str_array[i]) && classificationlist['/MPE Migration/' + str_array[i]] !== undefined) {
-            ClassID.push(classificationlist['/MPE Migration/' + str_array[i]]);
-          } else {
-            let APIResult = await searchClassification('/MPE Migration/' + str_array[i], token, data)
-            if (APIResult !== 'null') {
-              ClassID.push(APIResult);
-            }
-          }
-        }
-      }
-        /*
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-              "value": ClassID,
-              "languageId": "00000000000000000000000000000000"
-          }]
-        }); */
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'CATEGORY_TREE_IDS'://text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'CSORELEASE_MASTER':
-        if (data[key] === 'x') {
-          optionVal = "True"
-        }
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
+      case 'AGENCY':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_agency');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
         if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
@@ -674,7 +512,6 @@ createMeta = async (assetID, data, ImgToken, token) => {
             }]
           });
         }
-        // code block
         break;
       case 'BRAND'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_brand');
@@ -688,13 +525,25 @@ createMeta = async (assetID, data, ImgToken, token) => {
             }]
           });
         }
-        // code block
         break;
-      case 'INIT_DATE':
-        // code block
-        break;
-      case 'DOUBLE_WIDTH':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'DoubleWidth');
+      case 'BU': //Classification (Hierarchical)
+        
+        APIResult = await searchClassificationName(tmpKey, token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
+
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        break;        
+      case 'CONTACT'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_contact');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -704,13 +553,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;
-      case 'HD_OBJECT':
-        if (data[key] === 'x') {
-          optionVal = "True"
-        }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'HD Object');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
+      case 'DEPT'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'ResponsibleDepartment');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
         if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
@@ -722,6 +567,53 @@ createMeta = async (assetID, data, ImgToken, token) => {
         }
         // code block
         break;
+      case 'DESC'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_desc');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'DESCRIPTION'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'DESCRIPTION_POD'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description_pod');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'FILENAME':
+        // code block
+        break;
+      case 'HEADLINE'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_headline');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;  
       case 'ILABEL':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ilabel');
         updateObj.fields.addOrUpdate.push({
@@ -769,6 +661,45 @@ createMeta = async (assetID, data, ImgToken, token) => {
         
         // code block
         break;        
+      case 'INIT_NAME':
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+  
+          var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
+          var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
+  
+          //console.log('INIT_NAME **************', firstName);
+          //console.log('INIT_NAME **************', lastName);
+          APIResult = await searchUser(firstName, lastName, token);
+          if(APIResult !== '0'){
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });          
+          } else {
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APR_CREDENTIALS.defaultAssetOwner],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+  
+  
+          // code block
+          break;
       case 'KEYWORDS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
         updateObj.fields.addOrUpdate.push({
@@ -779,46 +710,9 @@ createMeta = async (assetID, data, ImgToken, token) => {
           }]
         });
         // code block
-        break;
-      case 'MISSING_TTNR':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Missing_TTNR');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'FILENAME':
-        // code block
-        break;
-      case 'SYMBOLIMG_DESCRIPTION':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Short Describtion');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'DESCRIPTION':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'SmartDescription');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-
-        // code block
-        break;
-      case 'AGENCY':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_agency');
+        break;    
+      case 'LANGUAGE'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetLanguage');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
         if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
@@ -829,16 +723,344 @@ createMeta = async (assetID, data, ImgToken, token) => {
             }]
           });
         }
-
+        // code block
+        break;
+      case 'LAUNCH_DATE':
+        let LAUNCH_DATE_VAR = new Date(data[key]);
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": LAUNCH_DATE_VAR,
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'ORIG_BE_ID'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_orig_be_id');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'PERSPECTIVE'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_perspective');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'PHOTOGRAPHER'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_photographer');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'PRODUCTION_AGENCY'://Option List
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_production_agency');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
         // code block
         break;
       case 'STATUS':
-        APIResult = await searchClassificationName(tmpKey, token, data);
+          APIResult = await searchClassificationName(tmpKey, token, data);
+          if (APIResult !== 'null') {
+            ClassID.push(APIResult);
+          }
+  
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": ClassID,
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'SYMBOLIMG_DESCRIPTION'://Text
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_symbolimg_description');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'TITLE'://Text
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_title');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'TRADE_LABEL_AGENCY'://Option List
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_agency');
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+          // code block
+          break;
+      case 'TRADE_LABEL_BRAND'://Option List
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_brand');
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+          // code block
+          break;
+      case 'TRADE_LABEL_CONTACT'://Text
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_contact');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'TRADE_LABEL_DEPT'://Option List
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_dept');
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+          // code block
+          break;      
+      case 'TRADE_LABEL_EAN'://Text
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_ean');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'TRADE_LABEL_KEYWORDS'://Text
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_keywords');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'TRADE_LABEL_PERSPECTIVE'://Option List
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_perspective');
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+          // code block
+          break;
+      case 'CATEGORY_TREE_IDS'://text
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'CATEGORY_TREE_NAMES':
+            if (typeof tmpKey === 'string') {        
+              tmpKey = tmpKey.replace(/\|\|/g, "/");
+            
+            var str_array = tmpKey.split('\\\\');
+            for (var i = 0; i < str_array.length; i++) {
+              // Trim the excess whitespace.
+              str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
+              // Add additional code here, such as:
+              if (classificationlist.hasOwnProperty('/MPE Migration/' + str_array[i]) && classificationlist['/MPE Migration/' + str_array[i]] !== undefined) {
+                ClassID.push(classificationlist['/MPE Migration/' + str_array[i]]);
+              } else {
+                let APIResult = await searchClassification('/MPE Migration/' + str_array[i], token, data)
+                if (APIResult !== 'null') {
+                  ClassID.push(APIResult);
+                }
+              }
+            }
+          }
+            /*
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                  "value": ClassID,
+                  "languageId": "00000000000000000000000000000000"
+              }]
+            }); */
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+            // code block
+            break;
+      case 'LTYPE_ID':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_id');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'LTYPE_NAME':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_name');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'LV_ID':
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger ID');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+          // code block
+          break;
+      case 'MASTER_RECORD':
+          /*
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
+          if(data[key] === 'x'){
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                  "values": ['c0cbb041f69b4c75aebfaeef0090663e'],
+                  "languageId": "00000000000000000000000000000000"
+              }]
+            });  
+          }*/
+          // code block
+          break;
+      case 'NAME':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'Title');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'OBJ_ID':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_obj_id');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        break;
+      case 'ORIGINAL_FILENAME':
+        // code block
+        break;
+      case 'OTYPE_ID':
+        // code block
+        break;
+      case 'OTYPE_NAME':
+        APIResult = await searchClassificationName(data[key], token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
         }
 
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_object_type');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "values": ClassID,
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+
+        // code block
+        break;
+      case 'SYSTEM_STATUS':
+        APIResult = await searchClassificationName(data[key], token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        }
+
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'SystemStatus');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -848,8 +1070,33 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;
-      case 'INIT_NAME':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
+
+      //Other Old Mapped Fields
+      case 'BINARY_FILENAME':
+        // code block
+        break;
+      case 'CSORELEASE_MASTER':
+        if (data[key] === 'x') {
+          optionVal = "True"
+        }
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
+        if (APIResult !== 'null') {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
+        // code block
+        break;
+      case 'INIT_DATE':
+        // code block
+        break;
+      case 'DOUBLE_WIDTH':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'DoubleWidth');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -857,38 +1104,28 @@ createMeta = async (assetID, data, ImgToken, token) => {
             "languageId": "00000000000000000000000000000000"
           }]
         });
+        // code block
+        break;
+      case 'HD_OBJECT':
+        if (data[key] === 'x') {
+          optionVal = "True"
+        }
 
-        var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
-        var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
-
-        //console.log('INIT_NAME **************', firstName);
-        //console.log('INIT_NAME **************', lastName);
-        APIResult = await searchUser(firstName, lastName, token);
-        if(APIResult !== '0'){
-          ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'HD Object');
+        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
+        if (APIResult !== 'null') {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
               "values": [APIResult],
               "languageId": "00000000000000000000000000000000"
             }]
-          });          
-        } else {
-          ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APR_CREDENTIALS.defaultAssetOwner],
-              "languageId": "00000000000000000000000000000000"
-            }]
           });
         }
-
-
         // code block
         break;
-      case 'ORIG_BE_ID'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_orig_be_id');
+      case 'MISSING_TTNR':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'Missing_TTNR');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
@@ -923,18 +1160,6 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;
-      case 'LAUNCH_DATE':
-        let LAUNCH_DATE_VAR = new Date(data[key]);
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": LAUNCH_DATE_VAR,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
       case 'CLIPLISTER_LINKS':
         // code block
         break;
@@ -949,276 +1174,6 @@ createMeta = async (assetID, data, ImgToken, token) => {
           }]
         });        
         break;
-
-      case 'CONTACT'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_contact');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'DEPT'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'ResponsibleDepartment');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-
-      case 'DESC'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_desc');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'DESCRIPTION'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'DESCRIPTION_POD'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description_pod');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'DESCRIPTION_POD'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description_pod');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'HEADLINE'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_headline');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-
-      case 'LANGUAGE'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetLanguage');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-
-      case 'PERSPECTIVE'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_perspective');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-      case 'PRODUCTION_AGENCY'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_production_agency');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-
-
-      case 'PHOTOGRAPHER'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_photographer');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'SYMBOLIMG_DESCRIPTION'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_symbolimg_description');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-
-      case 'TITLE'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_title');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'TRADE_LABEL_AGENCY'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_agency');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-      case 'TRADE_LABEL_BRAND'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_brand');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-      case 'TRADE_LABEL_DEPT'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_dept');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-      case 'TRADE_LABEL_PERSPECTIVE'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_perspective');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;
-      case 'TRADE_LABEL_CONTACT'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_contact');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'TRADE_LABEL_EAN'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_ean');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'TRADE_LABEL_KEYWORDS'://Text
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_keywords');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'BU': //Classification (Hierarchical)
-        
-        APIResult = await searchClassificationName(tmpKey, token, data);
-        if (APIResult !== 'null') {
-          ClassID.push(APIResult);
-        }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        
-        // code block
-        break;        
-
       default:
         // code block
     }
