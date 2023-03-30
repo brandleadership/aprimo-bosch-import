@@ -55,21 +55,27 @@ async function JSONtoCheckInData(processPath) {
 var appError = new winston.transports.DailyRotateFile({
   level: 'error',
   name: 'error',
-  filename: './logs/bosch-app-error-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-error.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-error',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
-  filename: './logs/bosch-app-combined-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-combined.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-combined.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var protocolsLogs = new winston.transports.DailyRotateFile({
-  filename: './logs/bosch-app-protocols-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-protocols.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-protocols.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });

@@ -47,37 +47,47 @@ const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 var appError = new winston.transports.DailyRotateFile({
   level: 'error',
   name: 'error',
-  filename: './logs/bosch-app-error-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-error.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-error',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appClassification = new winston.transports.DailyRotateFile({
   level: 'info',
-  filename: './logs/bosch-app-classification-error-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-classification-error.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-classification-error',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
   filename: './logs/bosch-app-combined-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  createSymlink: true,
+  symlinkName: 'bosch-app-combined.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var protocolsLogs = new winston.transports.DailyRotateFile({
-  filename: './logs/bosch-app-protocols-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-protocols.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-protocols.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var tokensLogs = new winston.transports.DailyRotateFile({
-  filename: './logs/bosch-app-uploaded-file-tokens-%DATE%.log',
-  datePattern: 'YYYY-MM',
+  filename: './logs/bosch-app-uploaded-file-tokens.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-uploaded-file-tokens.log',
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  json: true,
-  maxSize: '20m'
+  maxSize: '20m',
+  json: true
 });
 
 const logger = winston.createLogger({
