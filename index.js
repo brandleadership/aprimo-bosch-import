@@ -119,7 +119,7 @@ downloadCSVFromFtp = async () => {
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
-      console.log("files:", files);
+      //console.log("files:", files);
       for (var i = 0, len = files.length; i < len; i++) {
         if (files[i].name.match(/.+(\.finished)$/)) {
           let processPath = path.parse(files[i].name).name;
@@ -178,9 +178,9 @@ async function readExcel() {
       let cpuIndex = 0;
       let poolArray = [];
       for (const row of csvData) {
-        if (row?.status !== 'checkin' && row?.status !== 'linked') {
+        if (row?.appstatus !== 'checkin' && row?.appstatus !== 'linked') {
           cpuIndex++;
-          csvData[index].status = 'checkin';
+          csvData[index].appstatus = 'checkin';
           csvData[index].index = index;
           poolArray.push(pool.run({
             rowdata: row,
@@ -235,9 +235,9 @@ async function createRelation() {
       let poolArray = [];
 
       for (const maserDataRow of maserData) {
-        if (maserDataRow?.status === 'checkin') {
+        if (maserDataRow?.appstatus === 'checkin') {
           cpuIndex++;
-          csvData[maserDataRow.index].status = 'linked';
+          csvData[maserDataRow.index].appstatus = 'linked';
           csvData[maserDataRow.index].index = index;
           const childData = csvData.filter((row) => row['OBJ_ID'] === maserDataRow.OBJ_ID && row['recordID'] != '' && row['MASTER_RECORD'] != 'x');
           let childRecordID = [];
@@ -400,7 +400,7 @@ async function endProcess() {
     let randomName = APR_CREDENTIALS.targetPath + '/' + uuidv4() + '.xlsx'; // '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
     fs.rename(APR_CREDENTIALS.checkin, randomName, function (err) {
       if (err) throw err;
-      console.log('File Renamed.');
+      //console.log('File Renamed.');
     });
 
 
@@ -409,7 +409,7 @@ async function endProcess() {
       if (err) throw err;
   
       for (const file of files) {
-        console.log("File: ", file);
+        //console.log("File: ", file);
         if (file.match(/.+(\.finished)$/)) {
 
 
@@ -449,11 +449,11 @@ async function endProcess() {
 
 
 async function writeExcel(jsonArray, processPath) {
-  console.log("writeExcel processPath", processPath);
+  //console.log("writeExcel processPath", processPath);
   //console.log("jsonArray", jsonArray.length);
   try {
     if(processPath !== 'null'){
-      console.log("writeExcel processPath -0000001", processPath);
+      //console.log("writeExcel processPath -0000001", processPath);
       jsonArray[0].JOB_ID = '';
     }
 
@@ -464,7 +464,7 @@ async function writeExcel(jsonArray, processPath) {
       arrayKeys = arrayApp.concat(arrayKeys, arrayApp.keys(row));
     });
     let keys = arrayApp.uniq(arrayKeys); 
-    console.log('keys: ', keys);
+    //console.log('keys: ', keys);
     //const keys = arrayApp.keys(jsonArray[0]);
     //console.log("keys:", keys);
     //for (var k in jsonArray[0]) keys.push(k);

@@ -915,35 +915,43 @@ createMeta = async (assetID, data, ImgToken, token) => {
           // code block
           break;
       case 'CATEGORY_TREE_IDS'://text
-          ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-          // code block
-          break;
-      case 'CATEGORY_TREE_NAMES':
-            if (typeof tmpKey === 'string') {        
-              tmpKey = tmpKey.replace(/\|\|/g, "/");
-            
-            var str_array = tmpKey.split('\\\\');
-            for (var i = 0; i < str_array.length; i++) {
-              // Trim the excess whitespace.
-              str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
-              // Add additional code here, such as:
-              if (classificationlist.hasOwnProperty('/MPE Migration/' + str_array[i]) && classificationlist['/MPE Migration/' + str_array[i]] !== undefined) {
-                ClassID.push(classificationlist['/MPE Migration/' + str_array[i]]);
-              } else {
-                let APIResult = await searchClassification('/MPE Migration/' + str_array[i], token, data)
-                if (APIResult !== 'null') {
-                  ClassID.push(APIResult);
-                }
-              }
-            }
+        if (typeof tmpKey === 'string'){
+          //tmpKey = tmpKey.replace(/\|\|/g, "/");        
+          let str_array = tmpKey.split('\\\\');
+          //console.log("str_array: ", str_array);
+          //console.log("str_array.length: ", str_array.length);
+
+          for (let splitIndex = 0; splitIndex < str_array.length; splitIndex++) {
+            // Trim the excess whitespace.
+            //console.log("splitIndex: ", splitIndex);
+            let treeIDs = str_array[splitIndex];
+            let pieces = treeIDs.split(/[\s\|\|]+/);
+            //console.log("pieces: ", pieces);
+            let lastValue = pieces[pieces.length - 1];
+            //console.log("lastValue: ", lastValue);
+            lastValue = lastValue.replace(/^\s*/, "").replace(/\s*$/, "");
+            // Add additional code here, such as:
+            if(lastValue !== null){
+              let APIResult = await searchClassificationID(lastValue, token, data)
+              //console.log("lastValue: ", APIResult);  
+              if (APIResult !== 'null') {
+                ClassID.push(APIResult);
+              }  
+            }            
           }
+        }
+
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;
+      case 'CATEGORY_TREE_NAMES':
             /*
             ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
             updateObj.fields.addOrUpdate.push({
@@ -1035,27 +1043,26 @@ createMeta = async (assetID, data, ImgToken, token) => {
         // code block
         break;
       case 'OTYPE_ID':
+        APIResult = await searchClassificationID(data[key], token, data);
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+        
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_object_type');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }
         // code block
         break;
       case 'OTYPE_NAME':
-        APIResult = await searchClassificationName(data[key], token, data);
-        if (APIResult !== 'null') {
-          ClassID.push(APIResult);
-        }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_object_type');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-
         // code block
         break;
       case 'SYSTEM_STATUS':
-        APIResult = await searchClassificationName(data[key], token, data);
+        APIResult = await searchClassificationID('mpe_' + data[key], token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
         }
@@ -1064,7 +1071,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
           "localizedValues": [{
-            "values": ClassID,
+            "values": [APIResult],
             "languageId": "00000000000000000000000000000000"
           }]
         });
@@ -1095,6 +1102,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
       case 'INIT_DATE':
         // code block
         break;
+      /*
       case 'DOUBLE_WIDTH':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'DoubleWidth');
         updateObj.fields.addOrUpdate.push({
@@ -1124,6 +1132,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         }
         // code block
         break;
+      */
       case 'MISSING_TTNR':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Missing_TTNR');
         updateObj.fields.addOrUpdate.push({
@@ -1135,6 +1144,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;
+      /*
       case 'AC_MAIN_USAGE':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'IntendedUsage');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
@@ -1149,6 +1159,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         }
         // code block
         break;
+      */
       case 'LINKED_PRODUCTS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ReferencedProductsinPIM');
         updateObj.fields.addOrUpdate.push({
@@ -1177,7 +1188,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
       default:
         // code block
     }
-
+    //console.log("ClassID: ", ClassID);
 
     if (ClassID.length > 0) {
       for (let i = 0; i < ClassID.length; i++) {
@@ -1196,9 +1207,11 @@ createMeta = async (assetID, data, ImgToken, token) => {
       "sortIndex": c
     });
   }
+  //console.log("ClassObj: ", ClassObj);  
 
   } catch (error) {
     logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : META:' + JSON.stringify(error));
+    //console.log(' ERROR : META:', error);
   }
 
 
@@ -1477,6 +1490,50 @@ searchClassificationName = async (ClassID, token, data) => {
   return resultID;
 };
 
+/**
+ * 
+ * Search for Classificate Name
+ * @param {*} ClassID, token, data
+ */ 
+searchClassificationID = async (ClassID, token, data) => {
+  //let filterClass = ClassID.replace(/&/g, "%26");
+  //filterClass = filterClass.replace(/\+/g, "%2b");
+  ////console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
+  let resultID = await axios
+    .get(APR_CREDENTIALS.GetClassificationByID + "'" + encodeURI(ClassID) + "'", {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+    })
+    .then(async (resp) => {
+      const itemsObj = resp.data;
+      if (itemsObj.totalCount === 1) {
+        //console.log("Field Value: ", itemsObj.items[0].id);
+        return itemsObj.items[0].id;
+      } else {
+        logger.error(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        return 'null';
+      }
+    })
+    .catch(async (err) => {
+      logger.error(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+      //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err.response.data));
+      } else {
+        logger.warn(new Date() + ': ERROR : is ' + JSON.stringify(err));
+      }
+
+      return 'null';
+    });
+  return resultID;
+};
 /**
  * Upload file into Aprimo
  * @param {*} token, filename 
