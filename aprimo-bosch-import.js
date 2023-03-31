@@ -252,6 +252,8 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
         logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  +  ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, token, recordsCollection);
+      }else{
+        logger.info(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' Error : More Than One Record Found: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
       }
       return getFieldsResult;
     })
@@ -443,6 +445,44 @@ getFieldIDs = async (token) => {
 
 /**
  * 
+ * Find fields IDs for updating records. 
+ * @param {*} token
+ */  
+findFieldID = async (fieldName, token) => {
+  let getFieldsResult = await axios
+    .get(APR_CREDENTIALS.SearchFieldByName + fieldName, {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    .then(async (resp) => {
+      if (resp.data.items.length > 0) {
+        return resp.data.items;
+      } else {
+        logger.error(new Date() + ': ERROR : Field Not Found --');
+        //console.log(new Date() + ': ERROR : tempAssetID Missing --');
+        return null;
+      }
+    })
+    .catch(async (err) => {
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
+      return null;
+    });
+  return getFieldsResult;
+};
+/**
+ * 
  * createMeta for updating records. 
  * @param {*} assetID, Row data, ImgToken, token
  */  
@@ -536,21 +576,24 @@ createMeta = async (assetID, data, ImgToken, token) => {
           });
         }
         break;
-      case 'BU': //Classification (Hierarchical)
-        
+      case 'BU': //Classification (Hierarchical)        
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
+        
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
+          console.log("ObjectID", ObjectID.length);
+          if(ObjectID.length === 0){
+            ObjectID = await findFieldID('New_Ownership', token);
+          }
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": ClassID,
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
         }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
         break;        
       case 'CONTACT'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_contact');
@@ -640,17 +683,15 @@ createMeta = async (assetID, data, ImgToken, token) => {
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": ClassID,
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });  
         }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        
         // code block
         break;
       case 'IMG_TYPE_HAWERA': //Classification (Hierarchical)
@@ -658,17 +699,15 @@ createMeta = async (assetID, data, ImgToken, token) => {
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type_hawera');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": ClassID,
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
         }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type_hawera');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": ClassID,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        
         // code block
         break;        
       case 'INIT_NAME':
@@ -801,16 +840,15 @@ createMeta = async (assetID, data, ImgToken, token) => {
           APIResult = await searchClassificationName(tmpKey, token, data);
           if (APIResult !== 'null') {
             ClassID.push(APIResult);
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": ClassID,
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
           }
-  
-          ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
           // code block
           break;
       case 'SYMBOLIMG_DESCRIPTION'://Text
@@ -904,7 +942,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
-              "value": data[key],
+              "values": [data[key]],
               "languageId": "00000000000000000000000000000000"
             }]
           });
@@ -926,31 +964,23 @@ createMeta = async (assetID, data, ImgToken, token) => {
           break;
       case 'CATEGORY_TREE_IDS'://text
         if (typeof tmpKey === 'string'){
-          //tmpKey = tmpKey.replace(/\|\|/g, "/");        
           let str_array = tmpKey.split('\\\\');
-          //console.log("str_array: ", str_array);
-          //console.log("str_array.length: ", str_array.length);
 
           for (let splitIndex = 0; splitIndex < str_array.length; splitIndex++) {
             // Trim the excess whitespace.
-            //console.log("splitIndex: ", splitIndex);
             let treeIDs = str_array[splitIndex];
             let pieces = treeIDs.split(/[\s\|\|]+/);
-            //console.log("pieces: ", pieces);
             let lastValue = pieces[pieces.length - 1];
-            //console.log("lastValue: ", lastValue);
             lastValue = lastValue.replace(/^\s*/, "").replace(/\s*$/, "");
-            // Add additional code here, such as:
             if(lastValue !== null){
               let APIResult = await searchClassificationID(lastValue, token, data)
-              //console.log("lastValue: ", APIResult);  
               if (APIResult !== 'null') {
                 ClassID.push(APIResult);
               }  
             }            
           }
         }
-
+        
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
         updateObj.fields.addOrUpdate.push({
           "id": ObjectID[0].id,
@@ -1075,19 +1105,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
         APIResult = await searchClassificationID('mpe_' + data[key], token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'SystemStatus');
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [APIResult],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
         }
-
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'SystemStatus');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": [APIResult],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
         // code block
         break;
-
       //Other Old Mapped Fields
       case 'BINARY_FILENAME':
         // code block
@@ -1221,7 +1249,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
 
   } catch (error) {
     logger.info(new Date() + ': PID: '+ data["OBJ_ID"] + ' ERROR : META:' + JSON.stringify(error));
-    //console.log(' ERROR : META:', error);
+    console.log(' ERROR : META:', error);
   }
 
 
@@ -1423,7 +1451,7 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
     )
     .then(async (resp) => {
       ////console.log("resp.data:--------", resp.data);
-      ObjectID = findObject(resp.data.items, 'name', fieldValue);
+      ObjectID = findObject(resp.data.items, 'label', fieldValue);
       ////console.log("ObjectID:--------", ObjectID);
       if (ObjectID.length > 0) {
         ////console.log(new Date() + ': ObjectID.id -- ' + ObjectID[0].id);
