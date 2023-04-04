@@ -21,8 +21,13 @@ const options = {
   filename: 'aprimo-bosch-import.js'
 }
 
-async function JSONtoCheckInData(processPath) {
-  console.log("Start: ", processPath);
+/**
+ * 
+ * Create a checkin excel file from the JSON data
+ * @param {*} jobID
+ */  
+async function JSONtoCheckInData(jobID) {  
+  // Get All CSV files from FTP Target Path
   const csvInDir = fs
     .readdirSync(APR_CREDENTIALS.targetPath)
     .filter((file) => path.extname(file) === ".csv");
@@ -32,20 +37,18 @@ async function JSONtoCheckInData(processPath) {
     var file = csvInDir[i];
     if (file) {
       const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-      //console.log("filePath:", filePath);
+      // Read CSV files
       const csvFileDataTmp = await csv({
         'delimiter': [';', ','],
         'quote': '"',
         preserveLineEndings: true
       }).fromFile(filePath);
-      //console.log("currData:", csvFileDataTmp);
-
+      // Merge Into One Array Object
       csvFileData = arrayApp.concat(csvFileData, csvFileDataTmp);
     }
   }
-  //console.log("Data:", csvFileData);
-  await writeExcel(csvFileData, processPath);
-
+  // Write Excel File
+  await writeExcel(csvFileData, jobID);
 };
 
 
@@ -93,14 +96,14 @@ const plogger = winston.createLogger({
  * Download CSV files from the FTP
  */
 downloadCSVFromFtp = async () => {
-
   let ftpDirectory = APR_CREDENTIALS.targetPath;
+  // Read FTP directory for CSV files
   fs.readdir(ftpDirectory, (err, files) => {
     if (err) throw err;
 
     for (const file of files) {
-      //console.log("File: ", file);
       if (file.match(/.+(\.csv)$/)) {
+        // Delete CSV files from FTP directory
         fs.unlink(path.join(ftpDirectory, file), (err) => {
           if (err) throw err;
         });
@@ -111,10 +114,10 @@ downloadCSVFromFtp = async () => {
     if (err) throw err;
 
     for (const file of files) {
-      //console.log("File: ", file);
-        fs.unlink(path.join(APR_CREDENTIALS.imgFolderPath, file), (err) => {
-          if (err) throw err;
-        });
+      // Delete all downloaded files
+      fs.unlink(path.join(APR_CREDENTIALS.imgFolderPath, file), (err) => {
+        if (err) throw err;
+      });
     }
   });
 
@@ -122,44 +125,38 @@ downloadCSVFromFtp = async () => {
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
   let sftp = new Client();
+  //connect SFTP
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
-      //console.log("files:", files);
+      //process listed files
       for (var i = 0, len = files.length; i < len; i++) {
         if (files[i].name.match(/.+(\.finished)$/)) {
-          let processPath = path.parse(files[i].name).name;
+          let jobID = path.parse(files[i].name).name;
           let importFinished = false;
           importFinished = arrayApp.find(files, function(obj) {
-            if (obj.name === processPath + '.importFinished') {
+            if (obj.name === jobID + '.importFinished') {
                 return true;
             }
           });
-          if(!importFinished){          
-            let fd = fs.openSync(dst + '/' + processPath + '.finished', 'w');
-
-            //console.log("FTP:", processPath);
-            const csvfiles = await sftp.list(src + '/' + processPath + '/.');
-            //console.log("FTP:", src + '/' + processPath + '/.');
+          if(!importFinished){   
+            // Create .finished file for reference 
+            let fd = fs.openSync(dst + '/' + jobID + '.finished', 'w');
+            const csvfiles = await sftp.list(src + '/' + jobID + '/.');
 
             for (var i = 0, len = csvfiles.length; i < len; i++) {
               if (csvfiles[i].name.match(/.+(\.csv)$/)) {    
-                //console.log("FTP File:", src + '/' + processPath + '/' + csvfiles[i].name);
-                //console.log("FTP Download:", dst + '/' + csvfiles[i].name);
-                await sftp.fastGet(src + '/' + processPath + '/' + csvfiles[i].name, dst + '/' + csvfiles[i].name);
-                //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
+                await sftp.fastGet(src + '/' + jobID + '/' + csvfiles[i].name, dst + '/' + csvfiles[i].name);
               }
             }
 
-            await JSONtoCheckInData(processPath);
+            await JSONtoCheckInData(jobID);
             await readExcel();
             await createRelation();
             await createLanguageRelationParent();
             await createLanguageRelationChild();
-            await endProcess();
+            await endProcess(jobID);
           }
-          //await sftp.fastGet(src + '/' + processPath, dst + '/');
-          //await sftp.rename(src + '/' + files[i].name, src + '/' + path.parse(files[i].name).name  + '.importFinished');
         }
       }
 
@@ -172,10 +169,16 @@ downloadCSVFromFtp = async () => {
   return jsonData;
 };
 
+/**
+ * 
+ * readExcel to process further. 
+ */  
+
 async function readExcel() {
   try {
     const file = XLSX.readFile(APR_CREDENTIALS.checkin);
     const sheets = file.SheetNames;
+    //Read Excel Sheets
     for (let i = 0; i < sheets.length; i++) {
       const csvData = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]], {
         defval: ""
@@ -184,10 +187,12 @@ async function readExcel() {
       let cpuIndex = 0;
       let poolArray = [];
       for (const row of csvData) {
+        // Check checkin file.
         if (row?.appstatus !== 'checkin' && row?.appstatus !== 'linked') {
           cpuIndex++;
           csvData[index].appstatus = 'checkin';
           csvData[index].index = index;
+          // Create pool records
           poolArray.push(pool.run({
             rowdata: row,
             mode: 'createRecords'
@@ -207,7 +212,7 @@ async function readExcel() {
         index++;
       }
 
-      //Process remaining
+      //Process last remaining bunch of rows
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray)
         for (let r = 0; r < result.length; r++) {
@@ -225,6 +230,11 @@ async function readExcel() {
     console.log(new Date() + ': Error: Read Excel File: ' + e.message);
   }
 }
+
+/**
+ * 
+ * createRelation for master records. 
+ */  
 
 async function createRelation() {
   try {
@@ -284,6 +294,11 @@ async function createRelation() {
 
 }
 
+/**
+ * 
+ * createLanguageRelationParent for master records. 
+ */  
+
 async function createLanguageRelationParent() {
   try {
 
@@ -305,8 +320,6 @@ async function createLanguageRelationParent() {
         for (const childDataRow of childData) {
           childRecordID.push(childDataRow.recordID);
         }
-        //console.log("maserData", maserDataRow.RELATED_DOCUMENT);
-        //console.log("childRecordID", childRecordID);              
         if (childRecordID.length > 0) {
           poolArray.push(pool.run({
             rowdata: {
@@ -339,6 +352,11 @@ async function createLanguageRelationParent() {
     console.log(new Date() + ': Error: createLanguageRelationParent: ' + e.message);
   }
 }
+
+/**
+ * 
+ * createLanguageRelationChild for master records. 
+ */  
 
 async function createLanguageRelationChild() {
   try {
@@ -401,31 +419,29 @@ async function createLanguageRelationChild() {
   }
 }
 
-async function endProcess() {
-  try {
-    let randomName = APR_CREDENTIALS.targetPath + '/' + uuidv4() + '.xlsx'; // '110ec58a-a0f2-4ac4-8393-c866d813b8d1'
-    fs.rename(APR_CREDENTIALS.checkin, randomName, function (err) {
-      if (err) throw err;
-      //console.log('File Renamed.');
-    });
+/**
+ * 
+ * endProcess
+ */  
 
+async function endProcess(jobID) {
+  try {
+    let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '.xlsx';
+    fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
+      if (err) throw err;
+    });
 
     let ftpDirectory = APR_CREDENTIALS.targetPath;
     await fs.readdir(ftpDirectory, async (err, files) => {
       if (err) throw err;
   
       for (const file of files) {
-        //console.log("File: ", file);
         if (file.match(/.+(\.finished)$/)) {
-
-
           let jsonData;
           const dst = APR_CREDENTIALS.targetPath;
           const src = APR_CREDENTIALS.sourcePath;
           let sftp = new Client();
 
-          //console.log("FTP001: ", src + '/' + file);
-          //console.log("FTP002: ", src + '/' + path.parse(file).name  + '.importFinished');
           let fd = fs.openSync(dst + '/' + path.parse(file).name  + '.importFinished', 'w');
           jsonData = await sftp.connect(ftpConfig)
             .then(async () => {        
@@ -453,28 +469,21 @@ async function endProcess() {
   }
 }
 
-
-async function writeExcel(jsonArray, processPath) {
-  //console.log("writeExcel processPath", processPath);
-  //console.log("jsonArray", jsonArray.length);
+/**
+ * 
+ * writeExcel file from the JSON object
+ */  
+async function writeExcel(jsonArray, jobID) {
   try {
-    if(processPath !== 'null'){
-      //console.log("writeExcel processPath -0000001", processPath);
+    if(jobID !== 'null'){
       jsonArray[0].JOB_ID = '';
     }
 
-
     let arrayKeys = [];
     jsonArray.forEach((row) => {
-      //console.log("keys:", row);
       arrayKeys = arrayApp.concat(arrayKeys, arrayApp.keys(row));
     });
     let keys = arrayApp.uniq(arrayKeys); 
-    //console.log('keys: ', keys);
-    //const keys = arrayApp.keys(jsonArray[0]);
-    //console.log("keys:", keys);
-    //for (var k in jsonArray[0]) keys.push(k);
-    //keys.push("status", "recordID", "processdate");
 
     // Create a new workbook and worksheet
     const workbook = XLSX.utils.book_new();
@@ -482,12 +491,11 @@ async function writeExcel(jsonArray, processPath) {
       header: keys
     });
 
-
     jsonArray.forEach((row) => {
       let objData = {};
       keys.forEach((keyval) => {
-        if(keyval==='JOB_ID' && processPath !== 'null'){
-          objData[keyval] = processPath;
+        if(keyval==='JOB_ID' && jobID !== 'null'){
+          objData[keyval] = jobID;
         }else{
           objData[keyval] = row[keyval];
         }        
@@ -499,12 +507,10 @@ async function writeExcel(jsonArray, processPath) {
       });
     });
 
-
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
     // Write the workbook to a file
     XLSX.writeFile(workbook, APR_CREDENTIALS.checkin);
-
 
   } catch (e) {
     logger.info(new Date() + ': Error: writeExcel: ' + e.message);
@@ -513,9 +519,14 @@ async function writeExcel(jsonArray, processPath) {
 
 }
 
+/**
+ * 
+ * main function
+ */  
 
 main = async () => {
   console.log('####### Import Started at ' + new Date() + ' #########');
+  logger.info('####### Import Started at ' + new Date() + ' #########');
 
   
   if (fs.existsSync(APR_CREDENTIALS.checkin)) {
@@ -527,25 +538,11 @@ main = async () => {
   } else {
     await downloadCSVFromFtp();
   }
-  /*
-  plogger.info('####### Import Ended at ' + new Date() + ' #########');
-  console.log('####### Import Ended at ' + new Date() + ' #########');
-  //logger.info(new Date() + ': INFO : ideal waiting for next cron:');
-  //console.log(new Date() + ': INFO : ideal waiting for next cron:');
-  */
-};
 
-try {
-  if(fs.existsSync(APR_CREDENTIALS.signature)){
-    logger.info(new Date() + ': Skipping : Already Running :');
-  }else{
-    console.log("Start:");
-    let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
-    main();
-  }
-} catch (error) {
-  logger.error(new Date() + ': System Error -- ' + error);
-}
+  console.log('####### Import Ended at ' + new Date() + ' #########');
+  logger.info('####### Import Ended at ' + new Date() + ' #########');
+
+};
 
 
 function terminate(code){
@@ -554,9 +551,11 @@ function terminate(code){
       if (err) throw err;
     });
     console.log(`Process exited with code: ${code}`)  
-    logger.error(new Date() + ': System Error -- ' + code);
+    logger.error(new Date() + ': System -- ' + code);
   }
 }
+
+/*
 process.on('beforeExit', code => {
 	//terminate(code);
 })
@@ -564,6 +563,7 @@ process.on('beforeExit', code => {
 process.on('exit', code => {
 	//terminate(code);
 })
+*/
 
 process.on('SIGTERM', signal => {
 	terminate(process.pid);
@@ -584,3 +584,24 @@ process.on('unhandledRejection', (reason, promise) => {
 	terminate(process.pid);
 	process.exit(1)
 })
+
+
+/**
+ * 
+ * Calling main function
+ */  
+
+try {
+  if(fs.existsSync(APR_CREDENTIALS.signature)){
+    console.log(new Date() + ': Skipping : Already Running :');
+    logger.info(new Date() + ': Skipping : Already Running :');
+  }else{
+    console.log(new Date() + ': Start : ********** :');
+    logger.info(new Date() + ': Start : ********** :');
+    let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
+    main();
+  }
+} catch (error) {
+  console.log(new Date() + ': System Error -- ' + error);
+  logger.error(new Date() + ': System Error -- ' + error);
+}
