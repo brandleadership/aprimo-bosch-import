@@ -72,14 +72,7 @@ var appCombined = new winston.transports.DailyRotateFile({
   zippedArchive: false,
   maxSize: '20m'
 });
-var protocolsLogs = new winston.transports.DailyRotateFile({
-  filename: './logs/bosch-app-protocols.log',
-  createSymlink: true,
-  symlinkName: 'bosch-app-protocols.log',
-  datePattern: 'YYYY-MM-DD',
-  zippedArchive: false,
-  maxSize: '20m'
-});
+
 var tokensLogs = new winston.transports.DailyRotateFile({
   filename: './logs/bosch-app-uploaded-file-tokens.log',
   createSymlink: true,
@@ -93,10 +86,6 @@ var tokensLogs = new winston.transports.DailyRotateFile({
 const logger = winston.createLogger({
   level: 'info',
   transports: [appError, appCombined]
-});
-const plogger = winston.createLogger({
-  level: 'info',
-  transports: [protocolsLogs]
 });
 const clogger = winston.createLogger({
   level: 'info',
