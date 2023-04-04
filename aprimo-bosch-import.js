@@ -760,7 +760,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         });
         // code block
         break;    
-      case 'LANGUAGE'://Option List
+      /*case 'LANGUAGE'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetLanguage');
         APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
         if (APIResult !== 'null') {
@@ -773,7 +773,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
           });
         }
         // code block
-        break;
+        break;*/
       case 'LAUNCH_DATE':
         let LAUNCH_DATE_VAR = new Date(data[key]);
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');

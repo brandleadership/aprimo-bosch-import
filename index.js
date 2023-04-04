@@ -444,7 +444,7 @@ async function endProcess() {
       }
     });
 
-    
+    terminate('Normal Close');
 
 
   } catch (e) {
@@ -536,7 +536,51 @@ main = async () => {
 };
 
 try {
-  main();
+  if(fs.existsSync(APR_CREDENTIALS.signature)){
+    logger.info(new Date() + ': Skipping : Already Running :');
+  }else{
+    console.log("Start:");
+    let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
+    main();
+  }
 } catch (error) {
   logger.error(new Date() + ': System Error -- ' + error);
 }
+
+
+function terminate(code){
+  if(fs.existsSync(APR_CREDENTIALS.signature)){
+    fs.unlink(APR_CREDENTIALS.signature, (err) => {
+      if (err) throw err;
+    });
+    console.log(`Process exited with code: ${code}`)  
+    logger.error(new Date() + ': System Error -- ' + code);
+  }
+}
+process.on('beforeExit', code => {
+	//terminate(code);
+})
+
+process.on('exit', code => {
+	//terminate(code);
+})
+
+process.on('SIGTERM', signal => {
+	terminate(process.pid);
+	process.exit(0)
+})
+
+process.on('SIGINT', signal => {
+	terminate(process.pid);
+	process.exit(0)
+})
+
+process.on('uncaughtException', err => {
+	terminate(process.pid);
+	process.exit(1)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+	terminate(process.pid);
+	process.exit(1)
+})
