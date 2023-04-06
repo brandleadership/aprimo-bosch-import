@@ -8,6 +8,7 @@ const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 const winston = require("winston");
 require('winston-daily-rotate-file');
 const arrayApp = require('lodash');
+const cron = require("node-cron");
 
 const {
   v4: uuidv4
@@ -593,3 +594,22 @@ try {
   console.log(new Date() + ': System Error -- ' + error);
   logger.error(new Date() + ': System Error -- ' + error);
 }
+
+var task = cron.schedule(APR_CREDENTIALS.cronIntv, async () => {
+        console.log("running a task every 3 Min");
+        try {
+          if(fs.existsSync(APR_CREDENTIALS.signature)){
+            console.log(new Date() + ': Skipping : Already Running :');
+            logger.info(new Date() + ': Skipping : Already Running :');
+          }else{
+            console.log(new Date() + ': Start : ********** :');
+            logger.info(new Date() + ': Start : ********** :');
+            let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
+            await main();
+          }
+        } catch (error) {
+          console.log(new Date() + ': System Error -- ' + error);
+          logger.error(new Date() + ': System Error -- ' + error);
+        }
+  });
+task.start();
