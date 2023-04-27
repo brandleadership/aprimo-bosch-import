@@ -8,7 +8,6 @@ const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 const winston = require("winston");
 require('winston-daily-rotate-file');
 const arrayApp = require('lodash');
-const cron = require("node-cron");
 
 const {
   v4: uuidv4
@@ -192,11 +191,14 @@ async function readExcel() {
             poolArray = [];
             for (let r = 0; r < result.length; r++) {
               csvData[result[r].rowdata.index].recordID = result[r].recordID;
-              csvData[result[r].rowdata.index].processdate = new Date();
+              let timeStamp = new Date();
+              csvData[result[r].rowdata.index].processdate = timeStamp.toLocaleString();
               csvData[result[r].rowdata.index].message = result[r].message;
             }
-            await writeExcel(csvData, 'null');
-          }
+          }          
+        }
+        if (index % (APR_CREDENTIALS.worker * 20) === 0) {
+          await writeExcel(csvData, 'null');
         }
         index++;
       }
@@ -206,10 +208,13 @@ async function readExcel() {
         const result = await Promise.all(poolArray)
         for (let r = 0; r < result.length; r++) {
           csvData[result[r].rowdata.index].recordID = result[r].recordID;
-          csvData[result[r].rowdata.index].processdate = new Date();
+          let timeStamp = new Date();
+          csvData[result[r].rowdata.index].processdate = timeStamp.toLocaleString();
           csvData[result[r].rowdata.index].message = result[r].message;
         }
         poolArray = [];
+        await writeExcel(csvData, 'null');
+      }else{
         await writeExcel(csvData, 'null');
       }
     }
@@ -239,31 +244,41 @@ async function createRelation() {
       let cpuIndex = 0;
       let poolArray = [];
 
-      for (const maserDataRow of maserData) {
-        if (maserDataRow?.appstatus === 'checkin') {
+      for (const masterDataRow of maserData) {
+        if (masterDataRow?.appstatus === 'checkin') {
           cpuIndex++;
-          csvData[maserDataRow.index].appstatus = 'linked';
-          csvData[maserDataRow.index].index = index;
-          const childData = csvData.filter((row) => row['OBJ_ID'] === maserDataRow.OBJ_ID && row['recordID'] != '' && row['MASTER_RECORD'] != 'x');
+          csvData[masterDataRow.index].appstatus = 'linked';
+          csvData[masterDataRow.index].index = index;
+          
+          const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.OBJ_ID && row['recordID'] != '' && row['MASTER_RECORD'] != 'x');
           let childRecordID = [];
           for (const childDataRow of childData) {
             childRecordID.push(childDataRow.recordID);
           }
 
 
+          logger.info(new Date() + ': createRelation OBJ_ID: '+ masterDataRow.OBJ_ID);
+
           poolArray.push(pool.run({
             rowdata: {
-              masterRecordID: maserDataRow.recordID,
+              masterRecordID: masterDataRow.recordID,
               childRecordID: childRecordID
             },
             mode: 'linkRecords'
           }, options));
           if (cpuIndex === APR_CREDENTIALS.worker) {
+
+            //logger.info(new Date() + ': Start pool: ');
             const result = await Promise.all(poolArray);
-            console.log("result", result);
+            //logger.info(new Date() + ': End pool: ');
+
+            //console.log("result", result);
             cpuIndex = 0;
             poolArray = [];
-            await writeExcel(csvData, 'null');
+            //logger.info(new Date() + ': Start wrtie: ');
+            //await writeExcel(csvData, 'null');
+            //logger.info(new Date() + ': End wrtie: ');
+
           }
         }
         index++;
@@ -273,6 +288,8 @@ async function createRelation() {
         const result = await Promise.all(poolArray);
         console.log("result", result);
         poolArray = [];
+        await writeExcel(csvData, 'null');
+      }else{
         await writeExcel(csvData, 'null');
       }
     }
@@ -302,17 +319,19 @@ async function createLanguageRelationParent() {
       let cpuIndex = 0;
       let poolArray = [];
 
-      for (const maserDataRow of maserData) {
+      for (const masterDataRow of maserData) {
         cpuIndex++;
-        const childData = csvData.filter((row) => row['OBJ_ID'] === maserDataRow.RELATED_DOCUMENT && row['recordID'] != '');
+        const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.RELATED_DOCUMENT && row['recordID'] != '');
         let childRecordID = [];
         for (const childDataRow of childData) {
           childRecordID.push(childDataRow.recordID);
         }
+        logger.info(new Date() + ': LanguageRelationParent OBJ_ID: '+ masterDataRow.OBJ_ID);
+
         if (childRecordID.length > 0) {
           poolArray.push(pool.run({
             rowdata: {
-              masterRecordID: maserDataRow.recordID,
+              masterRecordID: masterDataRow.recordID,
               childRecordID: childRecordID
             },
             mode: 'LanguageRelationParent'
@@ -333,7 +352,7 @@ async function createLanguageRelationParent() {
         const result = await Promise.all(poolArray);
         console.log("result", result);
         poolArray = [];
-        await writeExcel(csvData, 'null');
+        //await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
@@ -361,10 +380,10 @@ async function createLanguageRelationChild() {
       let cpuIndex = 0;
       let poolArray = [];
 
-      for (const maserDataRow of maserData) {
+      for (const masterDataRow of maserData) {
         cpuIndex++;
-        if (typeof maserDataRow['RELATED_DOCUMENT[USAGE]'] === 'string') {
-          var str_array = maserDataRow['RELATED_DOCUMENT[USAGE]'].split(',');
+        if (typeof masterDataRow['RELATED_DOCUMENT[USAGE]'] === 'string') {
+          var str_array = masterDataRow['RELATED_DOCUMENT[USAGE]'].split(',');
           let childRecordID = [];
           for (var str = 0; str < str_array.length; str++) {
             // Trim the excess whitespace.
@@ -374,10 +393,12 @@ async function createLanguageRelationChild() {
               childRecordID.push(childDataRow.recordID);
             }
           }
+          logger.info(new Date() + ': LanguageRelationChild OBJ_ID: '+ masterDataRow.OBJ_ID);
+
           if (childRecordID.length > 0) {
             poolArray.push(pool.run({
               rowdata: {
-                masterRecordID: maserDataRow.recordID,
+                masterRecordID: masterDataRow.recordID,
                 childRecordID: childRecordID
               },
               mode: 'LanguageRelationChild'
@@ -399,7 +420,7 @@ async function createLanguageRelationChild() {
         const result = await Promise.all(poolArray);
         console.log("result", result);
         poolArray = [];
-        await writeExcel(csvData, 'null');
+        //await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
@@ -520,9 +541,24 @@ main = async () => {
   
   if (fs.existsSync(APR_CREDENTIALS.checkin)) {
     await readExcel();
+    console.log('####### createRelation Started at ' + new Date() + ' #########');
+    logger.info('####### createRelation Started at ' + new Date() + ' #########');  
     await createRelation();
+    console.log('####### createRelation Ended at ' + new Date() + ' #########');
+    logger.info('####### createRelation Ended at ' + new Date() + ' #########');
+
+    console.log('####### createLanguageRelationParent Started at ' + new Date() + ' #########');
+    logger.info('####### createLanguageRelationParent Started at ' + new Date() + ' #########');  
     await createLanguageRelationParent();
+    console.log('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
+    logger.info('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
+
+    console.log('####### createLanguageRelationChild Started at ' + new Date() + ' #########');
+    logger.info('####### createLanguageRelationChild Started at ' + new Date() + ' #########');  
     await createLanguageRelationChild();
+    console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
+    logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
+
     await endProcess();
   } else {
     await downloadCSVFromFtp();
@@ -555,30 +591,33 @@ process.on('exit', code => {
 */
 
 process.on('SIGTERM', signal => {
+  console.log('SIGTERM: ');
 	terminate(process.pid);
 	process.exit(0)
 })
 
 process.on('SIGINT', signal => {
+  console.log('SIGINT: ');
 	terminate(process.pid);
 	process.exit(0)
 })
 
 process.on('uncaughtException', err => {
+  console.log('Caught exception: ', err);
 	terminate(process.pid);
 	process.exit(1)
 })
 
 process.on('unhandledRejection', (reason, promise) => {
+  console.log('unhandledRejection: ');
 	terminate(process.pid);
 	process.exit(1)
 })
 
-
 /**
  * 
  * Calling main function
- */  
+ */
 
 try {
   if(fs.existsSync(APR_CREDENTIALS.signature)){
@@ -595,21 +634,3 @@ try {
   logger.error(new Date() + ': System Error -- ' + error);
 }
 
-var task = cron.schedule(APR_CREDENTIALS.cronIntv, async () => {
-        console.log("running a task every 3 Min");
-        try {
-          if(fs.existsSync(APR_CREDENTIALS.signature)){
-            console.log(new Date() + ': Skipping : Already Running :');
-            logger.info(new Date() + ': Skipping : Already Running :');
-          }else{
-            console.log(new Date() + ': Start : ********** :');
-            logger.info(new Date() + ': Start : ********** :');
-            let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
-            await main();
-          }
-        } catch (error) {
-          console.log(new Date() + ': System Error -- ' + error);
-          logger.error(new Date() + ': System Error -- ' + error);
-        }
-  });
-task.start();

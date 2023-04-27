@@ -25,7 +25,11 @@ const classificationlist = require("./bosch-classificationlist");
 
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
-let readJSONCron = true;
+let API_TOKEN = {
+  timeStamp: new Date().getTime() - 480000,
+  accessToken: ''
+};
+
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 
 var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
@@ -65,7 +69,8 @@ var appClassification = new winston.transports.DailyRotateFile({
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
-  filename: './logs/bosch-app-combined-%DATE%.log',
+  //filename: './logs/bosch-app-combined-%DATE%.log',
+  filename: './logs/bosch-app-combined.log',
   createSymlink: true,
   symlinkName: 'bosch-app-combined.log',
   datePattern: 'YYYY-MM-DD',
@@ -101,32 +106,41 @@ const tlogger = winston.createLogger({
  * Generating Token
  */
 getToken = async () => {
-  const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
-      timeout: 60000,
-      proxy: false,
-      httpsAgent: new HttpsProxyAgent(fullProxyURL),
-      headers: {
-      "Content-Type": "application/json",
-      "client-id": APR_CREDENTIALS.client_id,
-      Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
-      },
+  // Check for 8 Minutes API Token 
+  let syncTime = new Date().getTime() - 480000;  
+  if(API_TOKEN.timeStamp < syncTime) {
+    const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
+        timeout: 60000,
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),
+        headers: {
+        "Content-Type": "application/json",
+        "client-id": APR_CREDENTIALS.client_id,
+        Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
+        },
+      }
+    )
+    .then(async (resp) => {
+      logger.info(new Date() + ': API Token Generated: ###################################');
+      return resp.data;
+    })
+    .catch(async (err) => {    
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err));
+      }
+      var aprToken = await getToken();
+      return aprToken;
+    });  
+    if(resultAssets?.accessToken !== undefined){
+      API_TOKEN.timeStamp = new Date().getTime();
+      API_TOKEN.accessToken = resultAssets.accessToken;
     }
-  )
-  .then(async (resp) => {
-    return resp.data;
-  })
-  .catch(async (err) => {    
-    if(err.response !== undefined && err.response.data !== undefined){
-      logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err.response.data));
-    } else {
-      logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err));
-    }      
-
-    //console.log('ERROR' + new Date() + ': getToken error -- ', JSON.stringify(err.response.data));
-    var aprToken = await getToken();
-    return aprToken;
-  });
-  return resultAssets;
+    return resultAssets;
+  } else {
+    return API_TOKEN;
+  }
 };
 
 /**
@@ -162,6 +176,7 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
     });
   }
 
+  logger.info(new Date() + ': Start recordLinks API: '+ masterRecordID);
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL + '/' + masterRecordID,
       JSON.stringify(body), {
         proxy: false,
@@ -187,6 +202,8 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
       }  
       return false;
     });
+    
+    logger.info(new Date() + ': End recordLinks API: '+ masterRecordID);
   return resultAssets;
 };
 
@@ -1570,14 +1587,12 @@ async function uploadAsset(token, filename, processPath) {
   let remotePath = APR_CREDENTIALS.sourcePath + '/'+ processPath + '/binary/' + filename;
   filename = imgFolderPath + filename;
   
-  //console.log("File Downloading Started:: ", remotePath, " :: ", filename);
+  logger.info(new Date() + ': Start Downloading: ' + filename);
   let sftp = new Client();
   await sftp.connect(ftpConfig)
-    .then(async () => {
-      
+    .then(async () => {      
       await sftp.fastGet(remotePath, filename);
-
-      //console.log("File Downloading Ended:: ", remotePath, " :: ", filename);
+      logger.info(new Date() + ': End Downloading: ' + filename);
     }).catch(e => {
       logger.error(new Date() + ': ERROR : in the FTP Connection -- ' + e);
       //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
@@ -1586,11 +1601,8 @@ async function uploadAsset(token, filename, processPath) {
 
     if (fs.existsSync(filename) && BINARY_FILENAME !== '') {
       let varFileSize = await getFilesizeInMegabytes(filename);
-      let varFileSizeByte = varFileSize * (1024 * 1024);
+      //let varFileSizeByte = varFileSize * (1024 * 1024);
       let getMimeType = mime.lookup(filename);
-      ////console.log("varFileSize:", varFileSize);
-      //logger.info(new Date() + ": getMimeType: " + getMimeType);
-      //logger.info(new Date() + ': FileSize: ' + varFileSize);
       let APIResult = null;
       if (varFileSize > 1) {
 
@@ -1600,12 +1612,11 @@ async function uploadAsset(token, filename, processPath) {
             token = aprToken.accessToken;
 
             let SegmentURI = await getSegmentURL(filename, token);
-            //console.log("SegmentURI: ", SegmentURI);
+
             APIResult = await splitFile
               .splitFileBySize(filename, 10000000)
               .then(async (names) => {
                 for (let start = 0; start < names.length; start++) {
-                  //console.log("splitFileBySize: ", start, names[start]);
                   const aprToken = await getToken();
                   if(aprToken?.accessToken !== undefined){
                     token = aprToken.accessToken;
@@ -1619,6 +1630,8 @@ async function uploadAsset(token, filename, processPath) {
                 
                 const aprToken = await getToken();
                 if(aprToken?.accessToken !== undefined){
+
+                  logger.info(new Date() + ': Start Uploading Chunks: ' + filename);
                   token = aprToken.accessToken;
                   const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
 
@@ -1638,12 +1651,11 @@ async function uploadAsset(token, filename, processPath) {
                       } 
                     });  
                   }
-
+                  logger.info(new Date() + ': End Uploading Chunks: ' + filename);
                   return ImgToken;  
                 } else {
                   return null;
-                }    
-                //logger.info(new Date() + ": INFO : commitSegment: " + ImgToken);
+                }
               })
               .catch((err) => {
                 if(err.response !== undefined && err.response.data !== undefined){
@@ -1654,21 +1666,20 @@ async function uploadAsset(token, filename, processPath) {
           
                 //console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
                 return null;
-                ////console.log('Error: ', err);
               });
             return APIResult;
         }else{
           return null;
         }
       } else {
-        ////console.log("fileSize is < 20 MB:");
         //logger.info(new Date() + ": fileSize is < 20 MB: ");
+        logger.info(new Date() + ': Start Uploading: ' + filename);
         let form = new FormData();
         form.append("file", fs.createReadStream(filename), {
           contentType: getMimeType,
           filename: BINARY_FILENAME,
         });
-        //console.log("varFileSizeByte: ", varFileSizeByte);
+
         let reqUploadImg = await axios
           .post(APR_CREDENTIALS.Upload_URL, form, {
             proxy: false,
@@ -1684,21 +1695,15 @@ async function uploadAsset(token, filename, processPath) {
           })
           .then(async (resp) => {
             let ImgToken = resp.data.token;
-            //console.log("ImgToken: ", ImgToken);
-            // logger.info(new Date() + ": ImgToken: " + ImgToken);
-            //APIResult = await getFields("null", token, ImgToken);
 
               fs.unlink(filename, (err) => {
                 if (err){
                   logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
-                  //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
-                  //throw err;
                 } 
               });  
 
-
+            logger.info(new Date() + ': End Uploading: ' + filename);
             return ImgToken;
-            //await createAsset(ImgToken, data, token);
           })
           .catch((err) => {
             if(err.response !== undefined && err.response.data !== undefined){
@@ -1904,7 +1909,7 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
   }
   ////console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
   ////console.log("Post: ", JSON.stringify(body));
-
+  logger.info(new Date() + ': Start languageRelationParent API: '+ masterRecordID);
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
         proxy: false,
@@ -1929,6 +1934,7 @@ languageRelationParent = async (masterRecordID, childRecordID, token) => {
       //console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
       return false;
     });
+  logger.info(new Date() + ': End languageRelationParent API: '+ masterRecordID);
   return resultAssets;
 };
 
@@ -1966,6 +1972,7 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
 
   ////console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
   ////console.log("Post: ", JSON.stringify(body));
+  logger.info(new Date() + ': Start languageRelationChild API: '+ masterRecordID);
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
         proxy: false,
@@ -1990,6 +1997,7 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
       //console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
       return false;
     });
+  logger.info(new Date() + ': End languageRelationChild API: '+ masterRecordID);
   return resultAssets;
 };
 
