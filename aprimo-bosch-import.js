@@ -505,8 +505,8 @@ createMeta = async (assetID, data, ImgToken, token) => {
     },
   };
   let tempAssetObj = await getFieldIDs(token);
-
-  if (ImgToken !== "null") {
+  //console.log("ImgToken:", ImgToken);
+  if (ImgToken !== "null" && ImgToken !== undefined) {
     updateObj.files = {
       master: ImgToken,
       addOrUpdate: [{

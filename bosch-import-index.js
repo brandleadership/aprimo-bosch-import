@@ -16,10 +16,15 @@ const {
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 
 // Create a new thread pool
-const pool = new Piscina()
+const pool = new Piscina(
+  {
+    minThreads: APR_CREDENTIALS.worker, 
+    maxQueue: 'auto'
+  })
 const options = {
   filename: 'aprimo-bosch-import.js'
 }
+
 
 /**
  * 
@@ -185,7 +190,7 @@ async function readExcel() {
             rowdata: row,
             mode: 'createRecords'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker) {
+          if (cpuIndex === APR_CREDENTIALS.worker * 10) {
             const result = await Promise.all(poolArray)
             cpuIndex = 0;
             poolArray = [];
@@ -195,9 +200,9 @@ async function readExcel() {
               csvData[result[r].rowdata.index].processdate = timeStamp.toLocaleString();
               csvData[result[r].rowdata.index].message = result[r].message;
             }
-          }          
+          }
         }
-        if (index % (APR_CREDENTIALS.worker * 20) === 0) {
+        if (index % (APR_CREDENTIALS.worker * 10) === 0) {
           await writeExcel(csvData, 'null');
         }
         index++;
@@ -266,7 +271,7 @@ async function createRelation() {
             },
             mode: 'linkRecords'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker) {
+          if (cpuIndex === APR_CREDENTIALS.worker * 10) {
 
             //logger.info(new Date() + ': Start pool: ');
             const result = await Promise.all(poolArray);
@@ -336,7 +341,7 @@ async function createLanguageRelationParent() {
             },
             mode: 'LanguageRelationParent'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker) {
+          if (cpuIndex === APR_CREDENTIALS.worker * 10) {
             const result = await Promise.all(poolArray);
             console.log("result", result);
             cpuIndex = 0;
@@ -403,7 +408,7 @@ async function createLanguageRelationChild() {
               },
               mode: 'LanguageRelationChild'
             }, options));
-            if (cpuIndex === APR_CREDENTIALS.worker) {
+            if (cpuIndex === APR_CREDENTIALS.worker * 10) {
               const result = await Promise.all(poolArray);
               console.log("result", result);
               cpuIndex = 0;
