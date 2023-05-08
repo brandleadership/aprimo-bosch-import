@@ -21,7 +21,7 @@ npm install
 Use: node_modules.zip to skip the installation. (Recommendation: Always install Node packages to avoid unseen error.)
 
 ## Usage
-node index.js &
+node bosch-import-index.js >> error.log  &
 This command will run the app in the backend. 
 
 ## Important Config Files and Folders
@@ -84,3 +84,8 @@ Note: Data will be auto generated.
 
 ## Support
 If you find a bug or encounter any issue or have a problem/question with this script please contact bhavinder.singh@gateb.com
+
+
+###
+npm i -g split-file
+ps -aef | grep node

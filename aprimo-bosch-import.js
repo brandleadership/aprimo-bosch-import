@@ -195,10 +195,10 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
     .catch((err) => {
       if(err.response !== undefined && err.response.data !== undefined){
         logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
-        console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
+        //console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
       } else {
         logger.error(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-        console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+        //console.log(new Date() + ': PID: '+ masterRecordID + ' ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
       }  
       return false;
     });
@@ -228,7 +228,7 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   
 
   logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : SearchAsset URL: -- ' + APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
-  console.log(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID);
+  //console.log(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID);
   //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : SearchAsset URL: -- ', APR_CREDENTIALS.SearchAsset + encodeURI(queryString));
   //console.log("fullProxyURL:: " + fullProxyURL);
 
@@ -360,14 +360,12 @@ getFilesizeInMegabytes = async (filename) => {
  * @param {*} assetID, token, Row Data
  */  
 getFields = async (assetID, token, recordsCollection) => {
-  let findAssetID;
   let existImgId;
   let filename;
   let APIResult = 0;
 
   if (assetID === "null") {
     //Create New
-    findAssetID = APR_CREDENTIALS.tempAssetID;
     filename = recordsCollection.BINARY_FILENAME;
     existImgId = "null";
 
@@ -390,7 +388,7 @@ getFields = async (assetID, token, recordsCollection) => {
         }
       }
     } catch (error) {
-      console.log(new Date() + ": Error : Create Meta: "+ error);
+      //console.log(new Date() + ": Error : Create Meta: "+ error);
       logger.info(new Date() + ': Error : Create Meta: '+ error);
       APIResult = {'result': 0, 'message': error};
     }
@@ -402,7 +400,7 @@ getFields = async (assetID, token, recordsCollection) => {
           APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
       }
     } catch (error) {
-      console.log(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
+      //console.log(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
       logger.info(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
       APIResult = {'result': assetID, 'message': error};
     }
@@ -588,7 +586,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
           ClassID.push(APIResult);
         
           ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
-          console.log("ObjectID", ObjectID.length);
+          //console.log("ObjectID", ObjectID.length);
           if(ObjectID.length === 0){
             ObjectID = await findFieldID('New_Ownership', token);
           }
@@ -1229,6 +1227,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
           }]
         });        
         break;
+      case 'JOB_ID'://Text
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_job_id');
+        updateObj.fields.addOrUpdate.push({
+          "id": ObjectID[0].id,
+          "localizedValues": [{
+            "value": data[key],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        });
+        // code block
+        break;        
       default:
         // code block
     }
@@ -1254,7 +1263,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
   //console.log("ClassObj: ", ClassObj);  
 
   } catch (error) {
-    logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + ' ERROR : META:' + JSON.stringify(error));
+    logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + ' ERROR : META:' + error);
     console.log(' ERROR : META:', error);
   }
 
@@ -2008,9 +2017,13 @@ module.exports = async (rowdata) => {
   //console.log("Data:", rowdata);
   var aprToken = await getToken();
   if(rowdata.mode === 'createRecords'){
+    let timeStampStart = new Date();
     let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata.BINARY_FILENAME, rowdata.rowdata);
-    console.log("RecordID: ", RecordID);
+    //console.log("RecordID: ", RecordID);
+    let timeStampEnd = new Date();
     rowdata.recordID = RecordID.result;
+    rowdata.startTime = timeStampStart.toLocaleString();
+    rowdata.endTime = timeStampEnd.toLocaleString();
     rowdata.message = RecordID.message;
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){

@@ -8,6 +8,8 @@ const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 const winston = require("winston");
 require('winston-daily-rotate-file');
 const arrayApp = require('lodash');
+const os = require('os');
+const cpus = os.cpus();
 
 const {
   v4: uuidv4
@@ -25,6 +27,58 @@ const options = {
   filename: 'aprimo-bosch-import.js'
 }
 
+
+/**
+ * Log File
+ */
+var appError = new winston.transports.DailyRotateFile({
+  level: 'error',
+  name: 'error',
+  filename: './logs/bosch-app-error.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-error',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxSize: '20m'
+});
+var appCombined = new winston.transports.DailyRotateFile({
+  name: 'info',
+  filename: './logs/bosch-app-combined.log',
+  createSymlink: true,
+  symlinkName: 'bosch-app-combined.log',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxSize: '20m'
+});
+
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [appError, appCombined]
+});
+
+
+logger.info(new Date() + '####### Operating system: ' + process.platform );
+logger.info(new Date() + '####### Architecture: ' + process.arch );
+logger.info(new Date() + '####### Node.js version: ' + process.version );
+logger.info(new Date() + '####### Number of CPUs: ' + os.cpus().length );
+logger.info(new Date() + '####### Number of threads: ' + (process.env.UV_THREADPOOL_SIZE || os.cpus().length)  );
+cpus.forEach((cpu, i) => {
+  logger.info(new Date() + '####### CPU :' + (i + 1) );
+  logger.info(new Date() + '####### Model: ' + cpu.model );
+  logger.info(new Date() + '####### Speed: ' + cpu.speed + ' MHz' );
+  logger.info(new Date() + '####### Times: #########');
+  logger.info(new Date() + '#######    User: ' + cpu.times.user + ' ms  #########');
+  logger.info(new Date() + '#######    Nice: ' + cpu.times.nice + ' ms  #########');
+  logger.info(new Date() + '#######    Sys: ' + cpu.times.sys + ' ms  #########');
+  logger.info(new Date() + '#######    Idle: ' + cpu.times.idle + ' ms  #########');
+  logger.info(new Date() + '#######    IRQ: ' + cpu.times.irq + '  ms #########');
+});
+
+const totalMem = os.totalmem();
+const freeMem = os.freemem();
+logger.info(new Date() + '####### Total memory: ' + Math.round(totalMem / 1024 / 1024) + 'MB');
+logger.info(new Date() + '####### Free memory: ' + Math.round(freeMem / 1024 / 1024) + 'MB');
+logger.info(new Date() + '####### Worker Set: ' + APR_CREDENTIALS.worker);
 
 /**
  * 
@@ -57,33 +111,6 @@ async function JSONtoCheckInData(jobID) {
 };
 
 
-/**
- * Log File
- */
-var appError = new winston.transports.DailyRotateFile({
-  level: 'error',
-  name: 'error',
-  filename: './logs/bosch-app-error.log',
-  createSymlink: true,
-  symlinkName: 'bosch-app-error',
-  datePattern: 'YYYY-MM-DD',
-  zippedArchive: false,
-  maxSize: '20m'
-});
-var appCombined = new winston.transports.DailyRotateFile({
-  name: 'info',
-  filename: './logs/bosch-app-combined.log',
-  createSymlink: true,
-  symlinkName: 'bosch-app-combined.log',
-  datePattern: 'YYYY-MM-DD',
-  zippedArchive: false,
-  maxSize: '20m'
-});
-
-const logger = winston.createLogger({
-  level: 'info',
-  transports: [appError, appCombined]
-});
 
 /**
  * Download CSV files from the FTP
@@ -123,6 +150,7 @@ downloadCSVFromFtp = async () => {
     .then(async () => {
       const files = await sftp.list(src + '/.');
       //process listed files
+
       for (var i = 0, len = files.length; i < len; i++) {
         if (files[i].name.match(/.+(\.finished)$/)) {
           let jobID = path.parse(files[i].name).name;
@@ -134,21 +162,28 @@ downloadCSVFromFtp = async () => {
           });
           if(!importFinished){   
             // Create .finished file for reference 
+            logger.info('####### Import Started for ' + jobID + ' at ' + new Date() + ' #########');
+
             let fd = fs.openSync(dst + '/' + jobID + '.finished', 'w');
             const csvfiles = await sftp.list(src + '/' + jobID + '/.');
 
-            for (var i = 0, len = csvfiles.length; i < len; i++) {
-              if (csvfiles[i].name.match(/.+(\.csv)$/)) {    
-                await sftp.fastGet(src + '/' + jobID + '/' + csvfiles[i].name, dst + '/' + csvfiles[i].name);
+            
+            for (var j = 0, csvlen = csvfiles.length; j < csvlen; j++) {
+              if (csvfiles[j].name.match(/.+(\.csv)$/)) {    
+                await sftp.fastGet(src + '/' + jobID + '/' + csvfiles[j].name, dst + '/' + csvfiles[j].name);
               }
             }
-
+            
             await JSONtoCheckInData(jobID);
             await readExcel();
             await createRelation();
             await createLanguageRelationParent();
             await createLanguageRelationChild();
+            
             await endProcess(jobID);
+            
+            
+            logger.info('####### Import Ended for ' + jobID + ' at ' + new Date() + ' #########');
           }
         }
       }
@@ -156,7 +191,7 @@ downloadCSVFromFtp = async () => {
 
     }).catch(e => {
       logger.info(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
-      console.log(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
+      //console.log(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
     });
   sftp.end();
   return jsonData;
@@ -196,8 +231,8 @@ async function readExcel() {
             poolArray = [];
             for (let r = 0; r < result.length; r++) {
               csvData[result[r].rowdata.index].recordID = result[r].recordID;
-              let timeStamp = new Date();
-              csvData[result[r].rowdata.index].processdate = timeStamp.toLocaleString();
+              csvData[result[r].rowdata.index].startTime = result[r].startTime;
+              csvData[result[r].rowdata.index].endTime = result[r].endTime;
               csvData[result[r].rowdata.index].message = result[r].message;
             }
           }
@@ -213,8 +248,8 @@ async function readExcel() {
         const result = await Promise.all(poolArray)
         for (let r = 0; r < result.length; r++) {
           csvData[result[r].rowdata.index].recordID = result[r].recordID;
-          let timeStamp = new Date();
-          csvData[result[r].rowdata.index].processdate = timeStamp.toLocaleString();
+          csvData[result[r].rowdata.index].startTime = result[r].startTime;
+          csvData[result[r].rowdata.index].endTime = result[r].endTime;
           csvData[result[r].rowdata.index].message = result[r].message;
         }
         poolArray = [];
@@ -226,7 +261,7 @@ async function readExcel() {
 
   } catch (e) {
     logger.info(new Date() + ': Error: Read Excel File: ' + e.message);
-    console.log(new Date() + ': Error: Read Excel File: ' + e.message);
+    //console.log(new Date() + ': Error: Read Excel File: ' + e.message);
   }
 }
 
@@ -291,7 +326,7 @@ async function createRelation() {
       //Process remaining
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
-        console.log("result", result);
+        //console.log("result", result);
         poolArray = [];
         await writeExcel(csvData, 'null');
       }else{
@@ -300,7 +335,7 @@ async function createRelation() {
     }
   } catch (e) {
     logger.info(new Date() + ': Error: createRelation: ' + e.message);
-    console.log(new Date() + ': Error: createRelation: ' + e.message);
+    //console.log(new Date() + ': Error: createRelation: ' + e.message);
   }
 
 }
@@ -343,7 +378,7 @@ async function createLanguageRelationParent() {
           }, options));
           if (cpuIndex === APR_CREDENTIALS.worker * 10) {
             const result = await Promise.all(poolArray);
-            console.log("result", result);
+            //console.log("result", result);
             cpuIndex = 0;
             poolArray = [];
             //await writeExcel(csvData);
@@ -355,14 +390,14 @@ async function createLanguageRelationParent() {
       //Process remaining
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
-        console.log("result", result);
+        //console.log("result", result);
         poolArray = [];
         //await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
     logger.info(new Date() + ': Error: createLanguageRelationParent: ' + e.message);
-    console.log(new Date() + ': Error: createLanguageRelationParent: ' + e.message);
+    //console.log(new Date() + ': Error: createLanguageRelationParent: ' + e.message);
   }
 }
 
@@ -410,7 +445,7 @@ async function createLanguageRelationChild() {
             }, options));
             if (cpuIndex === APR_CREDENTIALS.worker * 10) {
               const result = await Promise.all(poolArray);
-              console.log("result", result);
+              //console.log("result", result);
               cpuIndex = 0;
               poolArray = [];
               //await writeExcel(csvData);
@@ -423,14 +458,14 @@ async function createLanguageRelationChild() {
       //Process remaining
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
-        console.log("result", result);
+        //console.log("result", result);
         poolArray = [];
         //await writeExcel(csvData, 'null');
       }
     }
   } catch (e) {
     logger.info(new Date() + ': Error: createLanguageRelationChild: ' + e.message);
-    console.log(new Date() + ': Error: createLanguageRelationChild: ' + e.message);
+    //console.log(new Date() + ': Error: createLanguageRelationChild: ' + e.message);
   }
 }
 
@@ -463,24 +498,32 @@ async function endProcess(jobID) {
               await sftp.put(dst + '/' + path.parse(file).name  + '.importFinished', src + '/' + path.parse(file).name  + '.importFinished');
             }).catch(e => {
               logger.info(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
-              console.log(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
+              //console.log(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
             });
           sftp.end();
           
           fs.unlink(path.join(ftpDirectory, file), (err) => {
             if (err) throw err;
           });
-
         }
+
+        if (path.extname(file) === '.csv') {
+          fs.unlink(path.join(ftpDirectory, file), err => {
+            if (err) {
+              console.error('Error deleting file:', err);
+            } else {
+              //console.log('File deleted:', file);
+            }
+          });
+        }
+
+
       }
     });
 
-    terminate('Normal Close');
-
-
   } catch (e) {
     logger.info(new Date() + ': Error: endProcess: ' + e.message);
-    console.log(new Date() + ': Error: endProcess: ' + e.message);
+    //console.log(new Date() + ': Error: endProcess: ' + e.message);
   }
 }
 
@@ -529,7 +572,7 @@ async function writeExcel(jsonArray, jobID) {
 
   } catch (e) {
     logger.info(new Date() + ': Error: writeExcel: ' + e.message);
-    console.log(new Date() + ': Error: writeExcel: ' + e.message);
+    //console.log(new Date() + ': Error: writeExcel: ' + e.message);
   }
 
 }
@@ -540,36 +583,38 @@ async function writeExcel(jsonArray, jobID) {
  */  
 
 main = async () => {
-  console.log('####### Import Started at ' + new Date() + ' #########');
+  //console.log('####### Import Started at ' + new Date() + ' #########');
   logger.info('####### Import Started at ' + new Date() + ' #########');
 
   
   if (fs.existsSync(APR_CREDENTIALS.checkin)) {
     await readExcel();
-    console.log('####### createRelation Started at ' + new Date() + ' #########');
+    //console.log('####### createRelation Started at ' + new Date() + ' #########');
     logger.info('####### createRelation Started at ' + new Date() + ' #########');  
     await createRelation();
-    console.log('####### createRelation Ended at ' + new Date() + ' #########');
+    //console.log('####### createRelation Ended at ' + new Date() + ' #########');
     logger.info('####### createRelation Ended at ' + new Date() + ' #########');
 
-    console.log('####### createLanguageRelationParent Started at ' + new Date() + ' #########');
+    //console.log('####### createLanguageRelationParent Started at ' + new Date() + ' #########');
     logger.info('####### createLanguageRelationParent Started at ' + new Date() + ' #########');  
     await createLanguageRelationParent();
-    console.log('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
+    //console.log('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
     logger.info('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
 
-    console.log('####### createLanguageRelationChild Started at ' + new Date() + ' #########');
+    //console.log('####### createLanguageRelationChild Started at ' + new Date() + ' #########');
     logger.info('####### createLanguageRelationChild Started at ' + new Date() + ' #########');  
     await createLanguageRelationChild();
-    console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
+    //console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
     logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
 
     await endProcess();
+    terminate('Normal Close');
   } else {
     await downloadCSVFromFtp();
+    terminate('Normal Close');
   }
 
-  console.log('####### Import Ended at ' + new Date() + ' #########');
+  //console.log('####### Import Ended at ' + new Date() + ' #########');
   logger.info('####### Import Ended at ' + new Date() + ' #########');
 
 };
@@ -580,7 +625,7 @@ function terminate(code){
     fs.unlink(APR_CREDENTIALS.signature, (err) => {
       if (err) throw err;
     });
-    console.log(`Process exited with code: ${code}`)  
+    //console.log(`Process exited with code: ${code}`)  
     logger.error(new Date() + ': System -- ' + code);
   }
 }
@@ -596,25 +641,25 @@ process.on('exit', code => {
 */
 
 process.on('SIGTERM', signal => {
-  console.log('SIGTERM: ');
+  //console.log('SIGTERM: ');
 	terminate(process.pid);
 	process.exit(0)
 })
 
 process.on('SIGINT', signal => {
-  console.log('SIGINT: ');
+  //console.log('SIGINT: ');
 	terminate(process.pid);
 	process.exit(0)
 })
 
 process.on('uncaughtException', err => {
-  console.log('Caught exception: ', err);
+  //console.log('Caught exception: ', err);
 	terminate(process.pid);
 	process.exit(1)
 })
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.log('unhandledRejection: ');
+  //console.log('unhandledRejection: ');
 	terminate(process.pid);
 	process.exit(1)
 })
@@ -626,16 +671,16 @@ process.on('unhandledRejection', (reason, promise) => {
 
 try {
   if(fs.existsSync(APR_CREDENTIALS.signature)){
-    console.log(new Date() + ': Skipping : Already Running :');
+    //console.log(new Date() + ': Skipping : Already Running :');
     logger.info(new Date() + ': Skipping : Already Running :');
   }else{
-    console.log(new Date() + ': Start : ********** :');
+    //console.log(new Date() + ': Start : ********** :');
     logger.info(new Date() + ': Start : ********** :');
     let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
     main();
   }
 } catch (error) {
-  console.log(new Date() + ': System Error -- ' + error);
+  //console.log(new Date() + ': System Error -- ' + error);
   logger.error(new Date() + ': System Error -- ' + error);
 }
 
