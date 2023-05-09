@@ -21,7 +21,7 @@ let Client = require("ssh2-sftp-client");
 const splitFile = require("split-file");
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
-const classificationlist = require("./bosch-classificationlist");
+//const classificationlist = require("./bosch-classificationlist");
 
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
@@ -213,7 +213,7 @@ recordLinks = async (masterRecordID, childRecordID, token) => {
  * Search for The Records in a combination of KBObjectID and Title and Kittelberger ID
  * @param {*} File Name, CSV Row Data, token
  */
-searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
+searchAsset = async (token, recordsCollection) => {
   ///let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
   //filterFileName = filterFileName.replace(/\+/g, "%2b");
 
@@ -282,65 +282,6 @@ searchAsset = async (token, Asset_BINARY_FILENAME, recordsCollection) => {
   return APIResult;
 };
 
-/**
- * Search for Classification ID
- * @param {*} Class Name, CSV Row Data, token
- */
-searchClassification = async (ClassID, token, data) => {
-  let filterClass = '';
-  if (typeof ClassID === 'string') {
-    filterClass = ClassID.replace(/&/g, "%26");
-    filterClass = filterClass.replace(/\+/g, "%2b");
-  }
-
-  let resultID = await axios
-    .get(APR_CREDENTIALS.GetClassification + filterClass, {
-      //proxy: APR_CREDENTIALS.proxyServerInfo,
-      proxy: false,
-      httpsAgent: new HttpsProxyAgent(fullProxyURL),
-      headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-        },
-    })
-    .then(async (resp) => {
-      //console.log("resp.data.id:", resp.data.id);
-      if (resp.data.id === null) {
-        //console.log(new Date() + ": WARNING : Classification Missing -- ", APR_CREDENTIALS.GetClassification + filterClass);
-        clogger.warn(new Date() + ': WARNING : Classification Missing -- ' + APR_CREDENTIALS.GetClassification + filterClass);
-        return 'null';
-      } else {
-        classificationlist[ClassID] = resp.data.id;
-        await writeClassificationlist();
-        return resp.data.id;
-      }
-    })
-    .catch(async (err) => {
-      //console.log(new Date() + ": WARNING : Classification Missing -- ", JSON.stringify(err.response.data));
-      clogger.warn(new Date() + ': WARNING : Classification Missing URL -- ' + APR_CREDENTIALS.GetClassification + filterClass);
-      if(err.response !== undefined && err.response.data !== undefined){
-        clogger.warn(new Date() + ': WARNING : ' + JSON.stringify(err.response.data));
-      } else {
-        clogger.warn(new Date() + ': WARNING : ' + JSON.stringify(err));
-      }
-      return 'null';
-    });
-  return resultID;
-};
-
-/**
- * 
- * Write Classification in local DB for reduce API Call
- */
-writeClassificationlist = async () => {
-  fs.writeFile("bosch-classificationlist.json", JSON.stringify(classificationlist), err => {
-    // Checking for errors
-    if (err) throw err;
-    //console.log("04 classificationlist Updated"); // Success
-  });
-};
 
 /**
  * Check File Size
@@ -377,9 +318,11 @@ getFields = async (assetID, token, recordsCollection) => {
             APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
         }
       } else {
-        const ImageToken = await uploadAsset(token, filename, recordsCollection.JOB_ID);
+        let tmpString = ': JobID: '+ recordsCollection.JOB_ID + ': PID: '+ recordsCollection.OBJ_ID + '_' + recordsCollection.LV_ID;
+        const ImageToken = await uploadAsset(token, filename, recordsCollection.JOB_ID, tmpString);
         //console.log(new Date() + ": INFO : Create Meta:");
-        logger.info(new Date() + ': INFO : Create Meta:');
+        logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ': INFO : Create Meta:');
+        
 
         const aprToken = await getToken();
         if(aprToken?.accessToken !== undefined){
@@ -389,7 +332,7 @@ getFields = async (assetID, token, recordsCollection) => {
       }
     } catch (error) {
       //console.log(new Date() + ": Error : Create Meta: "+ error);
-      logger.info(new Date() + ': Error : Create Meta: '+ error);
+      logger.error(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ': Error : Create Meta: '+ error);
       APIResult = {'result': 0, 'message': error};
     }
   } else {
@@ -401,7 +344,7 @@ getFields = async (assetID, token, recordsCollection) => {
       }
     } catch (error) {
       //console.log(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
-      logger.info(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
+      logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' Error : Create Meta: ' + error);
       APIResult = {'result': assetID, 'message': error};
     }
   }
@@ -556,28 +499,36 @@ createMeta = async (assetID, data, ImgToken, token) => {
     switch (key) {
       case 'AGENCY':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_agency');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+        if (ObjectID.hasOwnProperty('0')) {
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         break;
       case 'BRAND'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_brand');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+        if (ObjectID.hasOwnProperty('0')) {
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         break;
       case 'BU': //Classification (Hierarchical)        
@@ -586,75 +537,99 @@ createMeta = async (assetID, data, ImgToken, token) => {
           ClassID.push(APIResult);
         
           ObjectID = findObject(tempAssetObj, 'fieldName', 'New_Ownership');
-          //console.log("ObjectID", ObjectID.length);
-          if(ObjectID.length === 0){
-            ObjectID = await findFieldID('New_Ownership', token);
-          }
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            //console.log("ObjectID", ObjectID.length);
+            if(ObjectID.length === 0){
+              ObjectID = await findFieldID('New_Ownership', token);
+            }
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": ClassID,
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }            
         }
         break;        
       case 'CONTACT'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_contact');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'DEPT'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ResponsibleDepartment');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+        if (ObjectID.hasOwnProperty('0')) {
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         // code block
         break;
       case 'DESC'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_desc');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'DESCRIPTION'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'DESCRIPTION_POD'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_description_pod');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'FILENAME':
@@ -662,39 +637,50 @@ createMeta = async (assetID, data, ImgToken, token) => {
         break;
       case 'HEADLINE'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_headline');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;  
       case 'ILABEL':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ilabel');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
+          // code block
         break;
-      case 'IMG_TYPE': //Classification (Hierarchical)
-        
+      case 'IMG_TYPE': //Classification (Hierarchical)        
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });  
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": ClassID,
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });  
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }            
         }
         // code block
         break;
@@ -704,32 +690,38 @@ createMeta = async (assetID, data, ImgToken, token) => {
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type_hawera');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": ClassID,
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": ClassID,
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
         }
         // code block
         break;        
       case 'INIT_NAME':
           ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
   
           var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
           var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
   
           //console.log('INIT_NAME **************', firstName);
           //console.log('INIT_NAME **************', lastName);
-          APIResult = await searchUser(firstName, lastName, token);
+          let tmpString = ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data["LV_ID"];
+          APIResult = await searchUser(firstName, lastName, token, tmpString);
           if(APIResult !== '0'){
             ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
             updateObj.fields.addOrUpdate.push({
@@ -750,19 +742,24 @@ createMeta = async (assetID, data, ImgToken, token) => {
             });
           }
   
-  
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
           // code block
           break;
       case 'KEYWORDS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "values": [data[key]],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "values": [data[key]],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }        // code block
         break;    
       /*case 'LANGUAGE'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetLanguage');
@@ -781,62 +778,82 @@ createMeta = async (assetID, data, ImgToken, token) => {
       case 'LAUNCH_DATE':
         let LAUNCH_DATE_VAR = new Date(data[key]);
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": LAUNCH_DATE_VAR,
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": LAUNCH_DATE_VAR,
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'ORIG_BE_ID'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_orig_be_id');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'PERSPECTIVE'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_perspective');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+        if (ObjectID.hasOwnProperty('0')) {
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         // code block
         break;
       case 'PHOTOGRAPHER'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_photographer');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'PRODUCTION_AGENCY'://Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_production_agency');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+        if (ObjectID.hasOwnProperty('0')) {
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         // code block
         break;
@@ -845,124 +862,164 @@ createMeta = async (assetID, data, ImgToken, token) => {
           if (APIResult !== 'null') {
             ClassID.push(APIResult);
             ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": ClassID,
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
+            if (ObjectID.hasOwnProperty('0')) {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": [{
+                  "values": ClassID,
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }else{
+              logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+            }
           }
           // code block
           break;
       case 'SYMBOLIMG_DESCRIPTION'://Text
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_symbolimg_description');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
           // code block
           break;
       case 'TITLE'://Text
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_title');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
           // code block
           break;
       case 'TRADE_LABEL_AGENCY'://Option List
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_agency');
-          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-          if (APIResult !== 'null') {
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
+          if (ObjectID.hasOwnProperty('0')) {
+            APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+            if (APIResult !== 'null') {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": [{
+                  "values": [APIResult],
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
           }
           // code block
           break;
       case 'TRADE_LABEL_BRAND'://Option List
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_brand');
-          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-          if (APIResult !== 'null') {
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
+          if (ObjectID.hasOwnProperty('0')) {
+            APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+            if (APIResult !== 'null') {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": [{
+                  "values": [APIResult],
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
           }
           // code block
           break;
       case 'TRADE_LABEL_CONTACT'://Text
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_contact');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
           // code block
           break;
       case 'TRADE_LABEL_DEPT'://Option List
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_dept');
-          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-          if (APIResult !== 'null') {
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
+          if (ObjectID.hasOwnProperty('0')) {
+            APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+            if (APIResult !== 'null') {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": [{
+                  "values": [APIResult],
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
           }
           // code block
           break;      
       case 'TRADE_LABEL_EAN'://Text
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_ean');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "value": data[key],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
           // code block
           break;
       case 'TRADE_LABEL_KEYWORDS'://Text
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_keywords');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [data[key]],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [data[key]],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
           // code block
           break;
       case 'TRADE_LABEL_PERSPECTIVE'://Option List
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_trade_label_perspective');
-          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
-          if (APIResult !== 'null') {
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
+          if (ObjectID.hasOwnProperty('0')) {
+            APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], token, key)
+            if (APIResult !== 'null') {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": [{
+                  "values": [APIResult],
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
           }
           // code block
           break;
@@ -986,13 +1043,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
         }
         
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree Ids');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'CATEGORY_TREE_NAMES':
@@ -1006,39 +1067,22 @@ createMeta = async (assetID, data, ImgToken, token) => {
               }]
             }); */
             ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger Category Tree');
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "value": data[key],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
+            if (ObjectID.hasOwnProperty('0')) {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": [{
+                  "value": data[key],
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }else{
+              logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+            }
             // code block
             break;
       case 'LTYPE_ID':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_id');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'LTYPE_NAME':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_name');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
-        // code block
-        break;
-      case 'LV_ID':
-          ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger ID');
+        if (ObjectID.hasOwnProperty('0')) {
           updateObj.fields.addOrUpdate.push({
             "id": ObjectID[0].id,
             "localizedValues": [{
@@ -1046,6 +1090,39 @@ createMeta = async (assetID, data, ImgToken, token) => {
               "languageId": "00000000000000000000000000000000"
             }]
           });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
+        // code block
+        break;
+      case 'LTYPE_NAME':
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ltype_name');
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
+        // code block
+        break;
+      case 'LV_ID':
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'Kittelberger ID');
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "value": data[key],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
           // code block
           break;
       case 'MASTER_RECORD':
@@ -1064,24 +1141,32 @@ createMeta = async (assetID, data, ImgToken, token) => {
           break;
       case 'NAME':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Title');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'OBJ_ID':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_obj_id');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         break;
       case 'ORIGINAL_FILENAME':
         // code block
@@ -1092,13 +1177,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
           ClassID.push(APIResult);
         
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_object_type');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
         }
         // code block
         break;
@@ -1110,13 +1199,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
           ObjectID = findObject(tempAssetObj, 'fieldName', 'SystemStatus');
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+          }
         }
         // code block
         break;
@@ -1129,15 +1222,19 @@ createMeta = async (assetID, data, ImgToken, token) => {
           optionVal = "True"
         }
         ObjectID = findObject(tempAssetObj, 'fieldName', 'BI_Master');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
+        if (ObjectID.hasOwnProperty('0')) {
+          APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], optionVal, token, key)
+          if (APIResult !== 'null') {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         // code block
         break;
@@ -1177,13 +1274,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
       */
       case 'MISSING_TTNR':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Missing_TTNR');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       /*
@@ -1204,13 +1305,17 @@ createMeta = async (assetID, data, ImgToken, token) => {
       */
       case 'LINKED_PRODUCTS':
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ReferencedProductsinPIM');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;
       case 'CLIPLISTER_LINKS':
@@ -1219,23 +1324,31 @@ createMeta = async (assetID, data, ImgToken, token) => {
       case 'COLOR_SPACE':
         // code block
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ColorSpace');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });        
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });   
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }     
         break;
       case 'JOB_ID'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_job_id');
-        updateObj.fields.addOrUpdate.push({
-          "id": ObjectID[0].id,
-          "localizedValues": [{
-            "value": data[key],
-            "languageId": "00000000000000000000000000000000"
-          }]
-        });
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": data[key],
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
+        }
         // code block
         break;        
       default:
@@ -1263,13 +1376,13 @@ createMeta = async (assetID, data, ImgToken, token) => {
   //console.log("ClassObj: ", ClassObj);  
 
   } catch (error) {
-    logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + ' ERROR : META:' + error);
-    console.log(' ERROR : META:', error);
+    logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data["LV_ID"] + ' ERROR : META:' + error);
+    //console.log(' ERROR : META:', error);
   }
 
 
   //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
-  logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
+  logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data["LV_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
   
 
   if (assetID === "null") {
@@ -1379,7 +1492,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
  * Search for User Data
  * @param {*} firstName, lastName, token
  */ 
-searchUser = async (firstName, lastName, token) => {
+searchUser = async (firstName, lastName, token, tmpString) => {
   let body = {
     "and":[
        {
@@ -1398,9 +1511,9 @@ searchUser = async (firstName, lastName, token) => {
  };
 
 
-  logger.error(new Date() + ': INFO : Search USER ID: ' + JSON.stringify(body));
+  logger.info(new Date() + tmpString + ': INFO : Search USER ID: ' + JSON.stringify(body));
   //console.log(new Date() + ': INFO : Search USER ID: ', JSON.stringify(body));
-  logger.error(new Date() + ': INFO : Search USER URL: ' + APR_CREDENTIALS.SearchUser);
+  logger.info(new Date() + tmpString + ': INFO : Search USER URL: ' + APR_CREDENTIALS.SearchUser);
   //console.log(new Date() + ': INFO : Search USER URL: ', APR_CREDENTIALS.SearchUser);
   let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.SearchUser, JSON.stringify(body), {
@@ -1416,23 +1529,23 @@ searchUser = async (firstName, lastName, token) => {
       })
       .then(async (resp) => {        
         if (resp.data['_total'] !== 0) {
-          logger.error(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
+          logger.info(new Date() + tmpString + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
           //console.log(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
           return resp.data['_embedded'].user[0].adamUserId;
         } else {
-          logger.error(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
+          logger.error(new Date() + tmpString + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
           //console.log(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
           return '0';
         }
       })
       .catch((err) => {
-        logger.error(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
+        logger.error(new Date() + tmpString + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
         //console.log(new Date() + ': ERROR : USER SEARCH API -- First Name: ' + firstName + ' Last Name: ' + lastName);
 
         if(err.response !== undefined && err.response.data !== undefined){
-          logger.error(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err.response.data));
+          logger.error(new Date() + tmpString + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err.response.data));
         } else {
-          logger.error(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
+          logger.error(new Date() + tmpString + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err));
         }
 
         //console.log(new Date() + ': ERROR : USER SEARCH API -- ' + JSON.stringify(err.response.data));
@@ -1450,8 +1563,9 @@ getfielddefinitionID = async (fieldURL, fieldValue, token, keyValue) => {
   //let filterClass = fieldURL.replace(/&/g, "%26");
   //filterClass = filterClass.replace(/\+/g, "%2b");
   ////console.log('filterClass: ', filterClass);
+
   let resultID = await axios
-    .get(encodeURI(fieldURL),      
+    .get(encodeURI(fieldURL), 
       {
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
@@ -1590,20 +1704,20 @@ searchClassificationID = async (ClassID, token, data) => {
  * Upload file into Aprimo
  * @param {*} token, filename 
  */
-async function uploadAsset(token, filename, processPath) {
+async function uploadAsset(token, filename, processPath, tmpString) {
 
   let BINARY_FILENAME = filename
   let remotePath = APR_CREDENTIALS.sourcePath + '/'+ processPath + '/binary/' + filename;
   filename = imgFolderPath + filename;
   
-  logger.info(new Date() + ': Start Downloading: ' + filename);
+  logger.info(new Date() + tmpString + ': Start Downloading: ' + filename);
   let sftp = new Client();
   await sftp.connect(ftpConfig)
     .then(async () => {      
       await sftp.fastGet(remotePath, filename);
-      logger.info(new Date() + ': End Downloading: ' + filename);
+      logger.info(new Date() + tmpString + ': End Downloading: ' + filename);
     }).catch(e => {
-      logger.error(new Date() + ': ERROR : in the FTP Connection -- ' + e);
+      logger.error(new Date() + tmpString + ': ERROR : in the FTP Connection -- ' + e);
       //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
     });
     
@@ -1632,7 +1746,8 @@ async function uploadAsset(token, filename, processPath) {
                     await uploadSegment(
                       SegmentURI + "?index=" + start,
                       names[start],
-                      token
+                      token,
+                      tmpString
                     );
                   }
                 }
@@ -1640,14 +1755,14 @@ async function uploadAsset(token, filename, processPath) {
                 const aprToken = await getToken();
                 if(aprToken?.accessToken !== undefined){
 
-                  logger.info(new Date() + ': Start Uploading Chunks: ' + filename);
+                  logger.info(new Date() + tmpString + ': Start Uploading Chunks: ' + filename);
                   token = aprToken.accessToken;
-                  const ImgToken = await commitSegment(SegmentURI, filename, names.length, token);
+                  const ImgToken = await commitSegment(SegmentURI, filename, names.length, token, tmpString);
 
                   // Delete Main File 
                   fs.unlink(filename, (err) => {
                     if (err){
-                      logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                      logger.error(new Date() + tmpString + ': ERROR : File Deletion -- ' + JSON.stringify(err));
                       //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
                     } 
                   });
@@ -1655,12 +1770,12 @@ async function uploadAsset(token, filename, processPath) {
                   for (let start = 0; start < names.length; start++) {
                     fs.unlink(names[start], (err) => {
                       if (err){
-                        logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                        logger.error(new Date() + tmpString + ': ERROR : File Deletion -- ' + JSON.stringify(err));
                         //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
                       } 
                     });  
                   }
-                  logger.info(new Date() + ': End Uploading Chunks: ' + filename);
+                  logger.info(new Date() + tmpString + ': End Uploading Chunks: ' + filename);
                   return ImgToken;  
                 } else {
                   return null;
@@ -1668,9 +1783,9 @@ async function uploadAsset(token, filename, processPath) {
               })
               .catch((err) => {
                 if(err.response !== undefined && err.response.data !== undefined){
-                  logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
+                  logger.error(new Date() + tmpString + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
                 } else {
-                  logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
+                  logger.error(new Date() + tmpString + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
                 }
           
                 //console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
@@ -1682,7 +1797,7 @@ async function uploadAsset(token, filename, processPath) {
         }
       } else {
         //logger.info(new Date() + ": fileSize is < 20 MB: ");
-        logger.info(new Date() + ': Start Uploading: ' + filename);
+        logger.info(new Date() + tmpString + ': Start Uploading: ' + filename);
         let form = new FormData();
         form.append("file", fs.createReadStream(filename), {
           contentType: getMimeType,
@@ -1707,18 +1822,18 @@ async function uploadAsset(token, filename, processPath) {
 
               fs.unlink(filename, (err) => {
                 if (err){
-                  logger.error(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                  logger.error(new Date() + tmpString + ': ERROR : File Deletion -- ' + JSON.stringify(err));
                 } 
               });  
 
-            logger.info(new Date() + ': End Uploading: ' + filename);
+            logger.info(new Date() + tmpString + ': End Uploading: ' + filename);
             return ImgToken;
           })
           .catch((err) => {
             if(err.response !== undefined && err.response.data !== undefined){
-              logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
+              logger.error(new Date() + tmpString + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
             } else {
-              logger.error(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
+              logger.error(new Date() + tmpString + ': INFO : uploadAsset API -- ' + JSON.stringify(err));
             }
         
             //console.log(new Date() + ': INFO : uploadAsset API -- ' + JSON.stringify(err.response.data));
@@ -1731,7 +1846,7 @@ async function uploadAsset(token, filename, processPath) {
 
 
     }else{
-      logger.error(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
+      logger.error(new Date() + tmpString + ': ERROR : File Not Found in the FTP -- ' + filename);
       //console.log(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
     }
     sftp.end();
@@ -1810,7 +1925,7 @@ const findObject = (obj = {}, key, value) => {
 /**
  * uploadSegment
  */
-uploadSegment = async (SegmentURI, chunkFileName, token) => {
+uploadSegment = async (SegmentURI, chunkFileName, token, tmpString) => {
   let form = new FormData();
   form.append("file", fs.createReadStream(chunkFileName), {
     contentType: "image/png",
@@ -1830,25 +1945,22 @@ uploadSegment = async (SegmentURI, chunkFileName, token) => {
       maxBodyLength: Infinity,
     })
     .then(async (resp) => {
+      //logger.info(new Date() + tmpString + ': INFO : uploadSegment Done');
       //console.log("Segment Upload Done for:", chunkFileName);
     })
     .catch((err) => {
       if(err.response !== undefined && err.response.data !== undefined){
-        logger.error(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err.response.data));
+        logger.error(new Date() + tmpString + ': ERROR : uploadSegment -- ' + JSON.stringify(err.response.data));
       } else {
-        logger.error(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err));
+        logger.error(new Date() + tmpString + ': ERROR : uploadSegment -- ' + JSON.stringify(err));
       }
-
-      //console.log(new Date() + ': ERROR : uploadSegment -- ' + JSON.stringify(err.response.data));
     });
 };
 
 /**
  * commitSegment
  */
-commitSegment = async (SegmentURI, filename, segmentcount, token) => {
-  //logger.info(new Date() + ": commitSegment: ");
-  let APIResult = false;
+commitSegment = async (SegmentURI, filename, segmentcount, token, tmpString) => {
   let body = {
     filename: path.basename(filename),
     segmentcount: segmentcount,
@@ -1873,9 +1985,9 @@ commitSegment = async (SegmentURI, filename, segmentcount, token) => {
     })
     .catch((err) => {
       if(err.response !== undefined && err.response.data !== undefined){
-        logger.error(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err.response.data));
+        logger.error(new Date() + tmpString + ': ERROR : commitSegment -- ' + JSON.stringify(err.response.data));
       } else {
-        logger.error(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err));
+        logger.error(new Date() + tmpString + ': ERROR : commitSegment -- ' + JSON.stringify(err));
       }
 
       //console.log(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err.response.data));
@@ -2018,7 +2130,7 @@ module.exports = async (rowdata) => {
   var aprToken = await getToken();
   if(rowdata.mode === 'createRecords'){
     let timeStampStart = new Date();
-    let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata.BINARY_FILENAME, rowdata.rowdata);
+    let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata);
     //console.log("RecordID: ", RecordID);
     let timeStampEnd = new Date();
     rowdata.recordID = RecordID.result;

@@ -8,14 +8,24 @@ const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 const winston = require("winston");
 require('winston-daily-rotate-file');
 const arrayApp = require('lodash');
+const axios = require("axios").default;
+const HttpsProxyAgent = require('https-proxy-agent');
+
 const os = require('os');
 const cpus = os.cpus();
+
 
 const {
   v4: uuidv4
 } = require('uuid');
 
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
+var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
+if(APR_CREDENTIALS.proxyServerInfo.auth.username!="")
+{
+  fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+APR_CREDENTIALS.proxyServerInfo.auth.username +":"+ APR_CREDENTIALS.proxyServerInfo.auth.password+"@"+APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
+}
+
 
 // Create a new thread pool
 const pool = new Piscina(
@@ -579,43 +589,134 @@ async function writeExcel(jsonArray, jobID) {
 
 /**
  * 
+ * Find fields IDs for updating records. 
+ * @param {*} token
+ */  
+
+checkTempAsset = async () => {
+  const aprToken = await getToken();
+  if(aprToken?.accessToken !== undefined){
+  let token = aprToken.accessToken;
+  let getFieldsResult = await axios
+    .get(APR_CREDENTIALS.GetRecord_URL + APR_CREDENTIALS.tempAssetID + '/fields', {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    .then(async (resp) => {
+      if (resp.data.items.length > 0) {
+        return resp.data.items;
+      } else {
+        logger.error(new Date() + ': ERROR : tempAssetID Missing --');
+        //console.log(new Date() + ': ERROR : tempAssetID Missing --');
+        return null;
+      }
+    })
+    .catch(async (err) => {
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
+      }
+
+      //console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
+      return null;
+    });
+    return getFieldsResult;
+  } else {
+    return null;
+  }
+};
+
+
+/**
+ * Generating Token
+ */
+getToken = async () => {
+  let resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
+        timeout: 60000,
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),
+        headers: {
+        "Content-Type": "application/json",
+        "client-id": APR_CREDENTIALS.client_id,
+        Authorization: `Basic ${APR_CREDENTIALS.Auth_Token}`,
+        },
+      }
+    ).then(async (resp) => {
+      //console.log("resp", resp);
+      logger.info(new Date() + ': API Token Generated: ###################################');
+      return resp.data;
+    })
+    .catch(async (err) => {    
+      //console.log("err", err);
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err));
+      }
+
+      return aprToken;
+    });  
+
+    if(resultAssets?.accessToken !== undefined){
+      return resultAssets;
+    }else{
+      return 'null';
+    }
+};
+
+/**
+ * 
  * main function
  */  
 
 main = async () => {
-  //console.log('####### Import Started at ' + new Date() + ' #########');
-  logger.info('####### Import Started at ' + new Date() + ' #########');
+  let getTempAsset = await checkTempAsset();
+  //console.log("getTempAsset", getTempAsset);
+  if(getTempAsset !== null){
+      //console.log('####### Import Started at ' + new Date() + ' #########');
+      logger.info('####### Import Started at ' + new Date() + ' #########');
+      if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+        await readExcel();
+        //console.log('####### createRelation Started at ' + new Date() + ' #########');
+        logger.info('####### createRelation Started at ' + new Date() + ' #########');  
+        await createRelation();
+        //console.log('####### createRelation Ended at ' + new Date() + ' #########');
+        logger.info('####### createRelation Ended at ' + new Date() + ' #########');
 
-  
-  if (fs.existsSync(APR_CREDENTIALS.checkin)) {
-    await readExcel();
-    //console.log('####### createRelation Started at ' + new Date() + ' #########');
-    logger.info('####### createRelation Started at ' + new Date() + ' #########');  
-    await createRelation();
-    //console.log('####### createRelation Ended at ' + new Date() + ' #########');
-    logger.info('####### createRelation Ended at ' + new Date() + ' #########');
+        //console.log('####### createLanguageRelationParent Started at ' + new Date() + ' #########');
+        logger.info('####### createLanguageRelationParent Started at ' + new Date() + ' #########');  
+        await createLanguageRelationParent();
+        //console.log('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
+        logger.info('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
 
-    //console.log('####### createLanguageRelationParent Started at ' + new Date() + ' #########');
-    logger.info('####### createLanguageRelationParent Started at ' + new Date() + ' #########');  
-    await createLanguageRelationParent();
-    //console.log('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
-    logger.info('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
+        //console.log('####### createLanguageRelationChild Started at ' + new Date() + ' #########');
+        logger.info('####### createLanguageRelationChild Started at ' + new Date() + ' #########');  
+        await createLanguageRelationChild();
+        //console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
+        logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
 
-    //console.log('####### createLanguageRelationChild Started at ' + new Date() + ' #########');
-    logger.info('####### createLanguageRelationChild Started at ' + new Date() + ' #########');  
-    await createLanguageRelationChild();
-    //console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
-    logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
+        await endProcess();
+        terminate('Normal Close');
+      } else {
+        await downloadCSVFromFtp();
+        terminate('Normal Close');
+      }
 
-    await endProcess();
-    terminate('Normal Close');
-  } else {
-    await downloadCSVFromFtp();
+      //console.log('####### Import Ended at ' + new Date() + ' #########');
+      logger.info('####### Import Ended at ' + new Date() + ' #########');
+
+  }else{
+    logger.error('####### Sample Asset Not Found ' + new Date() + ' #########');
+    logger.error('####### Stop Further Processing ' + new Date() + ' #########');
     terminate('Normal Close');
   }
-
-  //console.log('####### Import Ended at ' + new Date() + ' #########');
-  logger.info('####### Import Ended at ' + new Date() + ' #########');
 
 };
 
