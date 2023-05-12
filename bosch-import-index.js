@@ -190,7 +190,7 @@ downloadCSVFromFtp = async () => {
             await createLanguageRelationParent();
             await createLanguageRelationChild();
             
-            await endProcess(jobID);
+            //await endProcess(jobID);
             
             
             logger.info('####### Import Ended for ' + jobID + ' at ' + new Date() + ' #########');
@@ -587,6 +587,51 @@ async function writeExcel(jsonArray, jobID) {
 
 }
 
+
+/**
+ * Search for Template Record with JOB-ID: job_999999999 and KBObjectID: 999999999 
+ * @param {*} File Name, CSV Row Data, token
+ */
+searchTemplateAsset = async (token) => {
+
+  let queryString = '';
+  queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
+
+  logger.info(new Date() + ': SearchTemplateAsset: ');
+  let APIResult = await axios
+    .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
+    { 
+      timeout: 60000,
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+    })
+    .then(async (resp) => {
+      const itemsObj = resp.data;
+      let getFieldsResult = 0;
+      if (itemsObj.totalCount === 0) {
+        logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      } else if (itemsObj.totalCount === 1) {
+          logger.info(new Date() + ': SearchTemplateAsset ID:'+ itemsObj.items[0].id );
+          getFieldsResult = itemsObj.items[0].id;
+      }else{
+        logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      }
+      return getFieldsResult;
+    })
+    .catch(async (err) => {
+      logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      return 0;
+    });
+  return APIResult;
+};
+
+
 /**
  * 
  * Find fields IDs for updating records. 
@@ -597,8 +642,13 @@ checkTempAsset = async () => {
   const aprToken = await getToken();
   if(aprToken?.accessToken !== undefined){
   let token = aprToken.accessToken;
+
+  let tempAssetID = await searchTemplateAsset(token);
+  if(tempAssetID !== 0){
+
+
   let getFieldsResult = await axios
-    .get(APR_CREDENTIALS.GetRecord_URL + APR_CREDENTIALS.tempAssetID + '/fields', {
+    .get(APR_CREDENTIALS.GetRecord_URL + tempAssetID + '/fields', {
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -628,6 +678,9 @@ checkTempAsset = async () => {
       return null;
     });
     return getFieldsResult;
+    }else{
+      return null;
+    }
   } else {
     return null;
   }
@@ -702,7 +755,7 @@ main = async () => {
         //console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
         logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
 
-        await endProcess();
+        //await endProcess();
         terminate('Normal Close');
       } else {
         await downloadCSVFromFtp();

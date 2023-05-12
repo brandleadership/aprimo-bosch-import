@@ -31,6 +31,13 @@ let API_TOKEN = {
 };
 
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
+const oTypes = JSON.parse(fs.readFileSync("otypes-mapping.json"));
+//console.log("oTypes", oTypes);
+//let AssetTypeValue = findObject(oTypes, 'OTYPE_ID', 16);
+//console.log("AssetTypeValue", AssetTypeValue);
+//return false;
+let SecurityAuthorizedID = '';
+let SecurityAuthorizedObj = '';
 
 var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
 if(APR_CREDENTIALS.proxyServerInfo.auth.username!="")
@@ -101,7 +108,6 @@ const tlogger = winston.createLogger({
   transports: [tokensLogs]
 });
 
-
 /**
  * Generating Token
  */
@@ -109,6 +115,7 @@ getToken = async () => {
   // Check for 8 Minutes API Token 
   let syncTime = new Date().getTime() - 480000;  
   if(API_TOKEN.timeStamp < syncTime) {
+    logger.info(new Date() + ': API Token Start: ###################################');
     const resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
         timeout: 60000,
         proxy: false,
@@ -284,6 +291,49 @@ searchAsset = async (token, recordsCollection) => {
 
 
 /**
+ * Search for Template Record with JOB-ID: job_999999999 and KBObjectID: 999999999 
+ * @param {*} File Name, CSV Row Data, token
+ */
+searchTemplateAsset = async (token) => {
+
+  let queryString = '';
+  queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
+
+  logger.info(new Date() + ': SearchTemplateAsset: ');
+  let APIResult = await axios
+    .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
+    { 
+      timeout: 60000,
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+    })
+    .then(async (resp) => {
+      const itemsObj = resp.data;
+      let getFieldsResult = 0;
+      if (itemsObj.totalCount === 0) {
+        logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      } else if (itemsObj.totalCount === 1) {
+          logger.info(new Date() + ': SearchTemplateAsset ID:'+ itemsObj.items[0].id );
+          getFieldsResult = itemsObj.items[0].id;
+      }else{
+        logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      }
+      return getFieldsResult;
+    })
+    .catch(async (err) => {
+      logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      return 0;
+    });
+  return APIResult;
+};
+
+/**
  * Check File Size
  * @param {*} File Name
  */
@@ -315,7 +365,9 @@ getFields = async (assetID, token, recordsCollection) => {
         const aprToken = await getToken();
         if(aprToken?.accessToken !== undefined){
             token = aprToken.accessToken;
+            logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Create Meta Start: ');
             APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+            logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Create Meta End: ');
         }
       } else {
         let tmpString = ': JobID: '+ recordsCollection.JOB_ID + ': PID: '+ recordsCollection.OBJ_ID + '_' + recordsCollection.LV_ID;
@@ -327,7 +379,9 @@ getFields = async (assetID, token, recordsCollection) => {
         const aprToken = await getToken();
         if(aprToken?.accessToken !== undefined){
             token = aprToken.accessToken;
-            APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);      
+            logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Create Meta Start: ');
+            APIResult = await createMeta(assetID, recordsCollection, ImageToken, token);
+            logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Create Meta End: ');
         }
       }
     } catch (error) {
@@ -340,7 +394,9 @@ getFields = async (assetID, token, recordsCollection) => {
       const aprToken = await getToken();
       if(aprToken?.accessToken !== undefined){
           token = aprToken.accessToken;
+          logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Create Meta Start: ');
           APIResult = await createMeta(assetID, recordsCollection, 'null', token);  
+          logger.info(new Date() + ': JobID: '+ recordsCollection.JOB_ID +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Create Meta End: ');
       }
     } catch (error) {
       //console.log(new Date() + ': PID: '+ assetID + ' Error : Create Meta: ' + error);
@@ -357,8 +413,12 @@ getFields = async (assetID, token, recordsCollection) => {
  * @param {*} token
  */  
 getFieldIDs = async (token) => {
+  let tempAssetID = await searchTemplateAsset(token);
+  if(tempAssetID !== 0){
+
+
   let getFieldsResult = await axios
-    .get(APR_CREDENTIALS.GetRecord_URL + APR_CREDENTIALS.tempAssetID + '/fields', {
+    .get(APR_CREDENTIALS.GetRecord_URL + tempAssetID + '/fields', {
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -387,7 +447,11 @@ getFieldIDs = async (token) => {
       //console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
       return null;
     });
-  return getFieldsResult;
+
+    return getFieldsResult;
+  } else {
+    return null;
+  }
 };
 
 /**
@@ -435,7 +499,11 @@ findFieldID = async (fieldName, token) => {
  */  
 createMeta = async (assetID, data, ImgToken, token) => {
 
+  
   let APIResult = false;
+  let tempAssetObj = await getFieldIDs(token);
+  let NewAssetTypeID = findObject(tempAssetObj, 'fieldName', 'NewAssetType');
+  let SOOID = await searchClassificationID('SecurityOwnership_OtherReleaseInfoInternal', token, data);
   let updateObj = {
     tag: "<xml>test tag</xml>",
     classifications: {
@@ -445,7 +513,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
       addOrUpdate: []
     },
   };
-  let tempAssetObj = await getFieldIDs(token);
+  
   //console.log("ImgToken:", ImgToken);
   if (ImgToken !== "null" && ImgToken !== undefined) {
     updateObj.files = {
@@ -468,11 +536,14 @@ createMeta = async (assetID, data, ImgToken, token) => {
   try {
     
   let ClassObj = [];
+  let CSORELEASE = [];
+
   for (var key in data) {
     let ClassID = [];
     let tmpKey = data[key];
     let optionVal = "False";
     let ObjectID = '';
+    
 
     if (typeof tmpKey === 'string') {
       tmpKey = tmpKey.replace(/&/g, "%26");
@@ -532,6 +603,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
         }
         break;
       case 'BU': //Classification (Hierarchical)        
+        /*
         APIResult = await searchClassificationName(tmpKey, token, data);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
@@ -553,6 +625,7 @@ createMeta = async (assetID, data, ImgToken, token) => {
             logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
           }            
         }
+        */
         break;        
       case 'CONTACT'://Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_contact');
@@ -1188,7 +1261,27 @@ createMeta = async (assetID, data, ImgToken, token) => {
           }else{
             logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
           }
+
         }
+
+
+          let AssetTypeKey = findObject(oTypes, 'OTYPE_ID', data[key]);
+          if (NewAssetTypeID.hasOwnProperty('0') && AssetTypeKey.hasOwnProperty('0')) {
+            APIResult = await searchClassificationID(AssetTypeKey[0].id, token, data);
+            //console.log("APIResult", APIResult);
+            if (APIResult !== 'null') {
+              ClassID.push(APIResult);
+              updateObj.fields.addOrUpdate.push({
+                "id": NewAssetTypeID[0].id,
+                "localizedValues": [{
+                  "values": [APIResult],
+                  "languageId": "00000000000000000000000000000000"
+                }]
+              });
+            }
+          }else{
+            logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: NewAssetType');
+          }
         // code block
         break;
       case 'OTYPE_NAME':
@@ -1350,11 +1443,50 @@ createMeta = async (assetID, data, ImgToken, token) => {
           logger.error(new Date() + ': JobID: '+ data["JOB_ID"] +  ': PID: '+ data["OBJ_ID"]  + '_' + data["LV_ID"]  + ': Error : Create Meta: ' + key);
         }
         // code block
-        break;        
+        break;  
+      case 'PRIMEMEDIAPOOL$DEFAULT$RELATED_COUNTRIES':
+        let PoolCode = data[key].split(',');
+        if (PoolCode.length > 0) {
+          for (let i = 0; i < PoolCode.length; i++) {
+            if (PoolCode[i].length > 0) {
+              if (PoolCode[i] !== 'null') {
+                if (CSORELEASE.indexOf(PoolCode[i].trim()) === -1){
+                  CSORELEASE.push(PoolCode[i].trim());
+                }
+              }
+            }
+          }
+        }
+        break;  
+      case 'PRIMEPOOL_BU':
+        let PoolCodeBU = data[key].split(',');
+        if (PoolCodeBU.length > 0) {
+          for (let i = 0; i < PoolCodeBU.length; i++) {
+            if (PoolCodeBU[i].length > 0) {
+              if (PoolCodeBU[i] !== 'null') {
+                if (CSORELEASE.indexOf(PoolCodeBU[i].trim()) === -1){
+                  CSORELEASE.push(PoolCodeBU[i].trim());
+                }                
+              }
+            }
+          }
+        }
+        break;
       default:
+        if(key.indexOf("CSORELEASE_") !== -1){
+          if(data[key] === 'x'){
+            let CSOCode = key.split('_');
+            if (CSOCode.hasOwnProperty('1')) {
+              if (CSORELEASE.indexOf(CSOCode[1].trim()) === -1){
+                CSORELEASE.push(CSOCode[1].trim());
+              }
+            }
+          }
+        } 
+        break;
         // code block
     }
-    //console.log("ClassID: ", ClassID);
+    
 
     if (ClassID.length > 0) {
       for (let i = 0; i < ClassID.length; i++) {
@@ -1366,6 +1498,41 @@ createMeta = async (assetID, data, ImgToken, token) => {
       }
     }
   }
+  //console.log("CSORELEASE: ", CSORELEASE);
+
+  //Security Ownership Code Start
+  if (data.hasOwnProperty('RESPONSIBLE_BUSINESS_UNIT')) {
+    if(data["RELEASED"] === 'x'){//SecurityOwnership_HGReleaseInfoPublic
+      APIResult = await searchClassificationID('SecurityOwnership_' + data['RESPONSIBLE_BUSINESS_UNIT']+'ReleaseInfoPublic', token, data);
+    }else if(data["RELEASED"] === '-'){//SecurityOwnership_HGReleaseInfoInternal
+      APIResult = await searchClassificationID('SecurityOwnership_' + data['RESPONSIBLE_BUSINESS_UNIT']+'ReleaseInfoInternal', token, data);
+    }else {
+      APIResult = await searchClassificationID('SecurityOwnership_' + data['RESPONSIBLE_BUSINESS_UNIT']+'ReleaseInfoRestricted', token, data);
+    }
+
+    if (APIResult !== 'null') {
+      ClassObj.push(APIResult);
+    }
+  } else {
+    logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data["LV_ID"] + ' ERROR : RESPONSIBLE_BUSINESS_UNIT: NOT FOUND');
+    logger.info(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data["LV_ID"] + ' INFO : ASSIGNING TO SecurityOwnership_OtherReleaseInfoInternal');
+    if(SOOID !== 'null') {
+      ClassObj.push(SOOID);
+    }
+  }
+  //Security Ownership Code End
+  //Security Authorized Code Start
+  if (CSORELEASE.length > 0) {
+    for (let cs = 0; cs < CSORELEASE.length; cs++) {
+      //console.log("SecurityAuthorized: ", 'SecurityAuthorized_'+CSORELEASE[cs]);
+      const AuthorizedID = findObject(SecurityAuthorizedObj, 'identifier', 'SecurityAuthorized_'+CSORELEASE[cs]);
+      if (AuthorizedID.hasOwnProperty('0')) {
+        //console.log("SecurityAuthorizedID: ", AuthorizedID[0].id);
+        ClassObj.push(AuthorizedID[0].id);
+      }
+    }
+  }
+  //Security Authorized Code End
 
   for (let c = 0; c < ClassObj.length; c++) {
     updateObj.classifications.addOrUpdate.push({
@@ -1473,18 +1640,21 @@ createMeta = async (assetID, data, ImgToken, token) => {
         return {'result': assetID, 'message': 'RECORD UPDATED'};
       })
       .catch((err) => {
-        logger.error(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
+        logger.error(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID + ' Asset ID: ' + assetID);
         //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID);
         if(err.response !== undefined && err.response.data !== undefined){
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- 33333333');
           logger.error(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err.response.data));
           return {'result': 0, 'message': JSON.stringify(err.response.data)};
         } else {
+          logger.error(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- 22222222');
           logger.error(new Date() + ': JobID: '+ data["JOB_ID"] + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : UPDATE RECORD API -- ' + JSON.stringify(err));
           return {'result': 0, 'message': JSON.stringify(err)};
         }        
       });
     return reqCreatRequest;
   }
+
 };
 
 /**
@@ -1656,6 +1826,50 @@ searchClassificationName = async (ClassID, token, data) => {
   return resultID;
 };
 
+
+/**
+ * 
+ * Search for Classificate Children
+ * @param {*} ClassID, token, data
+ */ 
+searchClassificationChildren = async (ClassID, token) => {
+  const aprToken = await getToken();
+  if(aprToken?.accessToken !== undefined){
+      token = aprToken.accessToken;
+  }
+  
+  const ClassificationChildrenURL = APR_CREDENTIALS.GetClassification.split('?');
+  if(ClassificationChildrenURL.hasOwnProperty('0')){
+  let resultID = await axios
+    .get(ClassificationChildrenURL[0] + "/" + encodeURI(ClassID) + "/children", {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+    })
+    .then(async (resp) => {
+      return resp.data.items;
+    })
+    .catch(async (err) => {
+      logger.error(new Date() + ': ERROR : Getting Security Authorized Children ' + encodeURI(ClassID));
+      //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.warn(new Date() + ': ERROR : Getting Security Authorized Children is ' + JSON.stringify(err.response.data));
+      } else {
+        logger.warn(new Date() + ': ERROR : Getting Security Authorized Children is ' + JSON.stringify(err));
+      }
+      return null;
+    });
+    return resultID;
+  }else{
+    return null;
+  }
+};
+
 /**
  * 
  * Search for Classificate Name
@@ -1665,6 +1879,12 @@ searchClassificationID = async (ClassID, token, data) => {
   //let filterClass = ClassID.replace(/&/g, "%26");
   //filterClass = filterClass.replace(/\+/g, "%2b");
   ////console.log("searchClassificationName URL: ", APR_CREDENTIALS.GetClassificationByName + "'" + filterClass + "'");
+  const aprToken = await getToken();
+  if(aprToken?.accessToken !== undefined){
+      token = aprToken.accessToken;
+  }
+  
+
   let resultID = await axios
     .get(APR_CREDENTIALS.GetClassificationByID + "'" + encodeURI(ClassID) + "'", {
       proxy: false,
@@ -1772,8 +1992,8 @@ async function uploadAsset(token, filename, processPath, tmpString) {
                       if (err){
                         logger.error(new Date() + tmpString + ': ERROR : File Deletion -- ' + JSON.stringify(err));
                         //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
-                      } 
-                    });  
+                      }
+                    });
                   }
                   logger.info(new Date() + tmpString + ': End Uploading Chunks: ' + filename);
                   return ImgToken;  
@@ -2128,6 +2348,11 @@ languageRelationChild = async (masterRecordID, childRecordID, token) => {
 module.exports = async (rowdata) => {
   //console.log("Data:", rowdata);
   var aprToken = await getToken();
+  SecurityAuthorizedID = await searchClassificationID('SecurityAuthorized', '', '');
+  SecurityAuthorizedObj = await searchClassificationChildren(SecurityAuthorizedID, '');
+
+
+
   if(rowdata.mode === 'createRecords'){
     let timeStampStart = new Date();
     let RecordID = await searchAsset(aprToken.accessToken, rowdata.rowdata);

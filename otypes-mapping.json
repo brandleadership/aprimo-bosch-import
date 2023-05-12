@@ -1,0 +1,162 @@
+[
+      {
+        "OTYPE_ID": "101",
+        "NAME": "Advertisements",
+        "id": "AssetType_Advertising"
+      },
+      {
+        "OTYPE_ID": "24",
+        "NAME": "Language version - Print/Document",
+        "id": "AssetType_PrintAds"
+      },
+      {
+        "OTYPE_ID": "30",
+        "NAME": "Language version - Non-digital",
+        "id": "AssetType_PrintAds"
+      },
+      {
+        "OTYPE_ID": "23",
+        "NAME": "Document - Print/Document",
+        "id": "AssetType_PrintAds"
+      },
+      {
+        "OTYPE_ID": "103",
+        "NAME": "Leaflets",
+        "id": "AssetType_Leaflet"
+      },
+      {
+        "OTYPE_ID": "104",
+        "NAME": "Posters",
+        "id": "AssetType_Poster"
+      },
+      {
+        "OTYPE_ID": "114",
+        "NAME": "News",
+        "id": "AssetType_PublicRelations"
+      },
+      {
+        "OTYPE_ID": "80",
+        "NAME": "Documents",
+        "id": "AssetType_DocumentPDF"
+      },
+      {
+        "OTYPE_ID": "44",
+        "NAME": "Language version - Online-Support",
+        "id": "AssetType_CustomerSpecific"
+      },
+      {
+        "OTYPE_ID": "108",
+        "NAME": "Flag-lines",
+        "id": "AssetType_InStoreMarketing"
+      },
+      {
+        "OTYPE_ID": "106",
+        "NAME": "Displays",
+        "id": "AssetType_POSDisplay"
+      },
+      {
+        "OTYPE_ID": "28",
+        "NAME": "Language version - Movie",
+        "id": "AssetType_Video"
+      },
+      {
+        "OTYPE_ID": "27",
+        "NAME": "Document – Movie",
+        "id": "AssetType_Video"
+      },
+      {
+        "OTYPE_ID": "89",
+        "NAME": "3D-DATEN",
+        "id": "AssetType_Product"
+      },
+      {
+        "OTYPE_ID": "66",
+        "NAME": "Homologationsdaten",
+        "id": "AssetType_Product"
+      },
+      {
+        "OTYPE_ID": "109",
+        "NAME": "Sample Cards",
+        "id": "AssetType_ProductCardProductTag"
+      },
+      {
+        "OTYPE_ID": "38",
+        "NAME": "CSO Image",
+        "id": "AssetType_ProductLogos"
+      },
+      {
+        "OTYPE_ID": "105",
+        "NAME": "One-to-One-Sheets",
+        "id": "AssetType_ProductOneToOneSheet"
+      },
+      {
+        "OTYPE_ID": "124",
+        "NAME": "AC PDF Files",
+        "id": "AssetType_ProductAccessoires"
+      },
+      {
+        "OTYPE_ID": "55",
+        "NAME": "Igelbild",
+        "id": "AssetType_ProductSpiderChartImage"
+      },
+      {
+        "OTYPE_ID": "47",
+        "NAME": "Sprachvariante - Sonderseite",
+        "id": "AssetType_Catalogs"
+      },
+      {
+        "OTYPE_ID": "52",
+        "NAME": "Flexible Sonderseite",
+        "id": "AssetType_Catalogs"
+      },
+      {
+        "OTYPE_ID": "95",
+        "NAME": "Cover Modularer Katalog",
+        "id": "AssetType_Catalogs"
+      },
+      {
+        "OTYPE_ID": "122",
+        "NAME": "Modular Catalogue statische Seiten",
+        "id": "AssetType_Catalogs"
+      },
+      {
+        "OTYPE_ID": "19",
+        "NAME": "Language version",
+        "id": "AssetType_ProductManualsSpecSheetsPartsLists"
+      },
+      {
+        "OTYPE_ID": "126",
+        "NAME": "Category images Bosch",
+        "id": "AssetType_ProductImages"
+      },
+      {
+        "OTYPE_ID": "16",
+        "NAME": "Images Bosch",
+        "id": "AssetType_ProductImages"
+      },
+      {
+        "OTYPE_ID": "21",
+        "NAME": "Images Hawera",
+        "id": "AssetType_ProductImages"
+      },
+      {
+        "OTYPE_ID": "79",
+        "NAME": "Images",
+        "id": "AssetType_ProductImages"
+      },
+      {
+        "OTYPE_ID": "107",
+        "NAME": "Case Sleeves",
+        "id": "AssetType_BoxCaseImage"
+      },
+      {
+        "OTYPE_ID": "116",
+        "NAME": "Selected Assortments",
+        "id": "AssetType_ComboKitImage "
+      },
+      {
+        "OTYPE_ID": "86",
+        "NAME": "Images Trade Label",
+        "id": "AssetType_ProductMarketingLabel"
+      }
+]
