@@ -10,7 +10,9 @@ require('winston-daily-rotate-file');
 const arrayApp = require('lodash');
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
-
+const { JsonDB, Config } = require('node-json-db');
+const db = new JsonDB(new Config("fieldIDs", true, true, '/'));
+const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
 
@@ -639,10 +641,9 @@ searchTemplateAsset = async (token) => {
  */  
 
 checkTempAsset = async () => {
-  const aprToken = await getToken();
-  if(aprToken?.accessToken !== undefined){
-  let token = aprToken.accessToken;
-
+  
+  await db.reload();
+  let token = await db.getObjectDefault("/token", "null");
   let tempAssetID = await searchTemplateAsset(token);
   if(tempAssetID !== 0){
 
@@ -681,9 +682,7 @@ checkTempAsset = async () => {
     }else{
       return null;
     }
-  } else {
-    return null;
-  }
+  
 };
 
 
@@ -713,16 +712,26 @@ getToken = async () => {
       } else {
         logger.error(new Date() + ': getToken error -- ' + JSON.stringify(err));
       }
-
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      let aprToken = await getToken();
       return aprToken;
     });  
 
     if(resultAssets?.accessToken !== undefined){
+      await db.push("/token", resultAssets.accessToken);
+      await db.save();
       return resultAssets;
     }else{
       return 'null';
     }
 };
+
+
+let task = cron.schedule("*/8 * * * *", async () => {
+  //console.log("running a task every 8 Min");
+  await getToken();
+});
+
 
 /**
  * 
@@ -730,6 +739,9 @@ getToken = async () => {
  */  
 
 main = async () => {
+  await getToken();
+  task.start();
+
   let getTempAsset = await checkTempAsset();
   //console.log("getTempAsset", getTempAsset);
   if(getTempAsset !== null){
@@ -780,9 +792,19 @@ function terminate(code){
       if (err) throw err;
     });
     //console.log(`Process exited with code: ${code}`)  
-    logger.error(new Date() + ': System -- ' + code);
+    if(code === 'Normal Close'){
+      logger.info(new Date() + ': System -- ' + code);
+    }else{
+      logger.error(new Date() + ': System -- ' + code);
+    }    
   }
+  task.stop();
 }
+
+
+
+
+
 
 /*
 process.on('beforeExit', code => {
@@ -795,28 +817,28 @@ process.on('exit', code => {
 */
 
 process.on('SIGTERM', signal => {
-  //console.log('SIGTERM: ');
-	terminate(process.pid);
+  console.log('Received SIGTERM');
+	terminate("Received SIGTERM");
 	process.exit(0)
 })
 
 process.on('SIGINT', signal => {
-  //console.log('SIGINT: ');
-	terminate(process.pid);
+  console.log('Received SIGINT');
+	terminate("Received SIGINT");
 	process.exit(0)
 })
 
 process.on('uncaughtException', err => {
-  //console.log('Caught exception: ', err);
-	terminate(process.pid);
+  console.log('Caught exception: ', err);
+	terminate('Caught exception: ' + err);
 	process.exit(1)
 })
 
-process.on('unhandledRejection', (reason, promise) => {
-  //console.log('unhandledRejection: ');
-	terminate(process.pid);
-	process.exit(1)
-})
+process.on('unhandledRejection', (reason, p) => {
+  console.log("Unhandled Rejection at: " + p + ' reason: ' + reason);
+  terminate("Unhandled Rejection at: " + p + ' reason: ' + reason);
+  process.exit(1)
+});
 
 /**
  * 
