@@ -1,0 +1,16 @@
+{
+    "mapping": {
+        "Home & Garden": "HG",
+        "Power Tools BE": "BE",
+        "Accessories PRO": "AC",
+        "Power Tools BI": "BI",
+        "Production Tools": "BI",
+        "Accessories DIY": "AC",
+        "Empty": "Other",
+        "MASTER": "ignore",
+        "CAM": "ignore",
+        "MIE": "ignore",
+        "AFR": "ignore",
+        "00": "ignore"
+    }
+}

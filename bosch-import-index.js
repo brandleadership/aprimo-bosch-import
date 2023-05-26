@@ -11,7 +11,7 @@ const arrayApp = require('lodash');
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
-const db = new JsonDB(new Config("fieldIDs", true, true, '/'));
+const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
 const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
@@ -192,7 +192,7 @@ downloadCSVFromFtp = async () => {
             await createLanguageRelationParent();
             await createLanguageRelationChild();
             
-            //await endProcess(jobID);
+            await endProcess(jobID);
             
             
             logger.info('####### Import Ended for ' + jobID + ' at ' + new Date() + ' #########');
@@ -642,8 +642,8 @@ searchTemplateAsset = async (token) => {
 
 checkTempAsset = async () => {
   
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  await dbtoken.reload();
+  let token = await dbtoken.getObjectDefault("/token", "null");
   let tempAssetID = await searchTemplateAsset(token);
   if(tempAssetID !== 0){
 
@@ -718,8 +718,8 @@ getToken = async () => {
     });  
 
     if(resultAssets?.accessToken !== undefined){
-      await db.push("/token", resultAssets.accessToken);
-      await db.save();
+      await dbtoken.push("/token", resultAssets.accessToken);
+      await dbtoken.save();
       return resultAssets;
     }else{
       return 'null';
@@ -746,7 +746,7 @@ main = async () => {
   //console.log("getTempAsset", getTempAsset);
   if(getTempAsset !== null){
       //console.log('####### Import Started at ' + new Date() + ' #########');
-      logger.info('####### Import Started at ' + new Date() + ' #########');
+      logger.info('####### '+ ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
       if (fs.existsSync(APR_CREDENTIALS.checkin)) {
         await readExcel();
         //console.log('####### createRelation Started at ' + new Date() + ' #########');
@@ -767,7 +767,7 @@ main = async () => {
         //console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
         logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
 
-        //await endProcess();
+        await endProcess();
         terminate('Normal Close');
       } else {
         await downloadCSVFromFtp();
@@ -775,7 +775,7 @@ main = async () => {
       }
 
       //console.log('####### Import Ended at ' + new Date() + ' #########');
-      logger.info('####### Import Ended at ' + new Date() + ' #########');
+      logger.info('####### '+ ' ' + process.pid + ': Import Ended at ' + new Date() + ' #########');
 
   }else{
     logger.error('####### Sample Asset Not Found ' + new Date() + ' #########');
@@ -848,15 +848,16 @@ process.on('unhandledRejection', (reason, p) => {
 try {
   if(fs.existsSync(APR_CREDENTIALS.signature)){
     //console.log(new Date() + ': Skipping : Already Running :');
-    logger.info(new Date() + ': Skipping : Already Running :');
+    logger.info(new Date() + ': ' + process.pid + ': Skipping : Already Running :');
+    task.stop();
   }else{
     //console.log(new Date() + ': Start : ********** :');
-    logger.info(new Date() + ': Start : ********** :');
+    logger.info(new Date() + ': ' + process.pid + ': Start : ********** :');
     let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
     main();
   }
 } catch (error) {
   //console.log(new Date() + ': System Error -- ' + error);
-  logger.error(new Date() + ': System Error -- ' + error);
+  logger.error(new Date() + ': ' + process.pid +': System Error -- ' + error);
 }
 

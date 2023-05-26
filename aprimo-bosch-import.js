@@ -23,8 +23,14 @@ const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
 const db = new JsonDB(new Config("fieldIDs", true, true, '/'));
+const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
+const kMap = new JsonDB(new Config("keymapping", true, true, '/'));
 
+const maxRetries = 3;
+const retryDelay = 1000;
+let retries = 0;
 let logRowInfo = '';
+let dataFlag = true;
 
 // Window System Path
 //let imgFolderPath = "ftp-temp\\binnery\\";
@@ -114,8 +120,8 @@ const tlogger = winston.createLogger({
  * @param {*} masterRecordID, childRecordID
  */
 recordLinks = async (masterRecordID, childRecordID) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let body = {
     "fields": {
@@ -185,8 +191,8 @@ recordLinks = async (masterRecordID, childRecordID) => {
 searchAsset = async (recordsCollection) => {
   ///let filterFileName = Asset_BINARY_FILENAME.replace(/&/g, "%26");
   //filterFileName = filterFileName.replace(/\+/g, "%2b");
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   logger.info(new Date() + logRowInfo + ' INFO : ###################################');
   logger.info(new Date() + logRowInfo + ' INFO : Start Processing Row');
@@ -259,8 +265,8 @@ searchAsset = async (recordsCollection) => {
  * @param {*} File Name, CSV Row Data
  */
 searchTemplateAsset = async () => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let queryString = '';
   queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
@@ -363,8 +369,8 @@ getFields = async (assetID, recordsCollection) => {
  * Find fields IDs for updating records. 
  */  
 getFieldIDs = async () => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let tempAssetID = await searchTemplateAsset();
   if(tempAssetID !== 0){
@@ -413,8 +419,8 @@ getFieldIDs = async () => {
  * @param {*} fieldName
  */  
 findFieldID = async (fieldName) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let getFieldsResult = await axios
     .get(APR_CREDENTIALS.SearchFieldByName + fieldName, {
@@ -486,7 +492,7 @@ createMeta = async (assetID, data, ImgToken) => {
   }
 
 
-  try {
+  //try {
     
   let ClassObj = [];
   let CSORELEASE = [];
@@ -1401,7 +1407,14 @@ createMeta = async (assetID, data, ImgToken) => {
             if (PoolCode[i].length > 0) {
               if (PoolCode[i] !== 'null') {
                 if (CSORELEASE.indexOf(PoolCode[i].trim()) === -1){
-                  CSORELEASE.push(PoolCode[i].trim());
+                  let keyMapPC = await getObjectDefault("/mapping/"+ PoolCode[i].trim(), "Null");
+                  if(keyMapPC === 'Null'){
+                    CSORELEASE.push(PoolCode[i].trim());
+                  }else if(keyMapPC === 'ignore'){
+                    //Ignore the Value
+                  }else{
+                    CSORELEASE.push(keyMapPC);
+                  }
                 }
               }
             }
@@ -1415,7 +1428,15 @@ createMeta = async (assetID, data, ImgToken) => {
             if (PoolCodeBU[i].length > 0) {
               if (PoolCodeBU[i] !== 'null') {
                 if (CSORELEASE.indexOf(PoolCodeBU[i].trim()) === -1){
-                  CSORELEASE.push(PoolCodeBU[i].trim());
+                  
+                  let keyMapBU = await getObjectDefault("/mapping/"+ PoolCodeBU[i].trim(), "Null");
+                  if(keyMapBU === 'Null'){
+                    CSORELEASE.push(PoolCodeBU[i].trim());
+                  }else if(keyMapBU === 'ignore'){
+                    //Ignore the Value
+                  }else{
+                    CSORELEASE.push(keyMapBU);
+                  }
                 }                
               }
             }
@@ -1474,7 +1495,14 @@ createMeta = async (assetID, data, ImgToken) => {
             let CSOCode = key.split('_');
             if (CSOCode.hasOwnProperty('1')) {
               if (CSORELEASE.indexOf(CSOCode[1].trim()) === -1){
-                CSORELEASE.push(CSOCode[1].trim());
+                let keyMap = await getObjectDefault("/mapping/"+ CSOCode[1].trim(), "Null");
+                if(keyMap === 'Null'){
+                  CSORELEASE.push(CSOCode[1].trim());
+                }else if(keyMap === 'ignore'){
+                  //Ignore the Value
+                }else{
+                  CSORELEASE.push(keyMap);
+                }
               }
             }
           }
@@ -1498,11 +1526,11 @@ createMeta = async (assetID, data, ImgToken) => {
   //Security Authorized Code Start
   if (CSORELEASE.length > 0) {
     let CSOArray = [];
-    let AuthorizedOther = await searchClassificationID('Authorized_Other', data, 'Authorized_Other');
+    let AuthorizedOther = await searchClassificationID('Authorized_Other', data, 'CSORELEASE_Other');
     
     for (let cs = 0; cs < CSORELEASE.length; cs++) {
       //console.log("SecurityAuthorized: ", 'SecurityAuthorized_'+CSORELEASE[cs]);
-      APIResult = await searchClassificationID('Authorized_' + CSORELEASE[cs], data, 'Authorized_' + CSORELEASE[cs]);
+      APIResult = await searchClassificationID('Authorized_' + CSORELEASE[cs], data, 'CSORELEASE_' + CSORELEASE[cs]);
       if (APIResult !== 'null') {
         //ClassObj.push(APIResult);
         CSOArray.push(APIResult);
@@ -1532,18 +1560,18 @@ createMeta = async (assetID, data, ImgToken) => {
     });
   }
   //console.log("ClassObj: ", ClassObj);  
-
+/*
   } catch (error) {
     logger.info(new Date() + logRowInfo + ' API ERROR : META:' + error);
     console.log(' ERROR : META:', error);
   }
-
+*/
 
   //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
   logger.info(new Date() + logRowInfo + ' INFO : Update JSON:' + JSON.stringify(updateObj));
   
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   if (assetID === "null") {
     let reqCreatRequest = await axios
@@ -1573,8 +1601,11 @@ createMeta = async (assetID, data, ImgToken) => {
             'Kittelberger ID': data['LV_ID'],
             'token': ImgToken
           });
-
-          return {'result': resp.data.id, 'message': 'RECORD CREATED'};
+          if(dataFlag){
+            return {'result': resp.data.id, 'message': 'RECORD CREATED'};
+          }else{
+            return {'result': resp.data.id, 'message': 'RECORD CREATED WITH DATA ERROR'};
+          }          
         } else {
           logger.error(new Date() + logRowInfo + ' ERROR : GETTING RECORD ID -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
           //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + '_' + data.LV_ID + ' ERROR : GETTING RECORD ID -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
@@ -1630,7 +1661,11 @@ createMeta = async (assetID, data, ImgToken) => {
         });        //ImgToken
     
         ////console.log(': Update Record ID: ');
-        return {'result': assetID, 'message': 'RECORD UPDATED'};
+        if(dataFlag){
+          return {'result': assetID, 'message': 'RECORD UPDATED'};
+        }else{
+          return {'result': resp.data.id, 'message': 'RECORD UPDATED WITH DATA ERROR'};
+        }
       })
       .catch((err) => {
         logger.error(new Date() + logRowInfo + ' ERROR : UPDATE RECORD API -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID' + data.OBJ_ID + ' Asset ID: ' + assetID);
@@ -1654,8 +1689,8 @@ createMeta = async (assetID, data, ImgToken) => {
  * @param {*} firstName, lastName
  */ 
 searchUser = async (firstName, lastName) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let body = {
     "and":[
@@ -1724,9 +1759,9 @@ searchUser = async (firstName, lastName) => {
  * @param {*} fieldURL, fieldValue, keyValue
  */ 
 getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
-  let fieldData = await db.getObjectDefault("/fieldIDs/"+ fieldValue, "null");
+  
+  let token = await getObjectDefault("/token", "null");
+  let fieldData = await getObjectDefault("/fieldIDs/"+ fieldValue, "null");
   
   if (fieldData === 'null') {  
   let resultID = await axios
@@ -1756,7 +1791,7 @@ getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
         logger.error(new Date() + logRowInfo + ': OPTION LIST ERROR : Field Definition -- ' + fieldURL);
         //console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
         logger.error(new Date() + logRowInfo + ': OPTION LIST ERROR : Field Definition Key: ' + keyValue + ' Value: ' + fieldValue);
-
+        dataFlag = false;
         return 'null';
       }
     })
@@ -1772,7 +1807,7 @@ getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
 
       //console.log(new Date() + ': ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
       logger.error(new Date() + logRowInfo + ': API ERROR : Field Definition Column -- ' + keyValue + ' Value ' + fieldValue);
-
+      dataFlag = false;
       return 'null';
     });
     return resultID;
@@ -1784,15 +1819,50 @@ getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
 
 };
 
+
+getObjectDefault = async(key, defval) => {
+  //console.log('I am in 001', key);
+  let data = defval;
+  try {
+    if(key === '/token'){
+      await dbtoken.reload();
+      data = await dbtoken.getData(key);
+    } else if(key.includes('/mapping')){
+      await kMap.reload();
+      data = await kMap.getData(key);
+    } else{
+      await dbtoken.reload();
+      data = await db.getData(key);
+    }
+  } catch (innerError) {
+    //console.log('error', innerError.message);
+    if(innerError.message.includes("find dataPath")){
+      return data;
+    }else if(innerError.message.includes("Load Database")){
+      logger.error(new Date() + logRowInfo + ' DATABASE ERROR : ' + innerError.message);
+      if (retries < maxRetries) {
+        retries++;
+        logger.error(new Date() + logRowInfo + ' DATABASE Retrying: ' + retries);
+        //setTimeout(getObjectDefault(key, defval), retryDelay);
+        setTimeout(async function() {
+          await getObjectDefault(key, defval);
+        }, retryDelay);
+      } else {
+        logger.error(new Date() + logRowInfo + ' DATABASE Max retries exceeded. Unable to load database. ');
+      }
+    }
+  }
+  return data;
+};
+
 /**
  * 
  * Search for Classificate Name
  * @param {*} ClassID, data
  */ 
 searchClassificationName = async (ClassID, data, key) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
-  let fieldData = await db.getObjectDefault("/fieldIDs/"+ ClassID, "null");
+  let token = await getObjectDefault("/token", "null");
+  let fieldData = await getObjectDefault("/fieldIDs/"+ ClassID, "null");
 
   if (fieldData === 'null') {    
   let resultID = await axios
@@ -1817,6 +1887,7 @@ searchClassificationName = async (ClassID, data, key) => {
         clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        dataFlag = false;
         return 'null';
       } else {
         clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
@@ -1834,7 +1905,7 @@ searchClassificationName = async (ClassID, data, key) => {
       } else {
         logger.warn(new Date() + logRowInfo + ': Classification API ERROR : is ' + JSON.stringify(err));
       }
-
+      dataFlag = false;
       return 'null';
     });
     return resultID;  
@@ -1850,9 +1921,9 @@ searchClassificationName = async (ClassID, data, key) => {
  * @param {*} ClassID, data
  */ 
 searchClassificationID = async (ClassID, data, key) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
-  let fieldData = await db.getObjectDefault("/fieldIDs/"+ ClassID, "null");
+  
+  let token = await getObjectDefault("/token", "null");
+  let fieldData = await getObjectDefault("/fieldIDs/"+ ClassID, "null");
 
   if (fieldData === 'null') {   
   let resultID = await axios
@@ -1878,11 +1949,13 @@ searchClassificationID = async (ClassID, data, key) => {
         clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        dataFlag = false;
         return 'null';
       } else {
         clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         //console.log(new Date() + ': ERROR : Classification is missing: -- ' + encodeURI(ClassID));
+        dataFlag = false;
         return 'null';
       }
     })
@@ -1894,7 +1967,7 @@ searchClassificationID = async (ClassID, data, key) => {
       } else {
         logger.warn(new Date() + logRowInfo + ': API ERROR : is ' + JSON.stringify(err));
       }
-
+      dataFlag = false;
       return 'null';
     });
     return resultID;
@@ -1908,8 +1981,8 @@ searchClassificationID = async (ClassID, data, key) => {
  * @param {*} filename 
  */
 async function uploadAsset(filename, processPath) {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let BINARY_FILENAME = filename
   let remotePath = APR_CREDENTIALS.sourcePath + '/'+ processPath + '/binary/' + filename;
@@ -1923,6 +1996,7 @@ async function uploadAsset(filename, processPath) {
       logger.info(new Date() + logRowInfo + ': End Downloading: ' + filename);
     }).catch(e => {
       logger.error(new Date() + logRowInfo + ': FTP ERROR : in the FTP Connection -- ' + e);
+      dataFlag = false;
       //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
     });
     
@@ -1989,8 +2063,8 @@ async function uploadAsset(filename, processPath) {
           filename: BINARY_FILENAME,
         });
 
-        await db.reload();
-        token = await db.getObjectDefault("/token", "null");
+        
+        token = await getObjectDefault("/token", "null");
       
         let reqUploadImg = await axios
           .post(APR_CREDENTIALS.Upload_URL, form, {
@@ -2045,8 +2119,8 @@ async function uploadAsset(filename, processPath) {
  * Get Segment URL for Big file upload in chunks
  */
 getSegmentURL = async (filename) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let body = {
     filename: path.basename(filename)
@@ -2080,7 +2154,7 @@ getSegmentURL = async (filename) => {
       } else {
         logger.error(new Date() + logRowInfo + ': API ERROR : getSegment -- ' + JSON.stringify(err));
       }
-
+      dataFlag = false;
       //console.log(new Date() + ': ERROR : getSegment -- ' + JSON.stringify(err.response.data));
     });
   return resultSegmentURI;
@@ -2117,8 +2191,8 @@ const findObject = (obj = {}, key, value) => {
  * uploadSegment
  */
 uploadSegment = async (SegmentURI, chunkFileName) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let form = new FormData();
   form.append("file", fs.createReadStream(chunkFileName), {
@@ -2148,6 +2222,7 @@ uploadSegment = async (SegmentURI, chunkFileName) => {
       } else {
         logger.error(new Date() + logRowInfo + ': API ERROR : uploadSegment -- ' + JSON.stringify(err));
       }
+      dataFlag = false;
     });
 };
 
@@ -2155,8 +2230,8 @@ uploadSegment = async (SegmentURI, chunkFileName) => {
  * commitSegment
  */
 commitSegment = async (SegmentURI, filename, segmentcount) => {
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   let body = {
     filename: path.basename(filename),
@@ -2186,7 +2261,7 @@ commitSegment = async (SegmentURI, filename, segmentcount) => {
       }
 
       //console.log(new Date() + ': ERROR : commitSegment -- ' + JSON.stringify(err.response.data));
-
+      dataFlag = false;
       return false;
     });
   return reqUploadImg;
@@ -2226,8 +2301,8 @@ languageRelationParent = async (masterRecordID, childRecordID) => {
   ////console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
   ////console.log("Post: ", JSON.stringify(body));
   logger.info(new Date() + logRowInfo + ': Start languageRelationParent API: '+ masterRecordID);
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
       JSON.stringify(body), {
@@ -2291,8 +2366,8 @@ languageRelationChild = async (masterRecordID, childRecordID) => {
 
   ////console.log("URL: ", APR_CREDENTIALS.GetRecord_URL  + masterRecordID);
   ////console.log("Post: ", JSON.stringify(body));
-  await db.reload();
-  let token = await db.getObjectDefault("/token", "null");
+  
+  let token = await getObjectDefault("/token", "null");
 
   logger.info(new Date() + logRowInfo + ': Start languageRelationChild API: '+ masterRecordID);
   const resultAssets = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
@@ -2328,8 +2403,10 @@ languageRelationChild = async (masterRecordID, childRecordID) => {
  */
 module.exports = async (rowdata) => {
   //console.log("Data:", rowdata);
-  logRowInfo = ': JobID: '+ rowdata.rowdata["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata["OBJ_ID"]  + '_' + rowdata.rowdata["LV_ID"];
+  retries = 0;
+  dataFlag = true;
   if(rowdata.mode === 'createRecords'){
+    logRowInfo = ' : PID: ' + process.pid + ' : JobID: '+ rowdata.rowdata["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata["OBJ_ID"]  + '_' + rowdata.rowdata["LV_ID"];
     let timeStampStart = new Date();
     let RecordID = await searchAsset(rowdata.rowdata);
     //console.log("RecordID: ", RecordID);
@@ -2340,6 +2417,7 @@ module.exports = async (rowdata) => {
     rowdata.message = RecordID.message;
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){
+    logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
     ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
     let recordLinksResult = await recordLinks(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID);
@@ -2347,7 +2425,7 @@ module.exports = async (rowdata) => {
     ////console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);
   } else if(rowdata.mode === 'LanguageRelationParent'){
-
+    logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
     ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
@@ -2356,7 +2434,7 @@ module.exports = async (rowdata) => {
     ////console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);    
   } else if(rowdata.mode === 'LanguageRelationChild'){
-
+    logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
     ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
