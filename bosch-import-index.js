@@ -488,7 +488,8 @@ async function createLanguageRelationChild() {
 
 async function endProcess(jobID) {
   try {
-    let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + uuidv4() + '.xlsx';
+    const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
+    let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '.xlsx';
     fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
       if (err) throw err;
     });

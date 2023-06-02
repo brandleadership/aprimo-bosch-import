@@ -25,6 +25,7 @@ const { JsonDB, Config } = require('node-json-db');
 const db = new JsonDB(new Config("fieldIDs", true, true, '/'));
 const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
 const kMap = new JsonDB(new Config("keymapping", true, true, '/'));
+const langMap = new JsonDB(new Config("languagemapping", true, true, '/'));
 
 const maxRetries = 3;
 const retryDelay = 1000;
@@ -790,20 +791,6 @@ createMeta = async (assetID, data, ImgToken) => {
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }        // code block
         break;    
-      /*case 'LANGUAGE'://Option List
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetLanguage');
-        APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], key)
-        if (APIResult !== 'null') {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [APIResult],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }
-        // code block
-        break;*/
       case 'LAUNCH_DATE':
         let LAUNCH_DATE_VAR = new Date(data[key]);
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');
@@ -1489,6 +1476,106 @@ createMeta = async (assetID, data, ImgToken) => {
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
+
+
+      case 'Language':
+        let keyMap = await getObjectDefault("/mapping/"+ data[key], "Null");
+        if(keyMap === 'Null'){
+          APIResult = await searchClassificationID('Language_' + data[key], data, key);
+        }else{
+          APIResult = await searchClassificationID(keyMap, data, key);
+        }
+        
+        if (APIResult !== 'null') {
+          ClassID.push(APIResult);
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'New_MAM_Languages');
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": [APIResult],
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
+          }
+        }
+        // code block
+        break;
+
+      case 'Languages':
+        //console.log("Languages Start");
+        let tmpString = data[key];
+        if (typeof tmpString === 'string'){        
+          let strRegex = /\((.*?)\)/g;
+          let strMatches = tmpString.match(strRegex);
+          let strValues = strMatches.map(strMatch => strMatch.slice(1, -1));
+        
+          let mpeHeadlineArray = [];
+          let mpeSubHeadlineArray = [];
+          let mpeURLArray = [];
+          //console.log("strValues: ", strValues);
+          for (let strValuesIndex = 0; strValuesIndex < strValues.length; strValuesIndex++) {
+            if (typeof strValues[strValuesIndex] === 'string'){
+              let langArray = strValues[strValuesIndex].split(',');
+                if (langArray.hasOwnProperty('0')) {
+                  //Get Language ID
+                  let getLanguageId = await GetLanguageID(langArray[0]);//"c2bd4f9bbb954bcb80c31e924c9c26dc";
+                  if (langArray.hasOwnProperty('1')) {
+                    mpeHeadlineArray.push({
+                      "value": langArray[1],
+                      "languageId": getLanguageId,
+                    });
+                  }
+                  if (langArray.hasOwnProperty('2')) {
+                    mpeSubHeadlineArray.push({
+                      "value": langArray[2],
+                      "languageId": getLanguageId,
+                    });
+                  }
+                  if (langArray.hasOwnProperty('3')) {
+                    mpeURLArray.push({
+                      "value": langArray[3],
+                      "languageId": getLanguageId,
+                    });
+                  }
+                }
+            }
+          }
+
+          if(mpeHeadlineArray.hasOwnProperty('0')){
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_headline');
+            if (ObjectID.hasOwnProperty('0')) {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": mpeHeadlineArray
+              });
+            }  
+          }
+
+          if(mpeSubHeadlineArray.hasOwnProperty('0')){
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_subheadline');
+            if (ObjectID.hasOwnProperty('0')) {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": mpeSubHeadlineArray
+              });
+            }  
+          }
+
+          if(mpeURLArray.hasOwnProperty('0')){
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_URL');
+            if (ObjectID.hasOwnProperty('0')) {
+              updateObj.fields.addOrUpdate.push({
+                "id": ObjectID[0].id,
+                "localizedValues": mpeURLArray
+              });  
+            }
+          }
+        }
+
+        break;
       default:
         if(key.indexOf("CSORELEASE_") !== -1){
           if(data[key] === 'x'){
@@ -1568,6 +1655,9 @@ createMeta = async (assetID, data, ImgToken) => {
 */
 
   //console.log(new Date() + ': PID: '+ data["OBJ_ID"] + ' INFO : Update JSON:' + JSON.stringify(updateObj));
+  //return false;
+
+
   logger.info(new Date() + logRowInfo + ' INFO : Update JSON:' + JSON.stringify(updateObj));
   
   
@@ -1755,6 +1845,48 @@ searchUser = async (firstName, lastName) => {
 
 /**
  * 
+ * Get GetLanguageID
+ * @param {*} token, fieldValue, keyValue
+ */ 
+
+GetLanguageID = async (langValue) => {
+  let token = await getObjectDefault("/token", "null");
+  let langKey = await getObjectDefault("/languagemapping/"+langValue, "ignore");
+  
+  let searchClass = await axios
+  .get(APR_CREDENTIALS.BaseURL + '/core/languages',
+    {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        "API-VERSION": APR_CREDENTIALS.Api_version,
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+  .then(async (resp) => {
+    const langObj = resp.data;
+    if (langObj.totalCount !== 0) {
+      let LangID = findObject(langObj.items, 'culture', langKey);
+      if (LangID.hasOwnProperty('0')) {
+        return LangID[0].id
+      }else{
+        return langObj.items[0].id;
+      }
+    } else {
+      logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID -- ' + langValue);
+    }
+  })
+  .catch(async (error) => {
+      logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID -- ' + langValue);
+      return null;
+  });
+  return searchClass;
+};
+
+
+/**
+ * 
  * Get Template Field for definition
  * @param {*} fieldURL, fieldValue, keyValue
  */ 
@@ -1827,10 +1959,13 @@ getObjectDefault = async(key, defval) => {
     if(key === '/token'){
       await dbtoken.reload();
       data = await dbtoken.getData(key);
-    } else if(key.includes('/mapping')){
+    } else if (key.includes('/mapping')){
       await kMap.reload();
       data = await kMap.getData(key);
-    } else{
+    } else if (key.includes('/languagemapping')){
+      await langMap.reload();
+      data = await langMap.getData(key);
+    } else {
       await dbtoken.reload();
       data = await db.getData(key);
     }
