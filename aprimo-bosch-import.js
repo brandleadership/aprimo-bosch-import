@@ -1854,7 +1854,7 @@ GetLanguageID = async (langValue) => {
   let langKey = await getObjectDefault("/languagemapping/"+langValue, "ignore");
   
   let searchClass = await axios
-  .get(APR_CREDENTIALS.BaseURL + '/core/languages',
+  .get(APR_CREDENTIALS.BaseURL + '/core/languages/?pageSize=400',
     {
       headers: {
         Accept: "*/*",
