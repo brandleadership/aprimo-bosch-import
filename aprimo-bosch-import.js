@@ -198,8 +198,10 @@ searchAsset = async (recordsCollection) => {
   logger.info(new Date() + logRowInfo + ' INFO : ###################################');
   logger.info(new Date() + logRowInfo + ' INFO : Start Processing Row');
   let queryString = '';
-  if(recordsCollection.LV_ID === ''){
+  if(recordsCollection.LV_ID === '' && recordsCollection.LTYPE_ID === ''){
     queryString = "'" + recordsCollection.OBJ_ID + "'";
+  }else if (recordsCollection.LV_ID === ''){
+    queryString = "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('mpe_ltype_id') = '" + recordsCollection.LTYPE_ID + "'";
   }else{
     queryString = "'" + recordsCollection.OBJ_ID + "'" + " and FieldName('Kittelberger ID') = '" + recordsCollection.LV_ID + "'";
   }
@@ -1754,7 +1756,7 @@ createMeta = async (assetID, data, ImgToken) => {
         if(dataFlag){
           return {'result': assetID, 'message': 'RECORD UPDATED'};
         }else{
-          return {'result': resp.data.id, 'message': 'RECORD UPDATED WITH DATA ERROR'};
+          return {'result': assetID, 'message': 'RECORD UPDATED WITH DATA ERROR'};
         }
       })
       .catch((err) => {
@@ -2552,15 +2554,15 @@ module.exports = async (rowdata) => {
     rowdata.message = RecordID.message;
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){
-    logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
+    logRowInfo = ' : PID: ' + process.pid + ' : JobID: '+ rowdata.rowdata.masterData["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata.masterData["OBJ_ID"]  + '_' + rowdata.rowdata.masterData["LV_ID"] +  ' : MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
     ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
     let recordLinksResult = await recordLinks(rowdata.rowdata.masterRecordID, rowdata.rowdata.childRecordID);
     //logger.info(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     ////console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);
-  } else if(rowdata.mode === 'LanguageRelationParent'){
-    logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
+  } else if(rowdata.mode === 'LanguageRelationParent'){    
+    logRowInfo = ' : PID: ' + process.pid + ' : JobID: '+ rowdata.rowdata.masterData["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata.masterData["OBJ_ID"]  + '_' + rowdata.rowdata.masterData["LV_ID"] +  ' : MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
     ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
@@ -2569,7 +2571,8 @@ module.exports = async (rowdata) => {
     ////console.log(new Date() + ': INFO : recordLinksResult: ' + recordLinksResult);
     return Promise.resolve(recordLinksResult);    
   } else if(rowdata.mode === 'LanguageRelationChild'){
-    logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
+    logRowInfo = ' : PID: ' + process.pid + ' : JobID: '+ rowdata.rowdata.masterData["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata.masterData["OBJ_ID"]  + '_' + rowdata.rowdata.masterData["LV_ID"] +  ' : MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
+    //logRowInfo = ': MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;
     ////console.log(new Date() + ': INFO : rowdata.rowdata.masterRecordID: ' + rowdata.rowdata.masterRecordID);
     ////console.log(new Date() + ': INFO : rowdata.rowdata.childRecordID: ' + rowdata.rowdata.childRecordID);
 
