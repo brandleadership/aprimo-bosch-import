@@ -780,19 +780,22 @@ createMeta = async (assetID, data, ImgToken) => {
           // code block
           break;
       case 'KEYWORDS':
-        ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
-        if (ObjectID.hasOwnProperty('0')) {
-          updateObj.fields.addOrUpdate.push({
-            "id": ObjectID[0].id,
-            "localizedValues": [{
-              "values": [data[key]],
-              "languageId": "00000000000000000000000000000000"
-            }]
-          });
-        }else{
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-        }        // code block
-        break;    
+	      let KeyWordObj = data[key].split(',');
+        if (KeyWordObj.length > 0) {
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
+          if (ObjectID.hasOwnProperty('0')) {
+            updateObj.fields.addOrUpdate.push({
+              "id": ObjectID[0].id,
+              "localizedValues": [{
+                "values": KeyWordObj,
+                "languageId": "00000000000000000000000000000000"
+              }]
+            });
+          }else{
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
+          }        // code block          
+        }
+      break;    
       case 'LAUNCH_DATE':
         let LAUNCH_DATE_VAR = new Date(data[key]);
         ObjectID = findObject(tempAssetObj, 'fieldName', 'LaunchDate');
