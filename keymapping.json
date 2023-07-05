@@ -6,6 +6,9 @@
         "Power Tools BI": "BI",
         "Production Tools": "BI",
         "Accessories DIY": "AC",
+        "Bosch Power Tools": {
+            "Corporate": "Authorized_Corporate"
+        },
         "Empty": "Other",
         "MASTER": "ignore",
         "CAM": "ignore",

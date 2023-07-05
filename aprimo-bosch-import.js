@@ -234,14 +234,17 @@ searchAsset = async (recordsCollection) => {
         //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
 
         getFieldsResult = await getFields("null", recordsCollection);
+        return getFieldsResult;
       } else if (itemsObj.totalCount === 1) {
         logger.info(new Date() + logRowInfo  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         //console.log(new Date() +  ': PID: '+ recordsCollection.OBJ_ID  + '_' + recordsCollection.LV_ID  +  ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, recordsCollection);
+        return getFieldsResult;
       }else{
         logger.info(new Date() + logRowInfo  + ' ERROR  : More Than One Record Found: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        return {'result': 0, 'message': 'More Than One Record Found'};
       }
-      return getFieldsResult;
+      
     })
     .catch(async (err) => {
       if(err.response !== undefined && err.response.data !== undefined){
@@ -255,9 +258,8 @@ searchAsset = async (recordsCollection) => {
       
     });
 
-    logger.info(new Date() + logRowInfo +  ' INFO : End Processing Row');    
+    logger.info(new Date() + logRowInfo + ' INFO : End Processing Row');
     logger.info(new Date() + logRowInfo + ' INFO : ###################################');
-    logger.info(new Date() + ' ');
   
   return APIResult;
 };
@@ -270,11 +272,9 @@ searchAsset = async (recordsCollection) => {
 searchTemplateAsset = async () => {
   
   let token = await getObjectDefault("/token", "null");
+  let queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
 
-  let queryString = '';
-  queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
-
-  logger.info(new Date() + ': SearchTemplateAsset: ');
+  logger.info(new Date() + ': SearchTemplateAsset: ' + queryString);
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
     { 
@@ -303,6 +303,11 @@ searchTemplateAsset = async () => {
     })
     .catch(async (err) => {
       logger.info(new Date() + ': ERROR: Search TemplateAsset API ');
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR: Search TemplateAsset API is -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR: Search TemplateAsset API is -- ' + JSON.stringify(err));
+      }
       return 0;
     });
   return APIResult;
@@ -361,7 +366,7 @@ getFields = async (assetID, recordsCollection) => {
     } catch (error) {
       //console.log(new Date() + ': PID: '+ assetID + ' ERROR  : Create Meta: ' + error);
       logger.info(new Date() + logRowInfo + ' ERROR  : Create Meta: ' + error);
-      APIResult = {'result': assetID, 'message': error};
+      APIResult = {'result': 0, 'message': error};
     }
   }
   return APIResult;
@@ -1483,7 +1488,7 @@ createMeta = async (assetID, data, ImgToken) => {
         break;
 
 
-      case 'Language':
+      case 'LANGUAGE':
         let keyMap = await getObjectDefault("/mapping/"+ data[key], "Null");
         if(keyMap === 'Null'){
           APIResult = await searchClassificationID('Language_' + data[key], data, key);
@@ -1509,14 +1514,18 @@ createMeta = async (assetID, data, ImgToken) => {
         // code block
         break;
 
-      case 'Languages':
+      case 'LANGUAGES':
         //console.log("Languages Start");
         let tmpString = data[key];
         if (typeof tmpString === 'string'){        
-          let strRegex = /\((.*?)\)/g;
+          let strRegex = /\((.*?)\)/gm;
+          //console.log("tmpString 1: ", tmpString);
+          tmpString = tmpString.replace(/[\r\n]/g, "");
+          //console.log("tmpString 2: ", tmpString);
           let strMatches = tmpString.match(strRegex);
+          //console.log("strMatches", strMatches);
           let strValues = strMatches.map(strMatch => strMatch.slice(1, -1));
-        
+          //console.log("strValues", strValues);
           let mpeHeadlineArray = [];
           let mpeSubHeadlineArray = [];
           let mpeURLArray = [];
@@ -1528,22 +1537,31 @@ createMeta = async (assetID, data, ImgToken) => {
                   //Get Language ID
                   let getLanguageId = await GetLanguageID(langArray[0]);//"c2bd4f9bbb954bcb80c31e924c9c26dc";
                   if (langArray.hasOwnProperty('1')) {
-                    mpeHeadlineArray.push({
-                      "value": langArray[1],
-                      "languageId": getLanguageId,
-                    });
+                    //console.log("langArray 1:", langArray[1].trim().length);
+                    if(langArray[1].trim().length > 0) {
+                      mpeHeadlineArray.push({
+                        "value": langArray[1],
+                        "languageId": getLanguageId,
+                      });
+                    }
                   }
                   if (langArray.hasOwnProperty('2')) {
-                    mpeSubHeadlineArray.push({
-                      "value": langArray[2],
-                      "languageId": getLanguageId,
-                    });
+                    //console.log("langArray 2:", langArray[2].trim().length);
+                    if(langArray[2].trim().length > 0) {
+                      mpeSubHeadlineArray.push({
+                        "value": langArray[2],
+                        "languageId": getLanguageId,
+                      });
+                    }
                   }
                   if (langArray.hasOwnProperty('3')) {
-                    mpeURLArray.push({
-                      "value": langArray[3],
-                      "languageId": getLanguageId,
-                    });
+                    
+                    if(langArray[3].trim().length > 0) {
+                      mpeURLArray.push({
+                        "value": langArray[3],
+                        "languageId": getLanguageId,
+                      });
+                    }
                   }
                 }
             }
@@ -1557,6 +1575,9 @@ createMeta = async (assetID, data, ImgToken) => {
                 "localizedValues": mpeHeadlineArray
               });
             }  
+            logger.info(new Date() + logRowInfo  + ': DATA Languages: mpe_headline: ' + JSON.stringify(mpeHeadlineArray));
+          }else{
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR Languages : mpe_headline: ' + JSON.stringify(mpeHeadlineArray));
           }
 
           if(mpeSubHeadlineArray.hasOwnProperty('0')){
@@ -1566,7 +1587,10 @@ createMeta = async (assetID, data, ImgToken) => {
                 "id": ObjectID[0].id,
                 "localizedValues": mpeSubHeadlineArray
               });
-            }  
+            }
+            logger.info(new Date() + logRowInfo  + ': DATA Languages: mpe_subheadline: ' + JSON.stringify(mpeSubHeadlineArray));  
+          }else{
+            logger.info(new Date() + logRowInfo  + ': DATA ERROR Languages: mpe_subheadline: ' + JSON.stringify(mpeSubHeadlineArray));  
           }
 
           if(mpeURLArray.hasOwnProperty('0')){
@@ -1577,6 +1601,9 @@ createMeta = async (assetID, data, ImgToken) => {
                 "localizedValues": mpeURLArray
               });  
             }
+            logger.info(new Date() + logRowInfo  + ': DATA Languages: mpe_URL: ' + JSON.stringify(mpeURLArray));  
+          }else{
+            logger.info(new Date() + logRowInfo  + ': DATA ERROR Languages: mpe_URL: ' + JSON.stringify(mpeURLArray));  
           }
         }
 
@@ -1699,7 +1726,7 @@ createMeta = async (assetID, data, ImgToken) => {
           if(dataFlag){
             return {'result': resp.data.id, 'message': 'RECORD CREATED'};
           }else{
-            return {'result': resp.data.id, 'message': 'RECORD CREATED WITH DATA ERROR'};
+            return {'result': 0, 'message': 'RECORD CREATED WITH DATA ERROR'};
           }          
         } else {
           logger.error(new Date() + logRowInfo + ' ERROR : GETTING RECORD ID -- LV_ID: ' + data.LV_ID + ' AND OBJ_ID: ' + data.OBJ_ID);
@@ -1759,7 +1786,7 @@ createMeta = async (assetID, data, ImgToken) => {
         if(dataFlag){
           return {'result': assetID, 'message': 'RECORD UPDATED'};
         }else{
-          return {'result': assetID, 'message': 'RECORD UPDATED WITH DATA ERROR'};
+          return {'result': 0, 'message': 'RECORD UPDATED WITH DATA ERROR'};
         }
       })
       .catch((err) => {
@@ -1827,7 +1854,7 @@ searchUser = async (firstName, lastName) => {
           //console.log(new Date() + ': INFO : USER ID: ', resp.data['_embedded'].user[0].adamUserId);
           return resp.data['_embedded'].user[0].adamUserId;
         } else {
-          logger.error(new Date() + logRowInfo + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
+          logger.info(new Date() + logRowInfo + ': WARNING : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
           //console.log(new Date() + ': ERROR : USER NOT FOUND -- First Name: ' + firstName + ' Last Name: ' + lastName);
           return '0';
         }
@@ -1858,9 +1885,12 @@ GetLanguageID = async (langValue) => {
   let token = await getObjectDefault("/token", "null");
   let langKey = await getObjectDefault("/languagemapping/"+langValue, "ignore");
   
+  logger.info(new Date() + logRowInfo + ': API REQUEST : -- ' + APR_CREDENTIALS.BaseURL + '/core/languages/?pageSize=400');
   let searchClass = await axios
   .get(APR_CREDENTIALS.BaseURL + '/core/languages/?pageSize=400',
     {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
@@ -1879,11 +1909,16 @@ GetLanguageID = async (langValue) => {
         return langObj.items[0].id;
       }
     } else {
-      logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID -- ' + langValue);
+      logger.error(new Date() + logRowInfo + ': API FOUND ZERO RECORD IN GetLanguageID -- ' + langValue);
     }
   })
-  .catch(async (error) => {
+  .catch(async (err) => {
       logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID -- ' + langValue);
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID is ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID is ' + JSON.stringify(err));
+      }
       return null;
   });
   return searchClass;
@@ -1898,7 +1933,7 @@ GetLanguageID = async (langValue) => {
 getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
   
   let token = await getObjectDefault("/token", "null");
-  let fieldData = await getObjectDefault("/fieldIDs/"+ fieldValue, "null");
+  let fieldData = await getObjectDefault("/fieldIDs/"+ keyValue + "/" + fieldValue, "null");
   
   if (fieldData === 'null') {  
   let resultID = await axios
@@ -1920,7 +1955,7 @@ getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
       ////console.log("ObjectID:--------", ObjectID);
       if (ObjectID.length > 0) {
         ////console.log(new Date() + ': ObjectID.id -- ' + ObjectID[0].id);
-        await db.push("/fieldIDs/"+fieldValue, ObjectID[0].id);
+        await db.push("/fieldIDs/"+ keyValue + "/" +fieldValue, ObjectID[0].id);
         await db.save();
         return ObjectID[0].id;
       } else {
@@ -2130,6 +2165,8 @@ async function uploadAsset(filename, processPath) {
   
   logger.info(new Date() + logRowInfo + ': Start Downloading: ' + filename);
   let sftp = new Client();
+  sftp.end();//Added to avoid the ECONNRESET error
+
   await sftp.connect(ftpConfig)
     .then(async () => {      
       await sftp.fastGet(remotePath, filename);
@@ -2139,7 +2176,7 @@ async function uploadAsset(filename, processPath) {
       dataFlag = false;
       //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
     });
-    
+    sftp.end();
 
     if (fs.existsSync(filename) && BINARY_FILENAME !== '') {
       let varFileSize = await getFilesizeInMegabytes(filename);
@@ -2251,7 +2288,7 @@ async function uploadAsset(filename, processPath) {
       logger.error(new Date() + logRowInfo + ': FTP ERROR : File Not Found in the FTP -- ' + filename);
       //console.log(new Date() + ': ERROR : File Not Found in the FTP -- ' + filename);
     }
-    sftp.end();
+    
 
 }
 

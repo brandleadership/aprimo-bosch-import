@@ -158,5 +158,20 @@
         "OTYPE_ID": "86",
         "NAME": "Images Trade Label",
         "id": "AssetType_ProductMarketingLabel"
+      },
+      {
+        "OTYPE_ID": "60",
+        "NAME": "Sales Materials",
+        "id": "AssetType_SalesMaterials"
+      },
+      {
+        "OTYPE_ID": "64",
+        "NAME": "Sales Materials",
+        "id": "AssetType_SalesMaterials"
+      },
+      {
+        "OTYPE_ID": "70",
+        "NAME": "Sales Materials",
+        "id": "AssetType_SalesMaterials"
       }
 ]

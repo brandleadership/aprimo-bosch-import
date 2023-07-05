@@ -165,12 +165,14 @@ downloadCSVFromFtp = async () => {
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
   let sftp = new Client();
+  sftp.end();//Added to avoid the ECONNRESET error
   //connect SFTP
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
+      files.sort((a,b) => a.name.localeCompare(b.name));
       //process listed files
-
+      sftp.end();
       for (var i = 0, len = files.length; i < len; i++) {
         if (files[i].name.match(/.+(\.finished)$/)) {
           let jobID = path.parse(files[i].name).name;
@@ -183,17 +185,22 @@ downloadCSVFromFtp = async () => {
           if(!importFinished){   
             // Create .finished file for reference 
             logger.info('####### Import Started for ' + jobID + ' at ' + new Date() + ' #########');
-
             let fd = fs.openSync(dst + '/' + jobID + '.finished', 'w');
-            const csvfiles = await sftp.list(src + '/' + jobID + '/.');
+            let sftpSub = new Client();
+            sftpSub.end();//Added to avoid the ECONNRESET error
+            await sftpSub.connect(ftpConfig).then(async () => {
+              const csvfiles = await sftpSub.list(src + '/' + jobID + '/.');
+              for (var j = 0, csvlen = csvfiles.length; j < csvlen; j++) {
+                if (csvfiles[j].name.match(/.+(\.csv)$/)) {    
+                  await sftpSub.fastGet(src + '/' + jobID + '/' + csvfiles[j].name, dst + '/' + csvfiles[j].name);
+                }
+              }  
+            }).catch(e => {
+              logger.info(new Date() + ': Error: In FTP Connection: ' + e.message);
+              //console.log(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
+            });
+            sftpSub.end();
 
-            
-            for (var j = 0, csvlen = csvfiles.length; j < csvlen; j++) {
-              if (csvfiles[j].name.match(/.+(\.csv)$/)) {    
-                await sftp.fastGet(src + '/' + jobID + '/' + csvfiles[j].name, dst + '/' + csvfiles[j].name);
-              }
-            }
-            
             let JSONprocess = await JSONtoCheckInData(jobID);
             let REprocess = await readExcel();
             let CRprocess = await createRelation();
@@ -214,10 +221,10 @@ downloadCSVFromFtp = async () => {
 
 
     }).catch(e => {
-      logger.info(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
+      logger.info(new Date() + ': Error: In FTP Connection: ' + e.message);
       //console.log(new Date() + ': Error: Download CSV FromFtp: ' + e.message);
     });
-  sftp.end();
+  
   return jsonData;
 };
 
@@ -240,11 +247,12 @@ async function readExcel() {
       let poolArray = [];
       for (const row of csvData) {
         // Check checkin file.
+        row.index = index;
         if (row?.appstatus !== 'checkin' && row?.appstatus !== 'linked') {
           cpuIndex++;
-          csvData[index].appstatus = 'checkin';
-          csvData[index].index = index;
-          pJobID = csvData[index].JOB_ID;
+          row.appstatus = 'checkin';
+          //csvData[index].index = index;
+          pJobID = row.JOB_ID;
           // Create pool records
           poolArray.push(pool.run({
             rowdata: row,
@@ -268,6 +276,7 @@ async function readExcel() {
         if (index % (APR_CREDENTIALS.worker * 10) === 0) {
           await writeExcel(csvData, 'null');
         }
+
         index++;
       }
 
@@ -316,20 +325,14 @@ async function createRelation() {
       let cpuIndex = 0;
       let poolArray = [];
 
-      for (const masterDataRow of maserData) {
+      for (const masterDataRow of maserData) {        
         if (masterDataRow?.appstatus === 'checkin') {
-          cpuIndex++;
-          csvData[masterDataRow.index].appstatus = 'linked';
-          csvData[masterDataRow.index].index = index;
-          
+          cpuIndex++;          
           const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.OBJ_ID && row['recordID'] != '' && row['MASTER_RECORD'] != 'x');
           let childRecordID = [];
           for (const childDataRow of childData) {
             childRecordID.push(childDataRow.recordID);
           }
-
-
-          logger.info(new Date() + ': createRelation OBJ_ID: '+ masterDataRow.OBJ_ID);
 
           poolArray.push(pool.run({
             rowdata: {
@@ -340,18 +343,9 @@ async function createRelation() {
             mode: 'linkRecords'
           }, options));
           if (cpuIndex === APR_CREDENTIALS.worker * 10) {
-
-            //logger.info(new Date() + ': Start pool: ');
             const result = await Promise.all(poolArray);
-            //logger.info(new Date() + ': End pool: ');
-
-            //console.log("result", result);
             cpuIndex = 0;
             poolArray = [];
-            //logger.info(new Date() + ': Start wrtie: ');
-            //await writeExcel(csvData, 'null');
-            //logger.info(new Date() + ': End wrtie: ');
-
           }
         }
         index++;
@@ -359,7 +353,6 @@ async function createRelation() {
       //Process remaining
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
-        //console.log("result", result);
         poolArray = [];
         await writeExcel(csvData, 'null');
       }else{
@@ -401,7 +394,7 @@ async function createLanguageRelationParent() {
         for (const childDataRow of childData) {
           childRecordID.push(childDataRow.recordID);
         }
-        logger.info(new Date() + ': LanguageRelationParent OBJ_ID: '+ masterDataRow.OBJ_ID);
+        //logger.info(new Date() + ': LanguageRelationParent OBJ_ID: '+ masterDataRow.OBJ_ID);
 
         if (childRecordID.length > 0) {
           poolArray.push(pool.run({
@@ -414,10 +407,8 @@ async function createLanguageRelationParent() {
           }, options));
           if (cpuIndex === APR_CREDENTIALS.worker * 10) {
             const result = await Promise.all(poolArray);
-            //console.log("result", result);
             cpuIndex = 0;
             poolArray = [];
-            //await writeExcel(csvData);
           }
         }
         index++;
@@ -426,9 +417,7 @@ async function createLanguageRelationParent() {
       //Process remaining
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
-        //console.log("result", result);
         poolArray = [];
-        //await writeExcel(csvData, 'null');
       }
     }
 
@@ -472,7 +461,7 @@ async function createLanguageRelationChild() {
               childRecordID.push(childDataRow.recordID);
             }
           }
-          logger.info(new Date() + ': LanguageRelationChild OBJ_ID: '+ masterDataRow.OBJ_ID);
+          //logger.info(new Date() + ': LanguageRelationChild OBJ_ID: '+ masterDataRow.OBJ_ID);
 
           if (childRecordID.length > 0) {
             poolArray.push(pool.run({
@@ -485,10 +474,8 @@ async function createLanguageRelationChild() {
             }, options));
             if (cpuIndex === APR_CREDENTIALS.worker * 10) {
               const result = await Promise.all(poolArray);
-              //console.log("result", result);
               cpuIndex = 0;
               poolArray = [];
-              //await writeExcel(csvData);
             }
           }
         }
@@ -498,9 +485,7 @@ async function createLanguageRelationChild() {
       //Process remaining
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
-        //console.log("result", result);
         poolArray = [];
-        //await writeExcel(csvData, 'null');
       }
     }
 
@@ -535,17 +520,39 @@ async function endProcess(jobID, pStatus) {
           const dst = APR_CREDENTIALS.targetPath;
           const src = APR_CREDENTIALS.sourcePath;
           let sftp = new Client();
-
+          sftp.end();//Added to avoid the ECONNRESET error
           let fd = fs.openSync(dst + '/' + path.parse(file).name  + '.importFinished', 'w');
           let jsonData = await sftp.connect(ftpConfig)
             .then(async () => {        
               await sftp.put(dst + '/' + path.parse(file).name  + '.importFinished', src + '/' + path.parse(file).name  + '.importFinished');
               if(pStatus){
-                await sftp.rename(src + '/' + jobID, src + '/../completed/' + jobID);
-                await sftp.rename(src + '/' + jobID + '.finished', src + '/../completed/' + jobID + '.finished');
-                await sftp.rename(src + '/' + jobID + '.importFinished', src + '/../completed/' + jobID + '.importFinished');
-                await sftp.rename(src + '/' + jobID + '.started', src + '/../completed/' + jobID + '.started');  
+
+
+
+                const csvfile = XLSX.readFile(fileName);
+                const sheets = csvfile.SheetNames;
+                for (let i = 0; i < sheets.length; i++) {
+                  const csvData = XLSX.utils.sheet_to_json(csvfile.Sheets[csvfile.SheetNames[i]], {
+                    defval: ""
+                  });
+
+                  const appStatus = csvData.filter((row) => row['appstatus'] === 'error');
+                  if(appStatus.length > 0){
+                    logger.info(new Date() + ' JobID: ' + jobID + ' : Row Has Error Moving to Error Folder');
+                    await sftp.rename(src + '/' + jobID, src + '/../errors/' + jobID);
+                    await sftp.rename(src + '/' + jobID + '.finished', src + '/../errors/' + jobID + '.finished');
+                    await sftp.rename(src + '/' + jobID + '.importFinished', src + '/../errors/' + jobID + '.importFinished');
+                    await sftp.rename(src + '/' + jobID + '.started', src + '/../errors/' + jobID + '.started');  
+                  }else{
+                    logger.info(new Date() + ' JobID: ' + jobID + ' : No Error Found Moving to Completed Folder');
+                    await sftp.rename(src + '/' + jobID, src + '/../completed/' + jobID);
+                    await sftp.rename(src + '/' + jobID + '.finished', src + '/../completed/' + jobID + '.finished');
+                    await sftp.rename(src + '/' + jobID + '.importFinished', src + '/../completed/' + jobID + '.importFinished');
+                    await sftp.rename(src + '/' + jobID + '.started', src + '/../completed/' + jobID + '.started');      
+                  }
+                }
               }else{
+                logger.info(new Date() + ' JobID: ' + jobID + ' : Process Error Moving to Error Folder');
                 await sftp.rename(src + '/' + jobID, src + '/../errors/' + jobID);
                 await sftp.rename(src + '/' + jobID + '.finished', src + '/../errors/' + jobID + '.finished');
                 await sftp.rename(src + '/' + jobID + '.importFinished', src + '/../errors/' + jobID + '.importFinished');
@@ -554,10 +561,14 @@ async function endProcess(jobID, pStatus) {
             }).catch(async (e) => {
               logger.info(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
               //console.log(new Date() + ': Error: Updating File Name in FTP Server ' + e.message);
-              await sftp.rename(src + '/' + jobID, src + '/../errors/' + jobID);
-              await sftp.rename(src + '/' + jobID + '.finished', src + '/../errors/' + jobID + '.finished');
-              await sftp.rename(src + '/' + jobID + '.importFinished', src + '/../errors/' + jobID + '.importFinished');
-              await sftp.rename(src + '/' + jobID + '.started', src + '/../errors/' + jobID + '.started');
+              try {
+                await sftp.rename(src + '/' + jobID, src + '/../errors/' + jobID);
+                await sftp.rename(src + '/' + jobID + '.finished', src + '/../errors/' + jobID + '.finished');
+                await sftp.rename(src + '/' + jobID + '.importFinished', src + '/../errors/' + jobID + '.importFinished');
+                await sftp.rename(src + '/' + jobID + '.started', src + '/../errors/' + jobID + '.started');                  
+              } catch (error) {
+                logger.info(new Date() + ': Error: Moving Files to Error Folder');
+              }
             });
           sftp.end();
           
@@ -825,7 +836,7 @@ main = async () => {
         //console.log('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
         logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
 
-        if(JSONprocess && REprocess && CRprocess && CLRPprocess && CLRCprocess){
+        if(REprocess && CRprocess && CLRPprocess && CLRCprocess){
           await endProcess(pJobID, true);
           logger.info('####### Import Ended for ' + pJobID + ' at ' + new Date() + ' #########');
         }else{
