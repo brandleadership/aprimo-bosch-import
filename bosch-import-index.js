@@ -798,22 +798,15 @@ let task = cron.schedule("*/5 * * * *", async () => {
   
   if (fs.existsSync(APR_CREDENTIALS.checkin)) {
     if(isFileOlderThanHours(APR_CREDENTIALS.checkin)){
-      // Delete signature file to restart process.
-      fs.unlink(APR_CREDENTIALS.signature, (err) => {
-        if (err) {
-          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
-        }
-      });
       // Delete checkindata file to restart process.
       fs.unlink(APR_CREDENTIALS.checkin, (err) => {
         if (err){
-          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.checkin);
+          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE: ' + APR_CREDENTIALS.checkin);
         }
       });
 
       logger.info(new Date() + ': ' + process.pid + ': Restart Process :');
       terminate("Received Exit");
-      process.exit(0);    
     }
   }
 });
@@ -893,51 +886,38 @@ function terminate(code){
     }    
   }
   task.stop();
+  process.exit(0);
 }
-
-
-
-
-
 
 /*
 process.on('beforeExit', code => {
 	task.stop();
 })
-*/
 process.on('exit', code => {
 	task.stop();
   //console.log('Received Exit');
   terminate("Received Exit");
-  process.exit(0);
 })
+*/
 
 process.on('SIGTERM', signal => {
-  task.stop();
   console.log('Received SIGTERM');
 	terminate("Received SIGTERM");
-	process.exit(0)
 })
 
 process.on('SIGINT', signal => {
-  task.stop();
   console.log('Received SIGINT');
 	terminate("Received SIGINT");
-	process.exit(0)
 })
 
 process.on('uncaughtException', err => {
-  task.stop();
   console.log('Caught exception: ', err);
 	terminate('Caught exception: ' + err);
-	process.exit(1)
 })
 
 process.on('unhandledRejection', (reason, p) => {
-  task.stop();
   console.log("Unhandled Rejection at: " + p + ' reason: ' + reason);
   terminate("Unhandled Rejection at: " + p + ' reason: ' + reason);
-  process.exit(1)
 });
 
 
@@ -965,50 +945,29 @@ function isFileOlderThanHours(filePath) {
  * 
  * Calling main function
  */
-
 try {
+  //Check for running process
   if(fs.existsSync(APR_CREDENTIALS.signature)){
-    
+    //Check for running checking file
     if(fs.existsSync(APR_CREDENTIALS.checkin)){
       if(isFileOlderThanHours(APR_CREDENTIALS.checkin)){
-      // Delete signature file to restart process.        
-        fs.unlink(APR_CREDENTIALS.signature, (err) => {
-          if (err){
-            logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
-          }
-        });
         // Delete checkindata file to restart process.
-        fs.unlink(APR_CREDENTIALS.checkin, (err) => {
-          if (err){
-            logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.checkin);
-          }
-        });  
         logger.info(new Date() + ': ' + process.pid + ': Reset Process :');  
-        task.stop();
+        terminate('Reset Process ');
       }else{
         logger.info(new Date() + ': ' + process.pid + ': Skipping : Already Running :');
         task.stop();
       }
     }else{
-      // Signature is there but checkin not found
-      // Delete signature file to restart process.
-      fs.unlink(APR_CREDENTIALS.signature, (err) => {
-        if (err){
-          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
-        }
-      });
-      logger.info(new Date() + ': ' + process.pid + ': Reset Process :');  
+      logger.info(new Date() + ': ' + process.pid + ': Skipping : Already Running :');
       task.stop();
     }
-    
   }else{
-    //console.log(new Date() + ': Start : ********** :');
     logger.info(new Date() + ': ' + process.pid + ': Start : ********** :');
     let fd = fs.openSync(APR_CREDENTIALS.signature, 'w');
     main();
   }
 } catch (error) {
-  //console.log(new Date() + ': System Error -- ' + error);
   logger.error(new Date() + ': ' + process.pid +': System Error -- ' + error);
   task.stop();
 }
