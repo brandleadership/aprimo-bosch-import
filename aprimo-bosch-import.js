@@ -26,6 +26,7 @@ const db = new JsonDB(new Config("fieldIDs", true, true, '/'));
 const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
 const kMap = new JsonDB(new Config("keymapping", true, true, '/'));
 const langMap = new JsonDB(new Config("languagemapping", true, true, '/'));
+const templateAsset = new JsonDB(new Config("template", true, true, '/'));
 
 const maxRetries = 3;
 const retryDelay = 1000;
@@ -215,7 +216,6 @@ searchAsset = async (recordsCollection) => {
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
     { 
-      timeout: 60000,
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -266,54 +266,6 @@ searchAsset = async (recordsCollection) => {
 
 
 /**
- * Search for Template Record with JOB-ID: job_999999999 and KBObjectID: 999999999 
- * @param {*} File Name, CSV Row Data
- */
-searchTemplateAsset = async () => {
-  
-  let token = await getObjectDefault("/token", "null");
-  let queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
-
-  logger.info(new Date() + ': SearchTemplateAsset: ' + queryString);
-  let APIResult = await axios
-    .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
-    { 
-      timeout: 60000,
-      proxy: false,
-      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
-      headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-        },
-    })
-    .then(async (resp) => {
-      const itemsObj = resp.data;
-      let getFieldsResult = 0;
-      if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': ERROR: TemplateAsset Not Found. Please Check Aprimo.');
-      } else if (itemsObj.totalCount === 1) {
-          //logger.info(new Date() + ': TemplateAsset ID:'+ itemsObj.items[0].id );
-          getFieldsResult = itemsObj.items[0].id;
-      }else{
-        logger.info(new Date() + ': ERROR: TemplateAsset Found More Than One. Please Check Aprimo.');
-      }
-      return getFieldsResult;
-    })
-    .catch(async (err) => {
-      logger.info(new Date() + ': ERROR: Search TemplateAsset API ');
-      if(err.response !== undefined && err.response.data !== undefined){
-        logger.error(new Date() + ': ERROR: Search TemplateAsset API is -- ' + JSON.stringify(err.response.data));
-      } else {
-        logger.error(new Date() + ': ERROR: Search TemplateAsset API is -- ' + JSON.stringify(err));
-      }
-      return 0;
-    });
-  return APIResult;
-};
-
-/**
  * Check File Size
  * @param {*} File Name
  */
@@ -331,16 +283,11 @@ getFilesizeInMegabytes = async (filename) => {
  * @param {*} assetID, Row Data
  */  
 getFields = async (assetID, recordsCollection) => {
-
-  let existImgId;
-  let filename;
+  let filename = recordsCollection.BINARY_FILENAME;
   let APIResult = 0;
 
   if (assetID === "null") {
     //Create New
-    filename = recordsCollection.BINARY_FILENAME;
-    existImgId = "null";
-
     try {
       if(recordsCollection.BINARY_FILENAME === '' && recordsCollection.LV_ID === ''){
             logger.info(new Date() + logRowInfo + ' INFO : Create Meta Start: ');
@@ -370,55 +317,6 @@ getFields = async (assetID, recordsCollection) => {
     }
   }
   return APIResult;
-};
-
-/**
- * 
- * Find fields IDs for updating records. 
- */  
-getFieldIDs = async () => {
-  
-  let token = await getObjectDefault("/token", "null");
-
-  let tempAssetID = await searchTemplateAsset();
-  if(tempAssetID !== 0){
-
-
-  let getFieldsResult = await axios
-    .get(APR_CREDENTIALS.GetRecord_URL + tempAssetID + '/fields', {
-      proxy: false,
-      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
-      headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-        },
-      })
-    .then(async (resp) => {
-      if (resp.data.items.length > 0) {
-        return resp.data.items;
-      } else {
-        //logger.error(new Date() + ': ERROR : tempAssetID Missing --');
-        //console.log(new Date() + ': ERROR : tempAssetID Missing --');
-        return null;
-      }
-    })
-    .catch(async (err) => {
-      if(err.response !== undefined && err.response.data !== undefined){
-        logger.error(new Date() + logRowInfo + ': ERROR : Template FieldIDs -- ' + JSON.stringify(err.response.data));
-      } else {
-        logger.error(new Date() + logRowInfo + ': ERROR : Template FieldIDs -- ' + JSON.stringify(err));
-      }
-
-      //console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
-      return null;
-    });
-
-    return getFieldsResult;
-  } else {
-    return null;
-  }
 };
 
 /**
@@ -469,7 +367,11 @@ findFieldID = async (fieldName) => {
  */  
 createMeta = async (assetID, data, ImgToken) => {  
   let APIResult = false;
-  let tempAssetObj = await getFieldIDs();  
+  //let tempAssetObj = await getFieldIDs(); 
+  await templateAsset.reload();
+  let tempAssetObj = await templateAsset.getData("/asset");
+  //console.log("tempAssetObj: ", tempAssetObj);
+ 
   let NewAssetTypeID = findObject(tempAssetObj, 'fieldName', 'NewAssetType');
   let updateObj = {
     tag: "<xml>test tag</xml>",
@@ -745,7 +647,8 @@ createMeta = async (assetID, data, ImgToken) => {
         // code block
         break;        
       case 'INIT_NAME':
-          ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
+          //ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
+          ObjectID = findObject(tempAssetObj, 'fieldName', 'MPE_AssetOwner');          
           if (ObjectID.hasOwnProperty('0')) {
             updateObj.fields.addOrUpdate.push({
               "id": ObjectID[0].id,
@@ -754,13 +657,14 @@ createMeta = async (assetID, data, ImgToken) => {
                 "languageId": "00000000000000000000000000000000"
               }]
             });
-  
+            
+            /*
           var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
           var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
   
           APIResult = await searchUser(firstName, lastName);
           if(APIResult !== '0'){
-            ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'MPE_AssetOwner');
             updateObj.fields.addOrUpdate.push({
               "id": ObjectID[0].id,
               "localizedValues": [{
@@ -769,7 +673,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });          
           } else {
-            ObjectID = findObject(tempAssetObj, 'fieldName', 'AssetOwner');
+            ObjectID = findObject(tempAssetObj, 'fieldName', 'MPE_AssetOwner');
             updateObj.fields.addOrUpdate.push({
               "id": ObjectID[0].id,
               "localizedValues": [{
@@ -777,7 +681,7 @@ createMeta = async (assetID, data, ImgToken) => {
                 "languageId": "00000000000000000000000000000000"
               }]
             });
-          }
+          }*/
   
         }else{
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
@@ -1577,7 +1481,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }  
             logger.info(new Date() + logRowInfo  + ': DATA Languages: mpe_headline: ' + JSON.stringify(mpeHeadlineArray));
           }else{
-            logger.error(new Date() + logRowInfo  + ': DATA ERROR Languages : mpe_headline: ' + JSON.stringify(mpeHeadlineArray));
+            logger.error(new Date() + logRowInfo  + ': DATA WARNING Languages : mpe_headline: ' + JSON.stringify(mpeHeadlineArray));
           }
 
           if(mpeSubHeadlineArray.hasOwnProperty('0')){
@@ -1590,7 +1494,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }
             logger.info(new Date() + logRowInfo  + ': DATA Languages: mpe_subheadline: ' + JSON.stringify(mpeSubHeadlineArray));  
           }else{
-            logger.info(new Date() + logRowInfo  + ': DATA ERROR Languages: mpe_subheadline: ' + JSON.stringify(mpeSubHeadlineArray));  
+            logger.info(new Date() + logRowInfo  + ': DATA WARNING Languages: mpe_subheadline: ' + JSON.stringify(mpeSubHeadlineArray));  
           }
 
           if(mpeURLArray.hasOwnProperty('0')){
@@ -1603,7 +1507,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }
             logger.info(new Date() + logRowInfo  + ': DATA Languages: mpe_URL: ' + JSON.stringify(mpeURLArray));  
           }else{
-            logger.info(new Date() + logRowInfo  + ': DATA ERROR Languages: mpe_URL: ' + JSON.stringify(mpeURLArray));  
+            logger.info(new Date() + logRowInfo  + ': DATA WARNING Languages: mpe_URL: ' + JSON.stringify(mpeURLArray));  
           }
         }
 
@@ -1697,7 +1601,7 @@ createMeta = async (assetID, data, ImgToken) => {
 
   if (assetID === "null") {
     let reqCreatRequest = await axios
-      .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {        
+      .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
         proxy: false,
         httpsAgent: new HttpsProxyAgent(fullProxyURL),
         headers: {
@@ -2151,6 +2055,35 @@ searchClassificationID = async (ClassID, data, key) => {
   }
 
 };
+
+/**
+ * Connect FTP With Retry Option
+ * @param {*} filename 
+ */
+async function connectFtpWithRetry(sftp, config, retries, remotePath, filename) {
+  return sftp.connect(config)
+    .then(async () => {
+      await sftp.fastGet(remotePath, filename);
+      logger.info(new Date() + logRowInfo + ': End Downloading: ' + filename);
+      sftp.end();
+    })
+    .catch(async (err) => {
+      logger.error(new Date() + logRowInfo + ': FTP ERROR : Error connecting to SSH server: -- ' + err.message);
+      if (retries > 0) {
+        logger.info(new Date() + logRowInfo + ': Retrying FTP Connection... : ' + retries);
+        const nextRetry = retries - 1;
+
+        // Delay before retrying
+        return new Promise(resolve => setTimeout(resolve, 2000))
+          .then(() => connectFtpWithRetry(sftp, config, nextRetry, remotePath, filename));
+      } else {
+        logger.error(new Date() + logRowInfo + ': FTP ERROR : Connection retries exhausted. Cannot connect to SSH server: -- ' + err.message);
+        return err;
+      }
+    });
+}
+
+
 /**
  * Upload file into Aprimo
  * @param {*} filename 
@@ -2165,8 +2098,13 @@ async function uploadAsset(filename, processPath) {
   
   logger.info(new Date() + logRowInfo + ': Start Downloading: ' + filename);
   let sftp = new Client();
-  sftp.end();//Added to avoid the ECONNRESET error
+  await connectFtpWithRetry(sftp, ftpConfig, 5, remotePath, filename)
+  .catch((err) => {
+    dataFlag = false;
+    logger.error(new Date() + logRowInfo + ': FTP ERROR : in the FTP Connection -- ' + err.message);
+  });
 
+  /*
   await sftp.connect(ftpConfig)
     .then(async () => {      
       await sftp.fastGet(remotePath, filename);
@@ -2176,7 +2114,8 @@ async function uploadAsset(filename, processPath) {
       dataFlag = false;
       //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
     });
-    sftp.end();
+  await sftp.end();
+  */
 
     if (fs.existsSync(filename) && BINARY_FILENAME !== '') {
       let varFileSize = await getFilesizeInMegabytes(filename);
@@ -2184,8 +2123,6 @@ async function uploadAsset(filename, processPath) {
       let getMimeType = mime.lookup(filename);
       let APIResult = null;
       if (varFileSize > 1) {
-
-
             let SegmentURI = await getSegmentURL(filename);
             APIResult = await splitFile
               .splitFileBySize(filename, 10000000)
@@ -2204,7 +2141,7 @@ async function uploadAsset(filename, processPath) {
                   // Delete Main File 
                   fs.unlink(filename, (err) => {
                     if (err){
-                      logger.error(new Date() + logRowInfo + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                      logger.error(new Date() + logRowInfo + ': WARNING : File Deletion -- ' + JSON.stringify(err));
                       //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
                     } 
                   });
@@ -2212,7 +2149,7 @@ async function uploadAsset(filename, processPath) {
                   for (let start = 0; start < names.length; start++) {
                     fs.unlink(names[start], (err) => {
                       if (err){
-                        logger.error(new Date() + logRowInfo + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                        logger.error(new Date() + logRowInfo + ': WARNING : File Deletion -- ' + JSON.stringify(err));
                         //console.log(new Date() + ': ERROR : File Deletion -- ' + JSON.stringify(err));    
                       }
                     });
@@ -2261,7 +2198,7 @@ async function uploadAsset(filename, processPath) {
 
               fs.unlink(filename, (err) => {
                 if (err){
-                  logger.error(new Date() + logRowInfo + ': ERROR : File Deletion -- ' + JSON.stringify(err));
+                  logger.error(new Date() + logRowInfo + ': WARNING : File Deletion -- ' + JSON.stringify(err));
                 } 
               });  
 
@@ -2449,7 +2386,10 @@ commitSegment = async (SegmentURI, filename, segmentcount) => {
  * @param {*} masterRecordID, childRecordID
  */
 languageRelationParent = async (masterRecordID, childRecordID) => {  
-  let tempAssetObj = await getFieldIDs();
+  //let tempAssetObj = await getFieldIDs();
+  await templateAsset.reload();
+  let tempAssetObj = await templateAsset.getData("/asset");
+
   let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
   //fall back
   if(ObjectID[0].id === null){
@@ -2514,7 +2454,9 @@ languageRelationParent = async (masterRecordID, childRecordID) => {
  * @param {*} masterRecordID, childRecordID
  */
 languageRelationChild = async (masterRecordID, childRecordID) => {
-  let tempAssetObj = await getFieldIDs();  
+  await templateAsset.reload();
+  let tempAssetObj = await templateAsset.getData("/asset");
+
   let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
   //fall back
   if(ObjectID[0].id === null){

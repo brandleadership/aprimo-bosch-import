@@ -12,6 +12,7 @@ const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
 const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
+const templateAsset = new JsonDB(new Config("template", true, true, '/'));
 const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
@@ -139,24 +140,32 @@ downloadCSVFromFtp = async () => {
   let ftpDirectory = APR_CREDENTIALS.targetPath;
   // Read FTP directory for CSV files
   fs.readdir(ftpDirectory, (err, files) => {
-    if (err) throw err;
+    if (err) {
+      logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING READ DIRECTORY');
+    }
 
     for (const file of files) {
       if (file.match(/.+(\.csv)$/)) {
         // Delete CSV files from FTP directory
         fs.unlink(path.join(ftpDirectory, file), (err) => {
-          if (err) throw err;
+          if (err){
+            logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING DELETE FILE');
+          }
         });
       }
     }
   });
   fs.readdir(APR_CREDENTIALS.imgFolderPath, (err, files) => {
-    if (err) throw err;
+    if (err){
+      logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING PATH MISSING');
+    }
 
     for (const file of files) {
       // Delete all downloaded files
       fs.unlink(path.join(APR_CREDENTIALS.imgFolderPath, file), (err) => {
-        if (err) throw err;
+        if (err){
+          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING DELETE FILE');
+        }
       });
     }
   });
@@ -165,7 +174,6 @@ downloadCSVFromFtp = async () => {
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
   let sftp = new Client();
-  sftp.end();//Added to avoid the ECONNRESET error
   //connect SFTP
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
@@ -187,7 +195,6 @@ downloadCSVFromFtp = async () => {
             logger.info('####### Import Started for ' + jobID + ' at ' + new Date() + ' #########');
             let fd = fs.openSync(dst + '/' + jobID + '.finished', 'w');
             let sftpSub = new Client();
-            sftpSub.end();//Added to avoid the ECONNRESET error
             await sftpSub.connect(ftpConfig).then(async () => {
               const csvfiles = await sftpSub.list(src + '/' + jobID + '/.');
               for (var j = 0, csvlen = csvfiles.length; j < csvlen; j++) {
@@ -320,7 +327,7 @@ async function createRelation() {
       const csvData = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]], {
         defval: ""
       });
-      const maserData = csvData.filter((row) => row['MASTER_RECORD'] === 'x' && row['recordID'] != '');
+      const maserData = csvData.filter((row) => row['MASTER_RECORD'] === 'x' && row['recordID'] != '' && row['recordID'] != 0);
       let index = 0;
       let cpuIndex = 0;
       let poolArray = [];
@@ -328,7 +335,7 @@ async function createRelation() {
       for (const masterDataRow of maserData) {        
         if (masterDataRow?.appstatus === 'checkin') {
           cpuIndex++;          
-          const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.OBJ_ID && row['recordID'] != '' && row['MASTER_RECORD'] != 'x');
+          const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.OBJ_ID && row['recordID'] != '' && row['recordID'] != 0 && row['MASTER_RECORD'] != 'x');
           let childRecordID = [];
           for (const childDataRow of childData) {
             childRecordID.push(childDataRow.recordID);
@@ -389,7 +396,7 @@ async function createLanguageRelationParent() {
 
       for (const masterDataRow of maserData) {
         cpuIndex++;
-        const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.RELATED_DOCUMENT && row['recordID'] != '');
+        const childData = csvData.filter((row) => row['OBJ_ID'] === masterDataRow.RELATED_DOCUMENT && row['recordID'] != '' && row['recordID'] != 0);
         let childRecordID = [];
         for (const childDataRow of childData) {
           childRecordID.push(childDataRow.recordID);
@@ -456,7 +463,7 @@ async function createLanguageRelationChild() {
           for (var str = 0; str < str_array.length; str++) {
             // Trim the excess whitespace.
             str_array[str] = str_array[str].replace(/^\s*/, "").replace(/\s*$/, "");
-            const childData = csvData.filter((row) => row['OBJ_ID'] === str_array[str] && row['recordID'] != '');
+            const childData = csvData.filter((row) => row['OBJ_ID'] === str_array[str] && row['recordID'] != '' && row['recordID'] != 0);
             for (const childDataRow of childData) {
               childRecordID.push(childDataRow.recordID);
             }
@@ -507,12 +514,16 @@ async function endProcess(jobID, pStatus) {
     const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
     let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '.xlsx';
     fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
-      if (err) throw err;
+      if (err){
+        logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN RENAME');
+      }
     });
 
     let ftpDirectory = APR_CREDENTIALS.targetPath;
     await fs.readdir(ftpDirectory, async (err, files) => {
-      if (err) throw err;
+      if (err){
+        logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN READ DIRECTORY');
+      };
   
       for (const file of files) {
         if (file.match(/.+(\.finished)$/)) {
@@ -520,7 +531,6 @@ async function endProcess(jobID, pStatus) {
           const dst = APR_CREDENTIALS.targetPath;
           const src = APR_CREDENTIALS.sourcePath;
           let sftp = new Client();
-          sftp.end();//Added to avoid the ECONNRESET error
           let fd = fs.openSync(dst + '/' + path.parse(file).name  + '.importFinished', 'w');
           let jsonData = await sftp.connect(ftpConfig)
             .then(async () => {        
@@ -573,35 +583,21 @@ async function endProcess(jobID, pStatus) {
           sftp.end();
           
           fs.unlink(path.join(ftpDirectory, file), (err) => {
-            if (err) throw err;
+            if (err) {
+              logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN DELETE FILE');
+            };
           });
         }
 
         if (path.extname(file) === '.csv') {
           fs.unlink(path.join(ftpDirectory, file), err => {
             if (err) {
-              console.error('Error deleting file:', err);
-            } else {
-              //console.log('File deleted:', file);
+              logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN DELETE FILE');
             }
           });
         }
-
-
       }
     });
-
-
-
-
-
-
-
-
-
-
-
-
   } catch (e) {
     logger.info(new Date() + ': Error: endProcess: ' + e.message);
     //console.log(new Date() + ': Error: endProcess: ' + e.message);
@@ -672,7 +668,6 @@ searchTemplateAsset = async (token) => {
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
     { 
-      timeout: 60000,
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -730,11 +725,13 @@ checkTempAsset = async () => {
       })
     .then(async (resp) => {
       if (resp.data.items.length > 0) {
-        return resp.data.items;
+        await templateAsset.push("/asset", resp.data.items);
+        await templateAsset.save();
+        return true;
       } else {
         logger.error(new Date() + ': ERROR : tempAssetID Missing --');
         //console.log(new Date() + ': ERROR : tempAssetID Missing --');
-        return null;
+        return false;
       }
     })
     .catch(async (err) => {
@@ -745,11 +742,11 @@ checkTempAsset = async () => {
       }
 
       //console.log(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
-      return null;
+      return false;
     });
-    return getFieldsResult;
+      return getFieldsResult;
     }else{
-      return null;
+      return false;
     }
   
 };
@@ -760,7 +757,6 @@ checkTempAsset = async () => {
  */
 getToken = async () => {
   let resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
-        timeout: 60000,
         proxy: false,
         httpsAgent: new HttpsProxyAgent(fullProxyURL),
         headers: {
@@ -799,6 +795,27 @@ getToken = async () => {
 let task = cron.schedule("*/5 * * * *", async () => {
   //console.log("running a task every 5 Min");
   await getToken();
+  
+  if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+    if(isFileOlderThanHours(APR_CREDENTIALS.checkin)){
+      // Delete signature file to restart process.
+      fs.unlink(APR_CREDENTIALS.signature, (err) => {
+        if (err) {
+          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
+        }
+      });
+      // Delete checkindata file to restart process.
+      fs.unlink(APR_CREDENTIALS.checkin, (err) => {
+        if (err){
+          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.checkin);
+        }
+      });
+
+      logger.info(new Date() + ': ' + process.pid + ': Restart Process :');
+      terminate("Received Exit");
+      process.exit(0);    
+    }
+  }
 });
 
 
@@ -813,7 +830,7 @@ main = async () => {
 
   let getTempAsset = await checkTempAsset();
   //console.log("getTempAsset", getTempAsset);
-  if(getTempAsset !== null){
+  if(getTempAsset !== false){
       //console.log('####### Import Started at ' + new Date() + ' #########');
       logger.info('####### '+ ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
       if (fs.existsSync(APR_CREDENTIALS.checkin)) {
@@ -864,7 +881,9 @@ main = async () => {
 function terminate(code){
   if(fs.existsSync(APR_CREDENTIALS.signature)){
     fs.unlink(APR_CREDENTIALS.signature, (err) => {
-      if (err) throw err;
+      if (err) {
+        logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
+      }
     });
     //console.log(`Process exited with code: ${code}`)  
     if(code === 'Normal Close'){
@@ -883,37 +902,64 @@ function terminate(code){
 
 /*
 process.on('beforeExit', code => {
-	//terminate(code);
-})
-
-process.on('exit', code => {
-	//terminate(code);
+	task.stop();
 })
 */
+process.on('exit', code => {
+	task.stop();
+  //console.log('Received Exit');
+  terminate("Received Exit");
+  process.exit(0);
+})
 
 process.on('SIGTERM', signal => {
+  task.stop();
   console.log('Received SIGTERM');
 	terminate("Received SIGTERM");
 	process.exit(0)
 })
 
 process.on('SIGINT', signal => {
+  task.stop();
   console.log('Received SIGINT');
 	terminate("Received SIGINT");
 	process.exit(0)
 })
 
 process.on('uncaughtException', err => {
+  task.stop();
   console.log('Caught exception: ', err);
 	terminate('Caught exception: ' + err);
 	process.exit(1)
 })
 
 process.on('unhandledRejection', (reason, p) => {
+  task.stop();
   console.log("Unhandled Rejection at: " + p + ' reason: ' + reason);
   terminate("Unhandled Rejection at: " + p + ' reason: ' + reason);
   process.exit(1)
 });
+
+
+// Function to check if the file is older than 2 hours
+function isFileOlderThanHours(filePath) {
+  const HoursInMilliseconds = 3 * 60 * 60 * 1000; // Convert 3 hours to milliseconds
+
+  // Get the file's information
+  const fileStats = fs.statSync(filePath);
+
+  // Calculate the timestamp for 3 hours ago
+  const HoursAgo = new Date().getTime() - HoursInMilliseconds;
+  //logger.info(new Date() + ': fileStats.mtimeMs ' + fileStats);
+  //logger.info(new Date() + ': HoursAgo ' + HoursAgo);
+
+  // Compare the file's modification timestamp with the calculated timestamp
+  if (fileStats.mtimeMs < HoursAgo) {
+    return true; // File is older than 3 hours
+  } else {
+    return false; // File is not older than 3 hours
+  }
+}
 
 /**
  * 
@@ -922,9 +968,39 @@ process.on('unhandledRejection', (reason, p) => {
 
 try {
   if(fs.existsSync(APR_CREDENTIALS.signature)){
-    //console.log(new Date() + ': Skipping : Already Running :');
-    logger.info(new Date() + ': ' + process.pid + ': Skipping : Already Running :');
-    task.stop();
+    
+    if(fs.existsSync(APR_CREDENTIALS.checkin)){
+      if(isFileOlderThanHours(APR_CREDENTIALS.checkin)){
+      // Delete signature file to restart process.        
+        fs.unlink(APR_CREDENTIALS.signature, (err) => {
+          if (err){
+            logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
+          }
+        });
+        // Delete checkindata file to restart process.
+        fs.unlink(APR_CREDENTIALS.checkin, (err) => {
+          if (err){
+            logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.checkin);
+          }
+        });  
+        logger.info(new Date() + ': ' + process.pid + ': Reset Process :');  
+        task.stop();
+      }else{
+        logger.info(new Date() + ': ' + process.pid + ': Skipping : Already Running :');
+        task.stop();
+      }
+    }else{
+      // Signature is there but checkin not found
+      // Delete signature file to restart process.
+      fs.unlink(APR_CREDENTIALS.signature, (err) => {
+        if (err){
+          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE:' + APR_CREDENTIALS.signature);
+        }
+      });
+      logger.info(new Date() + ': ' + process.pid + ': Reset Process :');  
+      task.stop();
+    }
+    
   }else{
     //console.log(new Date() + ': Start : ********** :');
     logger.info(new Date() + ': ' + process.pid + ': Start : ********** :');
@@ -934,5 +1010,6 @@ try {
 } catch (error) {
   //console.log(new Date() + ': System Error -- ' + error);
   logger.error(new Date() + ': ' + process.pid +': System Error -- ' + error);
+  task.stop();
 }
 
