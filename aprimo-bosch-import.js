@@ -27,6 +27,7 @@ const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
 const kMap = new JsonDB(new Config("keymapping", true, true, '/'));
 const langMap = new JsonDB(new Config("languagemapping", true, true, '/'));
 const templateAsset = new JsonDB(new Config("template", true, true, '/'));
+const langAsset = new JsonDB(new Config("languages", true, true, '/'));
 const maxRetries = 3;
 const retryDelay = 1000;
 let retries = 0;
@@ -233,7 +234,7 @@ searchAsset = async (recordsCollection) => {
         return getFieldsResult;
       }else{
         // If More Than One Record Found Then Log in Error
-        logger.error(new Date() + logRowInfo  + ' ERROR  : More Than One Record Found: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
+        logger.error(new Date() + logRowInfo  + ' DATA WARNING  : More Than One Record Found: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         return {'result': 0, 'message': 'More Than One Record Found'};
       }      
     })
@@ -408,6 +409,7 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -425,6 +427,7 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -464,6 +467,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -481,6 +485,7 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -495,6 +500,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -509,6 +515,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -523,6 +530,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -540,6 +548,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;  
@@ -554,11 +563,12 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
       case 'IMG_TYPE': // Classification (Hierarchical)        
-        APIResult = await searchClassificationName(tmpKey, key);
+        APIResult = await searchClassificationName(tmpKey, key, 'MPE Migration/IMG_TYPE_PT/');
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type');
@@ -569,14 +579,15 @@ createMeta = async (assetID, data, ImgToken) => {
                 "values": ClassID,
                 "languageId": "00000000000000000000000000000000"
               }]
-            });  
+            });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }            
         }
         break;
       case 'IMG_TYPE_HAWERA': // Classification (Hierarchical)        
-        APIResult = await searchClassificationName(tmpKey, key);
+        APIResult = await searchClassificationName(tmpKey, key, '');
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
           ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_img_type_hawera');
@@ -589,6 +600,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
@@ -631,6 +643,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }*/
   
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
           // code block
@@ -648,6 +661,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
@@ -664,6 +678,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -678,6 +693,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -695,6 +711,7 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -709,6 +726,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -726,11 +744,12 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
       case 'STATUS':
-          APIResult = await searchClassificationName(tmpKey, key);
+          APIResult = await searchClassificationName(tmpKey, key, '');
           if (APIResult !== 'null') {
             ClassID.push(APIResult);
             ObjectID = findObject(tempAssetObj, 'fieldName', 'Status');
@@ -743,6 +762,7 @@ createMeta = async (assetID, data, ImgToken) => {
                 }]
               });
             }else{
+              dataFlag = false;
               logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
             }
           }
@@ -758,6 +778,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -772,6 +793,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -789,6 +811,7 @@ createMeta = async (assetID, data, ImgToken) => {
               });
             }
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -806,6 +829,7 @@ createMeta = async (assetID, data, ImgToken) => {
               });
             }
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -820,6 +844,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -837,6 +862,7 @@ createMeta = async (assetID, data, ImgToken) => {
               });
             }
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;      
@@ -851,6 +877,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -865,6 +892,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -882,6 +910,7 @@ createMeta = async (assetID, data, ImgToken) => {
               });
             }
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -914,6 +943,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -928,6 +958,7 @@ createMeta = async (assetID, data, ImgToken) => {
                 }]
               });
             }else{
+              dataFlag = false;
               logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
             }
             break;
@@ -942,6 +973,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -956,6 +988,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -970,6 +1003,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
@@ -987,6 +1021,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1001,6 +1036,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1021,6 +1057,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
@@ -1040,6 +1077,7 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1060,6 +1098,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
@@ -1084,6 +1123,7 @@ createMeta = async (assetID, data, ImgToken) => {
             });
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1107,6 +1147,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1124,6 +1165,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1141,6 +1183,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });   
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }     
         break;
@@ -1155,6 +1198,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }]
           });
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;  
@@ -1239,9 +1283,11 @@ createMeta = async (assetID, data, ImgToken) => {
           }
 
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }else{
+          dataFlag = false;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
@@ -1265,6 +1311,7 @@ createMeta = async (assetID, data, ImgToken) => {
               }]
             });
           }else{
+            dataFlag = false;
             logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
@@ -1604,45 +1651,17 @@ GetLanguageID = async (langValue) => {
   let token = await getObjectDefault("/token", "null");
   // Get Language Key From Local DB
   let langKey = await getObjectDefault("/languagemapping/"+langValue, "ignore");
-  
-  logger.info(new Date() + logRowInfo + ': API REQUEST : -- ' + APR_CREDENTIALS.BaseURL + '/core/languages/?pageSize=400');
-  // API FOR Language Data
-  let languagesData = await axios
-  .get(APR_CREDENTIALS.BaseURL + '/core/languages/?pageSize=400',
-    {
-      proxy: false,
-      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "API-VERSION": APR_CREDENTIALS.Api_version,
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
-  .then(async (resp) => {
-    const langObj = resp.data;
-    if (langObj.totalCount !== 0) {
-      let LangID = findObject(langObj.items, 'culture', langKey);
-      if (LangID.hasOwnProperty('0')) {
-        return LangID[0].id
-      }else{
-        return langObj.items[0].id;
-      }
-    } else {
-      logger.error(new Date() + logRowInfo + ': API FOUND ZERO RECORD IN GetLanguageID -- ' + langValue);
-    }
-  })
-  .catch(async (err) => {
-      logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID -- ' + langValue);
-      if(err.response !== undefined && err.response.data !== undefined){
-        logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID is ' + JSON.stringify(err.response.data));
-      } else {
-        logger.error(new Date() + logRowInfo + ': API ERROR : GetLanguageID is ' + JSON.stringify(err));
-      }
-      return null;
-  });
-  return languagesData;
+  // Get Language Asset From Local DB
+  await langAsset.reload();
+  let tempLangAsset = await langAsset.getData("/asset");
+  let LangID = findObject(tempLangAsset, 'culture', langKey);
+  if (LangID.hasOwnProperty('0')) {
+    return LangID[0].id
+  }else{
+    // Fall Back to English
+    logger.info(new Date() + logRowInfo + ': DATA WARNING GetLanguageID -- ' + langValue);
+    return tempLangAsset[0].id;
+  }
 };
 
 
@@ -1745,18 +1764,25 @@ getObjectDefault = async(key, defval) => {
 /**
  * 
  * Search for Classification Name
- * @param {*} ClassID, Key
+ * @param {*} ClassID, Key, ClassPath
  */ 
-searchClassificationName = async (ClassID, key) => {
+searchClassificationName = async (ClassID, key, ClassPath) => {
   // Get Token For API
   let token = await getObjectDefault("/token", "null");
-  // Get Value From Local DB
-  let fieldData = await getObjectDefault("/fieldIDs/"+ ClassID, "null");
+  let ClassQuery = APR_CREDENTIALS.GetClassificationByName;
+  if(key === 'IMG_TYPE' && !ClassID.includes('/')){
+    ClassQuery = ClassQuery + "'" + encodeURI(ClassID) + "' and namePath='" + ClassPath + ClassID + "'";
+  }else{
+    ClassQuery = ClassQuery + "'" + encodeURI(ClassID) + "'"; 
+  }
 
+  // Get Value From Local DB
+  let fieldData = await getObjectDefault("/fieldIDs/"+ ClassPath + ClassID, "null");
+  logger.info(new Date() + logRowInfo + ': searchClassificationName ' + ClassQuery);
   if (fieldData === 'null') {
   // Get Value From API
   let resultID = await axios
-    .get(APR_CREDENTIALS.GetClassificationByName + "'" + encodeURI(ClassID) + "'", {
+    .get(ClassQuery, {
       proxy: false,
       httpsAgent: new HttpsProxyAgent(fullProxyURL), 
       headers: {
@@ -1770,23 +1796,24 @@ searchClassificationName = async (ClassID, key) => {
       const itemsObj = resp.data;
       if (itemsObj.totalCount === 1) {
         // Save Value In Local DB
-        await db.push("/fieldIDs/"+ClassID, itemsObj.items[0].id);
+        await db.push("/fieldIDs/"+ClassPath+ClassID, itemsObj.items[0].id);
         await db.save();
         return itemsObj.items[0].id;
       } else if (itemsObj.totalCount > 1) {
-        clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
-        logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        clogger.info(new Date() + logRowInfo + ': DATA WARNING : Classification Found More Than One: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        logger.error(new Date() + logRowInfo + ': DATA WARNING : Classification Found More Than One: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         dataFlag = false;
         return 'null';
       } else {
-        clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
-        logger.info(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification Is Missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        logger.info(new Date() + logRowInfo + ': DATA ERROR : Classification Is Missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        dataFlag = false;
         return 'null';
       }
     })
     .catch(async (err) => {
-      clogger.info(new Date() + logRowInfo + ': Classification API ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
-      logger.error(new Date() + logRowInfo + ': Classification API ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+      clogger.info(new Date() + logRowInfo + ': Classification API ERROR : Classification Is Missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+      logger.error(new Date() + logRowInfo + ': Classification API ERROR : Classification Is Missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
       if(err.response !== undefined && err.response.data !== undefined){
         logger.warn(new Date() + logRowInfo + ': Classification API ERROR : is ' + JSON.stringify(err.response.data));
       } else {
@@ -1834,13 +1861,13 @@ searchClassificationID = async (ClassID, data, key) => {
         await db.save();
         return itemsObj.items[0].id;
       } else if (itemsObj.totalCount > 1) {
-        clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
-        logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification found more than one: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        clogger.info(new Date() + logRowInfo + ': DATA WARNING : Classification Found More Than One: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        logger.error(new Date() + logRowInfo + ': DATA WARNING : Classification Found More Than One: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         dataFlag = false;
         return 'null';
       } else {
-        clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
-        logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification is missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        clogger.info(new Date() + logRowInfo + ': DATA ERROR : Classification Is Missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
+        logger.error(new Date() + logRowInfo + ': DATA ERROR : Classification Is Missing: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
         dataFlag = false;
         return 'null';
       }
@@ -1867,12 +1894,11 @@ searchClassificationID = async (ClassID, data, key) => {
  * Connect FTP With Retry Option
  * @param {*} filename 
  */
-async function connectFtpWithRetry(sftp, config, retries, remotePath, filename) {
-  return sftp.connect(config)
+async function connectFtpWithRetry(sftpRetry, config, retries, remotePath, filename) {
+  return sftpRetry.connect(config)
     .then(async () => {
-      await sftp.fastGet(remotePath, filename);
+      await sftpRetry.fastGet(remotePath, filename);
       logger.info(new Date() + logRowInfo + ': End Downloading: ' + filename);
-      sftp.end();
     })
     .catch(async (err) => {
       logger.error(new Date() + logRowInfo + ': FTP ERROR : Error connecting to SSH server: -- ' + err.message);
@@ -1881,8 +1907,8 @@ async function connectFtpWithRetry(sftp, config, retries, remotePath, filename) 
         const nextRetry = retries - 1;
 
         // Delay Before Retrying
-        return new Promise(resolve => setTimeout(resolve, 2000))
-          .then(() => connectFtpWithRetry(sftp, config, nextRetry, remotePath, filename));
+        return new Promise(resolve => setTimeout(resolve, 4000))
+          .then(() => connectFtpWithRetry(sftpRetry, config, nextRetry, remotePath, filename));
       } else {
         logger.error(new Date() + logRowInfo + ': FTP ERROR : Connection retries exhausted. Cannot connect to SSH server: -- ' + err.message);
         return err;
@@ -1909,6 +1935,7 @@ async function uploadAsset(filename, processPath) {
     dataFlag = false;
     logger.error(new Date() + logRowInfo + ': FTP ERROR : in the FTP Connection -- ' + err.message);
   });
+  await sftp.end();
 
   /*
   await sftp.connect(ftpConfig)
@@ -1919,17 +1946,16 @@ async function uploadAsset(filename, processPath) {
       logger.error(new Date() + logRowInfo + ': FTP ERROR : in the FTP Connection -- ' + e);
       dataFlag = false;
       //console.log(new Date() + ': ERROR : in the FTP Connection -- ' + e);
-    });
-  await sftp.end();
+    });  
   */
-
   if (fs.existsSync(filename) && BINARY_FILENAME !== '') {
     // Get File Size
     let varFileSize = await getFilesizeInMegabytes(filename);
     // Get Mime Type
     let getMimeType = mime.lookup(filename);
     let APIResult = null;
-    if (varFileSize > 1) {
+    // 0.9 MB Set To Avoid API Server Error 413 Request Entity Too Large
+    if (varFileSize > 0.9) {
       // Get Segment URL 
       let SegmentURI = await getSegmentURL(filename);
       // Split File Into 10 MB
@@ -2229,64 +2255,64 @@ languageRelationParent = async (masterRecordID, childRecordID) => {
  * @param {*} masterRecordID, childRecordID
  */
 languageRelationChild = async (masterRecordID, childRecordID) => {
-  await templateAsset.reload();
-  let tempAssetObj = await templateAsset.getData("/asset");
+    await templateAsset.reload();
+    let tempAssetObj = await templateAsset.getData("/asset");
 
-  let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
-  if(ObjectID[0].id === null){
-    // Fall Back
-    ObjectID = '71476f4d1c854d0fa0e9af9500f3445c';
-  }else{
-    ObjectID = ObjectID[0].id;
-  }
-
-  let body = {
-    "fields": {
-      "addOrUpdate": [{
-        "id": ObjectID,
-        "localizedValues": [{
-          "children": [],
-          "languageId": "00000000000000000000000000000000"
-        }]
-      }]
+    let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
+    if(ObjectID[0].id === null){
+      // Fall Back
+      ObjectID = '71476f4d1c854d0fa0e9af9500f3445c';
+    }else{
+      ObjectID = ObjectID[0].id;
     }
-  }
 
-  for (let i = 0; i < childRecordID.length; i++) {
-    body.fields.addOrUpdate[0].localizedValues[0].children.push({
-      "recordId": childRecordID[i]
-    });
-  }
+    let body = {
+      "fields": {
+        "addOrUpdate": [{
+          "id": ObjectID,
+          "localizedValues": [{
+            "children": [],
+            "languageId": "00000000000000000000000000000000"
+          }]
+        }]
+      }
+    }
 
-  // Get Token For API
-  let token = await getObjectDefault("/token", "null");
-  logger.info(new Date() + logRowInfo + ': Start languageRelationChild API: '+ masterRecordID);
-  const resultAPI = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
-      JSON.stringify(body), {
-        proxy: false,
-        httpsAgent: new HttpsProxyAgent(fullProxyURL),  
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-          "API-VERSION": APR_CREDENTIALS.Api_version,
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-    .then((res) => {
-      return true;
-    })
-    .catch((err) => {
-      if(err.response !== undefined && err.response.data !== undefined){
-        logger.error(new Date() + logRowInfo + ' API ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
-      } else {
-        logger.error(new Date() + logRowInfo + ' API ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
-      }
-      return false;
-    });
-  logger.info(new Date() + logRowInfo + ': End languageRelationChild API: '+ masterRecordID);
-  // Return True/False
-  return resultAPI;
+    for (let i = 0; i < childRecordID.length; i++) {
+      body.fields.addOrUpdate[0].localizedValues[0].children.push({
+        "recordId": childRecordID[i]
+      });
+    }
+
+    // Get Token For API
+    let token = await getObjectDefault("/token", "null");
+    logger.info(new Date() + logRowInfo + ': Start languageRelationChild API: '+ masterRecordID);
+    const resultAPI = await axios.put(APR_CREDENTIALS.GetRecord_URL  + masterRecordID,
+        JSON.stringify(body), {
+          proxy: false,
+          httpsAgent: new HttpsProxyAgent(fullProxyURL),  
+          headers: {
+            Accept: "*/*",
+            "Content-Type": "application/json",
+            "API-VERSION": APR_CREDENTIALS.Api_version,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        return true;
+      })
+      .catch((err) => {
+        if(err.response !== undefined && err.response.data !== undefined){
+          logger.error(new Date() + logRowInfo + ' API ERROR : RECORD LINKING API -- ' + JSON.stringify(err.response.data));
+        } else {
+          logger.error(new Date() + logRowInfo + ' API ERROR : RECORD LINKING API -- ' + JSON.stringify(err));
+        }
+        return false;
+      });
+    logger.info(new Date() + logRowInfo + ': End languageRelationChild API: '+ masterRecordID);
+    // Return True/False
+    return resultAPI;
 };
 
 /**
