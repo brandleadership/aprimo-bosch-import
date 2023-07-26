@@ -11,9 +11,9 @@ const arrayApp = require('lodash');
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
-const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
-const templateAsset = new JsonDB(new Config("template", true, true, '/'));
-const langAsset = new JsonDB(new Config("languages", true, true, '/'));
+const dbtoken = new JsonDB(new Config("apitoken", false, true, '/'));
+const templateAsset = new JsonDB(new Config("template", false, true, '/'));
+const langAsset = new JsonDB(new Config("languages", false, true, '/'));
 const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
@@ -259,7 +259,7 @@ async function readExcel(reTryIndex) {
             rowdata: row,
             mode: 'createRecords'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker * 10) {
+          if (cpuIndex === APR_CREDENTIALS.worker * 5) {
             const result = await Promise.all(poolArray)
             cpuIndex = 0;
             poolArray = [];
@@ -356,7 +356,7 @@ async function createRelation() {
             },
             mode: 'linkRecords'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker * 10) {
+          if (cpuIndex === APR_CREDENTIALS.worker * 5) {
             const result = await Promise.all(poolArray);
             cpuIndex = 0;
             poolArray = [];
@@ -394,7 +394,6 @@ async function createLanguageRelationParent() {
         defval: ""
       });
       const masterData = csvData.filter((row) => row['RELATED_DOCUMENT'] != '' && row['recordID'] != 0);
-      let index = 0;
       let cpuIndex = 0;
       let poolArray = [];
 
@@ -415,13 +414,12 @@ async function createLanguageRelationParent() {
             },
             mode: 'LanguageRelationParent'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker * 10) {
-            const result = await Promise.all(poolArray);
-            cpuIndex = 0;
-            poolArray = [];
-          }
         }
-        index++;
+        if (cpuIndex === APR_CREDENTIALS.worker * 5) {
+          const result = await Promise.all(poolArray);
+          cpuIndex = 0;
+          poolArray = [];
+        }
       }
 
       //Process remaining
@@ -450,7 +448,6 @@ async function createLanguageRelationChild() {
         defval: ""
       });
       const masterData = csvData.filter((row) => row['RELATED_DOCUMENT[USAGE]'] != '' && row['recordID'] != 0);
-      let index = 0;
       let cpuIndex = 0;
       let poolArray = [];
 
@@ -477,14 +474,13 @@ async function createLanguageRelationChild() {
               },
               mode: 'LanguageRelationChild'
             }, options));
-            if (cpuIndex === APR_CREDENTIALS.worker * 10) {
-              const result = await Promise.all(poolArray);
-              cpuIndex = 0;
-              poolArray = [];
-            }
+          }
+          if (cpuIndex === APR_CREDENTIALS.worker * 5) {
+            const result = await Promise.all(poolArray);
+            cpuIndex = 0;
+            poolArray = [];
           }
         }
-        index++;
       }
       //Process remaining
       if (poolArray.length > 0) {
@@ -508,22 +504,40 @@ async function endProcess(jobID, pStatus) {
     if(pStatus){
       const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
       let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '.xlsx';
-      fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
+      await fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
         if (err){
           logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN RENAME');
         }
       });
-
       const dst = APR_CREDENTIALS.targetPath;
       const src = APR_CREDENTIALS.sourcePath;
       fs.openSync(dst + '/' + jobID  + '.importFinished', 'w');
-      
+      const csvfile = XLSX.readFile(fileName);
+      const sheets = csvfile.SheetNames;
       let sftpEP = new Client();
-      await sftpEP.connect(ftpConfig).then(async () => {
-        await sftpEP.put(dst + '/' + jobID  + '.importFinished', src + '/' + jobID  + '.importFinished');
-      }).catch(async (e) => {
-          logger.info(new Date() + ': ERROR: Updating File Name in FTP Server ' + e);
-      });
+      for (let i = 0; i < sheets.length; i++) {
+        const csvData = XLSX.utils.sheet_to_json(csvfile.Sheets[csvfile.SheetNames[i]], {
+          defval: ""
+        });
+
+        const appStatus = csvData.filter((row) => row['appstatus'] === 'error');
+        if(appStatus.length > 0){
+          fs.openSync(dst + '/' + jobID  + '.error', 'w');
+        }else{
+          fs.openSync(dst + '/' + jobID  + '.completed', 'w');
+        }
+
+        await sftpEP.connect(ftpConfig).then(async () => {
+          await sftpEP.put(dst + '/' + jobID  + '.importFinished', src + '/' + jobID  + '.importFinished');
+          if(appStatus.length > 0){
+            await sftpEP.put(dst + '/' + jobID  + '.error', src + '/' + jobID  + '.error');
+          }else{
+            await sftpEP.put(dst + '/' + jobID  + '.completed', src + '/' + jobID  + '.completed');
+          }
+        }).catch(async (e) => {
+            logger.info(new Date() + ': ERROR: Updating File Name in FTP Server ' + e);
+        }); 
+      }
       sftpEP.end();
     }else{
       fs.unlink(APR_CREDENTIALS.checkin, (err) => {
@@ -835,7 +849,7 @@ function terminate(code){
       }
     });
     if(code === 'Normal Close'){
-      logger.info(new Date() + ': System ERROR -- ' + code);
+      logger.info(new Date() + ': System -- ' + code);
     }else{
       logger.error(new Date() + ': System ERROR -- ' + code);
     }    
