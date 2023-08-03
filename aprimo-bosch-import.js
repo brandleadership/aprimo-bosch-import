@@ -22,12 +22,12 @@ const splitFile = require("split-file");
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
-const db = new JsonDB(new Config("fieldIDs", true, true, '/'));
-const dbtoken = new JsonDB(new Config("apitoken", true, true, '/'));
-const kMap = new JsonDB(new Config("keymapping", true, true, '/'));
-const langMap = new JsonDB(new Config("languagemapping", true, true, '/'));
-const templateAsset = new JsonDB(new Config("template", true, true, '/'));
-const langAsset = new JsonDB(new Config("languages", true, true, '/'));
+const db = new JsonDB(new Config("fieldIDs", false, true, '/'));
+const dbtoken = new JsonDB(new Config("apitoken", false, true, '/'));
+const kMap = new JsonDB(new Config("keymapping", false, true, '/'));
+const langMap = new JsonDB(new Config("languagemapping", false, true, '/'));
+const templateAsset = new JsonDB(new Config("template", false, true, '/'));
+const langAsset = new JsonDB(new Config("languages", false, true, '/'));
 const maxRetries = 3;
 const retryDelay = 1000;
 let retries = 0;
@@ -323,7 +323,7 @@ createMeta = async (assetID, data, ImgToken) => {
   let APIResult = false;
   
   // Get Temp Asset From Local DB
-  await templateAsset.reload();
+  //await templateAsset.reload();
   let tempAssetObj = await templateAsset.getData("/asset");
  
   // Get NewAssetType Aprimo ID from tempAssetObj
@@ -1652,7 +1652,7 @@ GetLanguageID = async (langValue) => {
   // Get Language Key From Local DB
   let langKey = await getObjectDefault("/languagemapping/"+langValue, "ignore");
   // Get Language Asset From Local DB
-  await langAsset.reload();
+  //await langAsset.reload();
   let tempLangAsset = await langAsset.getData("/asset");
   let LangID = findObject(tempLangAsset, 'culture', langKey);
   if (LangID.hasOwnProperty('0')) {
@@ -1695,7 +1695,6 @@ getfielddefinitionID = async (fieldURL, fieldValue, keyValue) => {
       ObjectID = findObject(resp.data.items, 'label', fieldValue);
       if (ObjectID.length > 0) {
         await db.push("/fieldIDs/"+ keyValue + "/" +fieldValue, ObjectID[0].id);
-        await db.save();
         return ObjectID[0].id;
       } else {
         logger.error(new Date() + logRowInfo + ': OPTION LIST ERROR : Field Definition -- ' + fieldURL);
@@ -1728,16 +1727,16 @@ getObjectDefault = async(key, defval) => {
   let data = defval;
   try {
     if(key === '/token'){
-      await dbtoken.reload();
+      //await dbtoken.reload();
       data = await dbtoken.getData(key);
     } else if (key.includes('/mapping')){
-      await kMap.reload();
+      //await kMap.reload();
       data = await kMap.getData(key);
     } else if (key.includes('/languagemapping')){
-      await langMap.reload();
+      //await langMap.reload();
       data = await langMap.getData(key);
     } else {
-      await dbtoken.reload();
+      //await dbtoken.reload();
       data = await db.getData(key);
     }
   } catch (innerError) {
@@ -1748,12 +1747,17 @@ getObjectDefault = async(key, defval) => {
       // Retry If Fail to Load Local Database
       if (retries < maxRetries) {
         retries++;
-        logger.error(new Date() + logRowInfo + ' DATABASE Retrying: ' + retries);
+        logger.info(new Date() + logRowInfo + ' DATABASE Retrying: ' + retries);
         setTimeout(async function() {
           await getObjectDefault(key, defval);
         }, retryDelay);
       } else {
-        logger.error(new Date() + logRowInfo + ' DATABASE Max retries exceeded. Unable to load database. ');
+        logger.info(new Date() + logRowInfo + ' DATABASE Max retries exceeded. Unable to load database. ');
+        fs.unlink('./fieldIDs.json', (err) => {
+          if (err){
+            logger.error(new Date() + ' : ERROR IN RESET LOCAL DB : ');
+          }
+        });
       }
     }
   }
@@ -1797,7 +1801,6 @@ searchClassificationName = async (ClassID, key, ClassPath) => {
       if (itemsObj.totalCount === 1) {
         // Save Value In Local DB
         await db.push("/fieldIDs/"+ClassPath+ClassID, itemsObj.items[0].id);
-        await db.save();
         return itemsObj.items[0].id;
       } else if (itemsObj.totalCount > 1) {
         clogger.info(new Date() + logRowInfo + ': DATA WARNING : Classification Found More Than One: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
@@ -1858,7 +1861,6 @@ searchClassificationID = async (ClassID, data, key) => {
       if (itemsObj.totalCount === 1) {
         // Save Value In Local DB
         await db.push("/fieldIDs/"+ClassID, itemsObj.items[0].id);
-        await db.save();
         return itemsObj.items[0].id;
       } else if (itemsObj.totalCount > 1) {
         clogger.info(new Date() + logRowInfo + ': DATA WARNING : Classification Found More Than One: -- Key: ' + key + ' Value: ' + encodeURI(ClassID));
@@ -2191,7 +2193,7 @@ commitSegment = async (SegmentURI, filename, segmentcount) => {
  */
 languageRelationParent = async (masterRecordID, childRecordID) => {  
   // Get Temp Asset From Local DB
-  await templateAsset.reload();
+  //await templateAsset.reload();
   let tempAssetObj = await templateAsset.getData("/asset");
 
   let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
@@ -2255,7 +2257,7 @@ languageRelationParent = async (masterRecordID, childRecordID) => {
  * @param {*} masterRecordID, childRecordID
  */
 languageRelationChild = async (masterRecordID, childRecordID) => {
-    await templateAsset.reload();
+    //await templateAsset.reload();
     let tempAssetObj = await templateAsset.getData("/asset");
 
     let ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_language_relation');
@@ -2330,6 +2332,7 @@ module.exports = async (rowdata) => {
     rowdata.startTime = timeStampStart.toLocaleString();
     rowdata.endTime = timeStampEnd.toLocaleString();
     rowdata.message = RecordID.message;
+    await db.save();
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){
     logRowInfo = ' : PID: ' + process.pid + ' : JobID: '+ rowdata.rowdata.masterData["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata.masterData["OBJ_ID"]  + '_' + rowdata.rowdata.masterData["LV_ID"] +  ' : MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;

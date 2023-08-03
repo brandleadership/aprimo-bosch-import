@@ -216,7 +216,17 @@ downloadCSVFromFtp = async () => {
               logger.info('####### Import Ended for ' + jobID + ' at ' + new Date() + ' #########');
             }else{
               await endProcess(jobID, false);
-              logger.info('####### Import Ended with ERROR for ' + jobID + ' at ' + new Date() + ' #########');
+              if(!JSONprocess){
+                logger.info('####### Import Ended with ERROR in JSON Process for ' + jobID + ' at ' + new Date() + ' #########');
+              }else if(!REprocess){
+                logger.info('####### Import Ended with ERROR in Read Excel Process for ' + jobID + ' at ' + new Date() + ' #########');
+              }else if(!CRprocess){
+                logger.info('####### Import Ended with ERROR in Create Relation Process for ' + jobID + ' at ' + new Date() + ' #########');
+              }else if(!CLRPprocess){
+                logger.info('####### Import Ended with ERROR in Create Language Relation Parent Process for ' + jobID + ' at ' + new Date() + ' #########');
+              }else if(!CLRCprocess){
+                logger.info('####### Import Ended with ERROR in Create Language Relation Child Process for ' + jobID + ' at ' + new Date() + ' #########');
+              }
             }            
           }
         }
@@ -501,18 +511,12 @@ async function createLanguageRelationChild() {
  */  
 async function endProcess(jobID, pStatus) {
   try {
+    let statusLabel = 'error';
     if(pStatus){
-      const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
-      let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '.xlsx';
-      await fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
-        if (err){
-          logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN RENAME');
-        }
-      });
       const dst = APR_CREDENTIALS.targetPath;
       const src = APR_CREDENTIALS.sourcePath;
       fs.openSync(dst + '/' + jobID  + '.importFinished', 'w');
-      const csvfile = XLSX.readFile(fileName);
+      const csvfile = XLSX.readFile(APR_CREDENTIALS.checkin);
       const sheets = csvfile.SheetNames;
       let sftpEP = new Client();
       for (let i = 0; i < sheets.length; i++) {
@@ -530,8 +534,10 @@ async function endProcess(jobID, pStatus) {
         await sftpEP.connect(ftpConfig).then(async () => {
           await sftpEP.put(dst + '/' + jobID  + '.importFinished', src + '/' + jobID  + '.importFinished');
           if(appStatus.length > 0){
+            statusLabel = 'error';
             await sftpEP.put(dst + '/' + jobID  + '.error', src + '/' + jobID  + '.error');
           }else{
+            statusLabel = 'completed';
             await sftpEP.put(dst + '/' + jobID  + '.completed', src + '/' + jobID  + '.completed');
           }
         }).catch(async (e) => {
@@ -539,13 +545,15 @@ async function endProcess(jobID, pStatus) {
         }); 
       }
       sftpEP.end();
-    }else{
-      fs.unlink(APR_CREDENTIALS.checkin, (err) => {
-        if (err){
-          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE: ' + APR_CREDENTIALS.checkin);
-        }
-      });
     }
+    
+    const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
+    let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '_' + statusLabel + '.xlsx';
+    await fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
+      if (err){
+        logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN RENAME');
+      }
+    });
 
     let ftpDirectory = APR_CREDENTIALS.targetPath;
     fs.readdirSync(ftpDirectory).forEach(file => {
@@ -569,7 +577,7 @@ async function endProcess(jobID, pStatus) {
  */  
 async function writeExcel(jsonArray, jobID) {
   try {
-    if(jobID !== 'null'){
+    if(jobID !== 'null' && jsonArray.hasOwnProperty('0')){
       jsonArray[0].JOB_ID = '';
     }
 
