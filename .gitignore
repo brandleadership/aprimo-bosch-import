@@ -99,3 +99,10 @@ dist
 # TernJS port file
 .tern-port
 .ftp-temp/
+aprimo-bosch-import-old.js
+aprimo-bosch-import-test.js
+bosch-import-index-old.js
+bosch-import-index-test.js
+Bosch.postman_collection.json
+cron-bosh-import.sh
+ftp.json

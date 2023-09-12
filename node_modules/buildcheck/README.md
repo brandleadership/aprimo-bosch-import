@@ -26,7 +26,7 @@ by node.js are not supported.
 ```js
 'use strict';
 
-const { BuildEnvironment } = require('buildcheck');
+const BuildEnvironment = require('buildcheck');
 
 const buildEnv = new BuildEnvironment();
 
@@ -38,7 +38,7 @@ console.log(buildEnv.checkFunction('c', 'preadv2'));
 ```js
 'use strict';
 
-const { BuildEnvironment } = require('buildcheck');
+const BuildEnvironment = require('buildcheck');
 
 const buildEnv = new BuildEnvironment();
 
@@ -50,7 +50,7 @@ console.log(buildEnv.checkHeader('c', 'linux/io_uring.h'));
 ```js
 'use strict';
 
-const { BuildEnvironment } = require('buildcheck');
+const BuildEnvironment = require('buildcheck');
 
 const buildEnv = new BuildEnvironment();
 
@@ -65,7 +65,7 @@ console.log(buildEnv.tryCompile('c', 'int main() { return z; }'));
 
 ### Exports
 
-* `BuildEnvironment` - The main class for dealing with a build environment.
+The exported value is `BuildEnvironment`, the main class for dealing with a build environment.
 
 ### BuildEnvironment
 
