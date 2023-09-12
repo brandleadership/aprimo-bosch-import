@@ -17,8 +17,10 @@ const langAsset = new JsonDB(new Config("languages", false, true, '/'));
 const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
-let pJobID = 'job_000000';
+const axiosRetry = require('axios-retry');
+axiosRetry(axios, { retries: 3 });
 
+let pJobID = 'job_000000';
 const {
   v4: uuidv4
 } = require('uuid');
@@ -99,32 +101,35 @@ logger.info(new Date() + '####### Worker Set: ' + APR_CREDENTIALS.worker);
  * Create a checkin excel file from the JSON data
  * @param {*} jobID
  */
-async function JSONtoCheckInData(jobID) {  
+async function JSONtoCheckInData(jobID) {
   try{
-    // Get All CSV files from FTP Target Path
-    const csvInDir = fs
-      .readdirSync(APR_CREDENTIALS.targetPath)
-      .filter((file) => path.extname(file) === ".csv");
+    if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+      return true;
+    }else{    
+      // Get All CSV files from FTP Target Path
+      const csvInDir = fs
+        .readdirSync(APR_CREDENTIALS.targetPath)
+        .filter((file) => path.extname(file) === ".csv");
 
-    let csvFileData = [];
-    for (var i = 0, len = csvInDir.length; i < len; i++) {
-      var file = csvInDir[i];
-      if (file) {
-        const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-        // Read CSV files
-        const csvFileDataTmp = await csv({
-          'delimiter': [';', ','],
-          'quote': '"',
-          preserveLineEndings: true
-        }).fromFile(filePath);
-        // Merge Into One Array Object
-        csvFileData = arrayApp.concat(csvFileData, csvFileDataTmp);
+      let csvFileData = [];
+      for (var i = 0, len = csvInDir.length; i < len; i++) {
+        var file = csvInDir[i];
+        if (file) {
+          const filePath = APR_CREDENTIALS.targetPath + "/" + file;
+          // Read CSV files
+          const csvFileDataTmp = await csv({
+            'delimiter': [';', ','],
+            'quote': '"',
+            preserveLineEndings: true
+          }).fromFile(filePath);
+          // Merge Into One Array Object
+          csvFileData = arrayApp.concat(csvFileData, csvFileDataTmp);
+        }
       }
+      // Write Excel File
+      await writeExcel(csvFileData, jobID);
+      return true;
     }
-    // Write Excel File
-    await writeExcel(csvFileData, jobID);
-
-    return true;
   } catch (e) {
     logger.info(new Date() + ': ERROR: Write Excel File: ' + e.message);
     return false;
@@ -196,7 +201,7 @@ downloadCSVFromFtp = async () => {
             await sftpSub.connect(ftpConfig).then(async () => {
               const csvfiles = await sftpSub.list(src + '/' + jobID + '/.');
               for (var j = 0, csvlen = csvfiles.length; j < csvlen; j++) {
-                if (csvfiles[j].name.match(/.+(\.csv)$/)) {    
+                if (csvfiles[j].name.match(/.+(\.csv)$/) || csvfiles[j].name.match(/.+(\.xlsx)$/)) {
                   await sftpSub.fastGet(src + '/' + jobID + '/' + csvfiles[j].name, dst + '/' + csvfiles[j].name);
                 }
               }  
@@ -358,14 +363,16 @@ async function createRelation() {
             childRecordID.push(childDataRow.recordID);
           }
 
-          poolArray.push(pool.run({
-            rowdata: {
-              masterRecordID: masterDataRow.recordID,
-              masterData: masterDataRow,
-              childRecordID: childRecordID
-            },
-            mode: 'linkRecords'
-          }, options));
+          if (childRecordID.length > 0) {
+            poolArray.push(pool.run({
+              rowdata: {
+                masterRecordID: masterDataRow.recordID,
+                masterData: masterDataRow,
+                childRecordID: childRecordID
+              },
+              mode: 'linkRecords'
+            }, options));
+          }
           if (cpuIndex === APR_CREDENTIALS.worker * 5) {
             const result = await Promise.all(poolArray);
             cpuIndex = 0;
@@ -513,9 +520,9 @@ async function endProcess(jobID, pStatus) {
   try {
     let statusLabel = 'error';
     if(pStatus){
-      const dst = APR_CREDENTIALS.targetPath;
-      const src = APR_CREDENTIALS.sourcePath;
-      fs.openSync(dst + '/' + jobID  + '.importFinished', 'w');
+      let src = APR_CREDENTIALS.targetPath;
+      let dst = APR_CREDENTIALS.sourcePath;
+      fs.openSync(src + '/' + jobID  + '.importFinished', 'w');
       const csvfile = XLSX.readFile(APR_CREDENTIALS.checkin);
       const sheets = csvfile.SheetNames;
       let sftpEP = new Client();
@@ -526,19 +533,20 @@ async function endProcess(jobID, pStatus) {
 
         const appStatus = csvData.filter((row) => row['appstatus'] === 'error');
         if(appStatus.length > 0){
-          fs.openSync(dst + '/' + jobID  + '.error', 'w');
+          fs.openSync(src + '/' + jobID  + '.error', 'w');
         }else{
-          fs.openSync(dst + '/' + jobID  + '.completed', 'w');
+          fs.openSync(src + '/' + jobID  + '.completed', 'w');
         }
 
         await sftpEP.connect(ftpConfig).then(async () => {
-          await sftpEP.put(dst + '/' + jobID  + '.importFinished', src + '/' + jobID  + '.importFinished');
+          await sftpEP.put(APR_CREDENTIALS.checkin, dst + '/' + jobID  + '/checkindata.xlsx');
+          await sftpEP.put(src + '/' + jobID  + '.importFinished', dst + '/' + jobID  + '.importFinished');
           if(appStatus.length > 0){
             statusLabel = 'error';
-            await sftpEP.put(dst + '/' + jobID  + '.error', src + '/' + jobID  + '.error');
+            await sftpEP.put(src + '/' + jobID  + '.error', dst + '/' + jobID  + '.error');
           }else{
             statusLabel = 'completed';
-            await sftpEP.put(dst + '/' + jobID  + '.completed', src + '/' + jobID  + '.completed');
+            await sftpEP.put(src + '/' + jobID  + '.completed', dst + '/' + jobID  + '.completed');
           }
         }).catch(async (e) => {
             logger.info(new Date() + ': ERROR: Updating File Name in FTP Server ' + e);
@@ -546,7 +554,7 @@ async function endProcess(jobID, pStatus) {
       }
       sftpEP.end();
     }
-    
+
     const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
     let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '_' + statusLabel + '.xlsx';
     await fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {

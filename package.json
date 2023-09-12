@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "0.27.2",
+    "axios-retry": "^3.7.0",
     "csvtojson": "2.0.10",
     "dotenv": "16.0.2",
     "form-data": "4.0.0",
@@ -22,7 +23,7 @@
     "piscina": "^3.2.0",
     "request": "^2.88.2",
     "split-file": "2.3.0",
-    "ssh2-sftp-client": "9.0.4",
+    "ssh2-sftp-client": "^9.1.0",
     "uuid": "^8.3.2",
     "winston": "3.8.2",
     "winston-daily-rotate-file": "4.7.1",

@@ -1,0 +1,3035 @@
+{
+    "asset": [
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d86c9ef9c8cd4b23b24031b4a74794d9"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d86c9ef9c8cd4b23b24031b4a74794d9",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "Aprimo_AI_SmartTags",
+            "label": "Smart tags",
+            "id": "d86c9ef9c8cd4b23b24031b4a74794d9",
+            "localizedValues": [
+                {
+                    "values": [
+                        "text",
+                        "screenshot",
+                        "home appliance",
+                        "product",
+                        "font",
+                        "material property"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T19:10:41.327Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/0ae0e84536ff498a9b1eace8013c6ad1"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/0ae0e84536ff498a9b1eace8013c6ad1",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Status",
+            "label": "Status",
+            "id": "0ae0e84536ff498a9b1eace8013c6ad1",
+            "localizedValues": [
+                {
+                    "values": [
+                        "e82e9b83e439406aaaf0ace80139a80e"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T12:37:53.933Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/03ee6bbd70b241af83e6afd30100d0c1"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/03ee6bbd70b241af83e6afd30100d0c1",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "mpe_trade_label_keywords",
+            "label": "ME Trade Label Keywords",
+            "id": "03ee6bbd70b241af83e6afd30100d0c1",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/16b8726424b743cfa0d7ace8013c6b63"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/16b8726424b743cfa0d7ace8013c6b63",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "Keywords",
+            "label": "Keywords",
+            "id": "16b8726424b743cfa0d7ace8013c6b63",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/f33c5acfdd574ac78239ace8013c6c45"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/f33c5acfdd574ac78239ace8013c6c45",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "MultiLineText",
+            "fieldName": "SmartDescription",
+            "label": "Smart Description",
+            "id": "f33c5acfdd574ac78239ace8013c6c45",
+            "localizedValues": [
+                {
+                    "value": "graphical user interface, diagram",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-07T05:30:43.793Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/90126db4127f4330ae7cace8013c6ca6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/90126db4127f4330ae7cace8013c6ca6",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "IsCopyrightLimitApplied",
+            "label": "Copyright limitations?",
+            "id": "90126db4127f4330ae7cace8013c6ca6",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/9a4d69aeb4c8437eb596ace8013c6d12"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/9a4d69aeb4c8437eb596ace8013c6d12",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "AuthorizedRegionsCountries",
+            "label": "Authorized Regions & Countries",
+            "id": "9a4d69aeb4c8437eb596ace8013c6d12",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/2d44fbec9b164c39a681ace8013c6e7b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/2d44fbec9b164c39a681ace8013c6e7b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Source",
+            "label": "Source",
+            "id": "2d44fbec9b164c39a681ace8013c6e7b",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/9a2b207652204959bb76ace8013c6f82"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/9a2b207652204959bb76ace8013c6f82",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Producers",
+            "label": "Producers",
+            "id": "9a2b207652204959bb76ace8013c6f82",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d46e13cca5824c8084d0ace8013c7048"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d46e13cca5824c8084d0ace8013c7048",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "People",
+            "label": "People",
+            "id": "d46e13cca5824c8084d0ace8013c7048",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/72a7b6b10b214e5fadc8ace8013c709d"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/72a7b6b10b214e5fadc8ace8013c709d",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "Ethnicity",
+            "label": "Ethnicity",
+            "id": "72a7b6b10b214e5fadc8ace8013c709d",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/2c48b3b7ce8e4b4cb4a1ace8013c70ef"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/2c48b3b7ce8e4b4cb4a1ace8013c70ef",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "IsCustomerExclusive",
+            "label": "Customer Exclusive",
+            "id": "2c48b3b7ce8e4b4cb4a1ace8013c70ef",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/cf2f685d9e9643b398daace8013c71d4"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/cf2f685d9e9643b398daace8013c71d4",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "Battery",
+            "label": "Battery",
+            "id": "cf2f685d9e9643b398daace8013c71d4",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/ff85cd1f24a74578b022ace8013c72e0"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/ff85cd1f24a74578b022ace8013c72e0",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "AssetLanguage",
+            "label": "Asset Language",
+            "id": "ff85cd1f24a74578b022ace8013c72e0",
+            "localizedValues": [
+                {
+                    "values": [
+                        "6093ff91646d4814a841ace8013c72e5"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:21:59.75Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/46f288fde5b44034bb78ace8013c7482"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/46f288fde5b44034bb78ace8013c7482",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "Material",
+            "label": "Material",
+            "id": "46f288fde5b44034bb78ace8013c7482",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/bfc0668c0c8e46ac9eb0ace8013c74f0"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/bfc0668c0c8e46ac9eb0ace8013c74f0",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "StyleGuide",
+            "label": "Style Guide",
+            "id": "bfc0668c0c8e46ac9eb0ace8013c74f0",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5bc4e940d90b4304b9f6afcf004c63f4"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5bc4e940d90b4304b9f6afcf004c63f4",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_trade_label_dept",
+            "label": "MPE Trade Label Department",
+            "id": "5bc4e940d90b4304b9f6afcf004c63f4",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/05beadbb03e94410a0ceace8013c7539"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/05beadbb03e94410a0ceace8013c7539",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "ResponsibleDepartment",
+            "label": "Responsible Department",
+            "id": "05beadbb03e94410a0ceace8013c7539",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d9cbbeb776334c91a0f3adba01835856"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d9cbbeb776334c91a0f3adba01835856",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "UserList",
+            "fieldName": "AssetRequestor2",
+            "label": "Asset Requestor 2",
+            "id": "d9cbbeb776334c91a0f3adba01835856",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/84ad1eaef75c45989a97adba017dd788"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/84ad1eaef75c45989a97adba017dd788",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "UserList",
+            "fieldName": "AssetRequestor1",
+            "label": "Asset Requestor 1",
+            "id": "84ad1eaef75c45989a97adba017dd788",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/f055aa7ce13c41b49377ace8013c75b3"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/f055aa7ce13c41b49377ace8013c75b3",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "UserList",
+            "fieldName": "AssetOwner",
+            "label": "Asset Owner",
+            "id": "f055aa7ce13c41b49377ace8013c75b3",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d78fb1a18f15477e9e94ace8013c75eb"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d78fb1a18f15477e9e94ace8013c75eb",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "CountryOfOrigin",
+            "label": "Country of Origin",
+            "id": "d78fb1a18f15477e9e94ace8013c75eb",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/cdd9564f15de4115b7b4ace8013c766e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/cdd9564f15de4115b7b4ace8013c766e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "BusinessUnits",
+            "label": "Business Units",
+            "id": "cdd9564f15de4115b7b4ace8013c766e",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/9fb27dc0e89f42929ab8ace8013c76dd"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/9fb27dc0e89f42929ab8ace8013c76dd",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Brand",
+            "label": "Brand",
+            "id": "9fb27dc0e89f42929ab8ace8013c76dd",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/eadc3c13e2054e8eac44ace8013c776f"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/eadc3c13e2054e8eac44ace8013c776f",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "IntendedUsage",
+            "label": "Intended Usage",
+            "id": "eadc3c13e2054e8eac44ace8013c776f",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T12:38:22.357Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/52eb5348c31940838383ace8013c77e6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/52eb5348c31940838383ace8013c77e6",
+                    "select-key": "definition"
+                }
+            },
+            "recordLinkConditions": null,
+            "dataType": "RecordLink",
+            "fieldName": "RelatedAssets",
+            "label": "Related Assets",
+            "id": "52eb5348c31940838383ace8013c77e6",
+            "localizedValues": [
+                {
+                    "links": null,
+                    "parents": null,
+                    "children": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/056efb34a8dd42358f42ace8013c784b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/056efb34a8dd42358f42ace8013c784b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "RelatedSKUs",
+            "label": "Related SKUs",
+            "id": "056efb34a8dd42358f42ace8013c784b",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/85c40619563c49afbcd4af0e0114e996"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/85c40619563c49afbcd4af0e0114e996",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "DremelEU_KBObjectID",
+            "label": "Dremel EU KB Object ID",
+            "id": "85c40619563c49afbcd4af0e0114e996",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/ce31e94391a34eb8a8d0ace8013c7939"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/ce31e94391a34eb8a8d0ace8013c7939",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_obj_id",
+            "label": "KB Object ID",
+            "id": "ce31e94391a34eb8a8d0ace8013c7939",
+            "localizedValues": [
+                {
+                    "value": "999999999",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:40:01.89Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/e45bd9854c234568b73aace8013c79ab"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/e45bd9854c234568b73aace8013c79ab",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "DateTime",
+            "fieldName": "CreationDate",
+            "label": "Creation Date",
+            "id": "e45bd9854c234568b73aace8013c79ab",
+            "localizedValues": [
+                {
+                    "value": "2023-05-12T07:03:21.9330000",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/a6a5c3e2e3994ef7a0b0ace8013c79f6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/a6a5c3e2e3994ef7a0b0ace8013c79f6",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "FileType",
+            "label": "File Type",
+            "id": "a6a5c3e2e3994ef7a0b0ace8013c79f6",
+            "localizedValues": [
+                {
+                    "value": "jpg",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/47e8776ebf5e47f49cadace8013c7a4a"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/47e8776ebf5e47f49cadace8013c7a4a",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "Resolution",
+            "label": "Resolution",
+            "id": "47e8776ebf5e47f49cadace8013c7a4a",
+            "localizedValues": [
+                {
+                    "value": "96",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:22:04.773Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/3fc05e652abb4de78aa0ace8013c7aee"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/3fc05e652abb4de78aa0ace8013c7aee",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "Width",
+            "label": "Width",
+            "id": "3fc05e652abb4de78aa0ace8013c7aee",
+            "localizedValues": [
+                {
+                    "value": "995",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:22:04.773Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/01ea4c9e5a7346a39f0aace8013c7b3b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/01ea4c9e5a7346a39f0aace8013c7b3b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "FileSize",
+            "label": "File Size (b)",
+            "id": "01ea4c9e5a7346a39f0aace8013c7b3b",
+            "localizedValues": [
+                {
+                    "value": "90435",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5b27237b7159453280a2ace8013c7a94"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5b27237b7159453280a2ace8013c7a94",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "Height",
+            "label": "Height",
+            "id": "5b27237b7159453280a2ace8013c7a94",
+            "localizedValues": [
+                {
+                    "value": "836",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:22:04.773Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/cb35a753cfe64697abe9ace8013c7b78"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/cb35a753cfe64697abe9ace8013c7b78",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "IsPubliclyAvailable",
+            "label": "Publicly Available",
+            "id": "cb35a753cfe64697abe9ace8013c7b78",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T12:38:22.357Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/b982411a930046cd86e5ace8013c7bc3"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/b982411a930046cd86e5ace8013c7bc3",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "SubBrand",
+            "label": "Sub-brand",
+            "id": "b982411a930046cd86e5ace8013c7bc3",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/8e3009211177402fac12afcf00498484"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/8e3009211177402fac12afcf00498484",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_trade_label_agency",
+            "label": "MPE Trade Label Agency",
+            "id": "8e3009211177402fac12afcf00498484",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/a87c32df35cf477b9750ace8013c7cae"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/a87c32df35cf477b9750ace8013c7cae",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_agency",
+            "label": "MPE Agency",
+            "id": "a87c32df35cf477b9750ace8013c7cae",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d6e1b3d8054d4223b2c1ace8013c7d0f"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d6e1b3d8054d4223b2c1ace8013c7d0f",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "ColorSpace",
+            "label": "Color Space",
+            "id": "d6e1b3d8054d4223b2c1ace8013c7d0f",
+            "localizedValues": [
+                {
+                    "value": "Rgb",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:22:04.773Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/1c2e7263906e4e3ea66eace8013c7d5b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/1c2e7263906e4e3ea66eace8013c7d5b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "SEOKeywords",
+            "label": "SEO Keywords",
+            "id": "1c2e7263906e4e3ea66eace8013c7d5b",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/3a40cc86a4404d4cb502ace8013c7f73"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/3a40cc86a4404d4cb502ace8013c7f73",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Teststatus",
+            "label": "Test status",
+            "id": "3a40cc86a4404d4cb502ace8013c7f73",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/a991046ddec44c2fbd23ace8013c7fbf"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/a991046ddec44c2fbd23ace8013c7fbf",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Title",
+            "label": "Title",
+            "id": "a991046ddec44c2fbd23ace8013c7fbf",
+            "localizedValues": [
+                {
+                    "value": "Template Asset For Import",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T12:34:10.853Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/978655be7ce94bdf817eace8013c80b7"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/978655be7ce94bdf817eace8013c80b7",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Security_AuthRegions",
+            "label": "Security-Authorized Regions",
+            "id": "978655be7ce94bdf817eace8013c80b7",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/09458744e60948d49c1face8013c8102"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/09458744e60948d49c1face8013c8102",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Security_CalculContributorAccess",
+            "label": "Security-Calculated Contributor Access",
+            "id": "09458744e60948d49c1face8013c8102",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/f22e825338e04bc89099ace8013c8148"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/f22e825338e04bc89099ace8013c8148",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Security_CalculConsumerAccess",
+            "label": "Security-Calculated Consumer Access",
+            "id": "f22e825338e04bc89099ace8013c8148",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/3d05753357cf4703b463ad88013fbcd6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/3d05753357cf4703b463ad88013fbcd6",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "FulfillmentCenterModelNumber",
+            "label": "Fulfillment Center Model #",
+            "id": "3d05753357cf4703b463ad88013fbcd6",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/ade1a83e9e564994a262ad83012c8379"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/ade1a83e9e564994a262ad83012c8379",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Requestor",
+            "label": "Requestor",
+            "id": "ade1a83e9e564994a262ad83012c8379",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/fe0dce9b819841e6b559aeef00a7b4c5"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/fe0dce9b819841e6b559aeef00a7b4c5",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "BA_MPE_Export_Flag",
+            "label": "BA MPE Export Flag",
+            "id": "fe0dce9b819841e6b559aeef00a7b4c5",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d77e31380a324f73baeaaeef008ff20b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d77e31380a324f73baeaaeef008ff20b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "BI_Master",
+            "label": "BI Master",
+            "id": "d77e31380a324f73baeaaeef008ff20b",
+            "localizedValues": [
+                {
+                    "values": [
+                        "c0cbb041f69b4c75aebfaeef0090663e"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/b57d0b33aa9b4aa398faaeef009c9e83"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/b57d0b33aa9b4aa398faaeef009c9e83",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "HyperlinkList",
+            "fieldName": "Base_URI",
+            "label": "Base URI",
+            "id": "b57d0b33aa9b4aa398faaeef009c9e83",
+            "localizedValues": [
+                {
+                    "hyperlinks": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": "None",
+            "inheritable": false
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/53d11de3dd154b24a2e2aeef009ddf63"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/53d11de3dd154b24a2e2aeef009ddf63",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "Cliplister_ID",
+            "label": "Cliplister ID",
+            "id": "53d11de3dd154b24a2e2aeef009ddf63",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/c7639a1b442f437b8db5aeef00a1d3b2"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/c7639a1b442f437b8db5aeef00a1d3b2",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Translation",
+            "label": "Translation",
+            "id": "c7639a1b442f437b8db5aeef00a1d3b2",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/c2f019b6f533465e8817aeef00a3b0ed"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/c2f019b6f533465e8817aeef00a3b0ed",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "TextList",
+            "fieldName": "BA_Translation",
+            "label": "BA Translation",
+            "id": "c2f019b6f533465e8817aeef00a3b0ed",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/adb8712c2fa64a82a20eaeef00a86614"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/adb8712c2fa64a82a20eaeef00a86614",
+                    "select-key": "definition"
+                }
+            },
+            "recordLinkConditions": null,
+            "dataType": "RecordLink",
+            "fieldName": "Belongs_to",
+            "label": "Belongs_to",
+            "id": "adb8712c2fa64a82a20eaeef00a86614",
+            "localizedValues": [
+                {
+                    "links": null,
+                    "parents": [
+                        {
+                            "recordId": "c1306d2ccd194698b86ab000007445ca",
+                            "modifiedOn": "2023-05-12T07:04:08.433Z",
+                            "tag": null
+                        }
+                    ],
+                    "children": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:04:08.433Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/b7cdf94e554d477e9d77aef60077726b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/b7cdf94e554d477e9d77aef60077726b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Multilanguage Test Field",
+            "label": "Multilanguage Test Field",
+            "id": "b7cdf94e554d477e9d77aef60077726b",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "c2bd4f9bbb954bcb80c31e924c9c26dc",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/28fb81f0af89486a9065af2000f1a92a"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/28fb81f0af89486a9065af2000f1a92a",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "ReferencedProductsinPIM",
+            "label": "Referenced Products in PIM",
+            "id": "28fb81f0af89486a9065af2000f1a92a",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/3dfb8d812afb44bbaf69af230165753c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/3dfb8d812afb44bbaf69af230165753c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Bosch_STEP_JSON_Payload",
+            "label": "Bosch STEP JSON Payload",
+            "id": "3dfb8d812afb44bbaf69af230165753c",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/0554e5d2d86d4161994baf2500d7c3a1"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/0554e5d2d86d4161994baf2500d7c3a1",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "New_ReleaseInfo",
+            "label": "New_ReleaseInfo",
+            "id": "0554e5d2d86d4161994baf2500d7c3a1",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/1d04510a913a4675b203af2500d7807c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/1d04510a913a4675b203af2500d7807c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "New_Authorized",
+            "label": "New_Authorized",
+            "id": "1d04510a913a4675b203af2500d7807c",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/214fa0ba1dc64d0787a7af2500d71af3"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/214fa0ba1dc64d0787a7af2500d71af3",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "New_Ownership",
+            "label": "New_Ownership",
+            "id": "214fa0ba1dc64d0787a7af2500d71af3",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5a773a8758f54d93b7f3af3100d0fa25"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5a773a8758f54d93b7f3af3100d0fa25",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Object Type",
+            "label": "Object Type",
+            "id": "5a773a8758f54d93b7f3af3100d0fa25",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/668136c3d86e456e804caf3100d2838e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/668136c3d86e456e804caf3100d2838e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "HD Object",
+            "label": "HD Object",
+            "id": "668136c3d86e456e804caf3100d2838e",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/1b2f110b0b834d27a468af3100d31752"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/1b2f110b0b834d27a468af3100d31752",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "Kittelberger ID",
+            "label": "Kittelberger ID",
+            "id": "1b2f110b0b834d27a468af3100d31752",
+            "localizedValues": [
+                {
+                    "value": "534117",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/3f2e459d9a94401eb983af3100d3724e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/3f2e459d9a94401eb983af3100d3724e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "mpe_ltype_id",
+            "label": "LTYPE ID",
+            "id": "3f2e459d9a94401eb983af3100d3724e",
+            "localizedValues": [
+                {
+                    "value": "85",
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/2d68f14c81b54cf79755af3100d675c3"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/2d68f14c81b54cf79755af3100d675c3",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_ltype_name",
+            "label": "LTYPE Name",
+            "id": "2d68f14c81b54cf79755af3100d675c3",
+            "localizedValues": [
+                {
+                    "value": "PREVIEW_JPEG",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/05d9d4524e9e47adb05caf3100dc4f81"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/05d9d4524e9e47adb05caf3100dc4f81",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Short Description",
+            "label": "Short Description",
+            "id": "05d9d4524e9e47adb05caf3100dc4f81",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/9d05d4e5180447f2b560af3100e21c40"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/9d05d4e5180447f2b560af3100e21c40",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "mpe_object_type",
+            "label": "MPE Object Type",
+            "id": "9d05d4e5180447f2b560af3100e21c40",
+            "localizedValues": [
+                {
+                    "values": [
+                        "41e58c74bfc5410a8ce8afbd0062b795"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/c66d2f10ee4e4244bee7af3200844348"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/c66d2f10ee4e4244bee7af3200844348",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Kittelberger Category Tree",
+            "label": "Kittelberger Category Tree",
+            "id": "c66d2f10ee4e4244bee7af3200844348",
+            "localizedValues": [
+                {
+                    "value": "PT Digital Archive 2008||Accessories||Bosch Professional||Internet/Multimedia||Product data",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/660c512e069d494cbd88afa400c81f4b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/660c512e069d494cbd88afa400c81f4b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Related document usage",
+            "label": "Related document usage",
+            "id": "660c512e069d494cbd88afa400c81f4b",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/ed79eceb63f84a19a7a9afa400c7db9f"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/ed79eceb63f84a19a7a9afa400c7db9f",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Related document",
+            "label": "Related document",
+            "id": "ed79eceb63f84a19a7a9afa400c7db9f",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/fd3cfeeb3ed14b339b72af320084b2f5"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/fd3cfeeb3ed14b339b72af320084b2f5",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Kittelberger Category Tree Ids",
+            "label": "Kittelberger Category Tree Ids",
+            "id": "fd3cfeeb3ed14b339b72af320084b2f5",
+            "localizedValues": [
+                {
+                    "value": "15388||18869||15998||182678||719675",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/dd86bfd93c2c4bfa9773af3800cc44db"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/dd86bfd93c2c4bfa9773af3800cc44db",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "PH Structure",
+            "label": "PH Structure",
+            "id": "dd86bfd93c2c4bfa9773af3800cc44db",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/38d993ed2e014f369f88af3800d3e9f7"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/38d993ed2e014f369f88af3800d3e9f7",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "PH Structure Code",
+            "label": "PH Structure Code",
+            "id": "38d993ed2e014f369f88af3800d3e9f7",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/08b1218a33414ad3944eaf5e00de580a"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/08b1218a33414ad3944eaf5e00de580a",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Missing_TTNR",
+            "label": "Missing TTNR",
+            "id": "08b1218a33414ad3944eaf5e00de580a",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/b90be741a2454b3c8587af5f006360f2"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/b90be741a2454b3c8587af5f006360f2",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "SystemStatus",
+            "label": "SystemStatus",
+            "id": "b90be741a2454b3c8587af5f006360f2",
+            "localizedValues": [
+                {
+                    "values": [
+                        "0edeeb5123d64fcc814caf5e00e08cfb"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/cde1ce436b6b4a49aecfaf5f0065287e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/cde1ce436b6b4a49aecfaf5f0065287e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "DateTime",
+            "fieldName": "LaunchDate",
+            "label": "LaunchDate",
+            "id": "cde1ce436b6b4a49aecfaf5f0065287e",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/ad9945acd8d0465495a5af5f00683d21"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/ad9945acd8d0465495a5af5f00683d21",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_ilabel",
+            "label": "MPE ILabel",
+            "id": "ad9945acd8d0465495a5af5f00683d21",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/2e107d379c8241159b27af5f006aa196"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/2e107d379c8241159b27af5f006aa196",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "DoubleWidth",
+            "label": "DoubleWidth",
+            "id": "2e107d379c8241159b27af5f006aa196",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/f07383ab15df4240b89baf71011c413e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/f07383ab15df4240b89baf71011c413e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Init Name",
+            "label": "Init Name",
+            "id": "f07383ab15df4240b89baf71011c413e",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/71f4c9607a7c407e86edaf8600d1a9a6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/71f4c9607a7c407e86edaf8600d1a9a6",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Numeric",
+            "fieldName": "md5Checksum",
+            "label": "md5Checksum",
+            "id": "71f4c9607a7c407e86edaf8600d1a9a6",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/6c4ffcf6d34d46e58098af9000e44718"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/6c4ffcf6d34d46e58098af9000e44718",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "master_record",
+            "label": "Master Record",
+            "id": "6c4ffcf6d34d46e58098af9000e44718",
+            "localizedValues": [
+                {
+                    "values": [
+                        "a14e72f4f1fe4d5c9b8baf9000e4cbeb"
+                    ],
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5f96a79dc5184042b7d9af930084b9b6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5f96a79dc5184042b7d9af930084b9b6",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "MultiLineText",
+            "fieldName": "Test",
+            "label": "Test",
+            "id": "5f96a79dc5184042b7d9af930084b9b6",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/71476f4d1c854d0fa0e9af9500f3445c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/71476f4d1c854d0fa0e9af9500f3445c",
+                    "select-key": "definition"
+                }
+            },
+            "recordLinkConditions": null,
+            "dataType": "RecordLink",
+            "fieldName": "mpe_language_relation",
+            "label": "Language Relation",
+            "id": "71476f4d1c854d0fa0e9af9500f3445c",
+            "localizedValues": [
+                {
+                    "links": null,
+                    "parents": null,
+                    "children": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/52c4acfa7c284231a58fafb100ec56ed"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/52c4acfa7c284231a58fafb100ec56ed",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_orig_be_id",
+            "label": "MPE ORIG_BE_ID",
+            "id": "52c4acfa7c284231a58fafb100ec56ed",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/b212b7cca11b4fd68b60afc400cad417"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/b212b7cca11b4fd68b60afc400cad417",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "deepak_language_test",
+            "label": "deepak_language_test",
+            "id": "b212b7cca11b4fd68b60afc400cad417",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "c2bd4f9bbb954bcb80c31e924c9c26dc",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/0a602403508a4d03a047afc400f93b42"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/0a602403508a4d03a047afc400f93b42",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "bosch_md5_checksum",
+            "label": "bosch_md5_checksum",
+            "id": "0a602403508a4d03a047afc400f93b42",
+            "localizedValues": [
+                {
+                    "value": "Data: 0",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/c1b057d4cc0848c69e38afcd00d3714e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/c1b057d4cc0848c69e38afcd00d3714e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_contact",
+            "label": "MPE Contact",
+            "id": "c1b057d4cc0848c69e38afcd00d3714e",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/dfe9c7b10bf445f9b2cfafcd00d3d18e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/dfe9c7b10bf445f9b2cfafcd00d3d18e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_desc",
+            "label": "MPE Desc",
+            "id": "dfe9c7b10bf445f9b2cfafcd00d3d18e",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/3278063b6f3d479dafdfafcd00d42f86"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/3278063b6f3d479dafdfafcd00d42f86",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_description",
+            "label": "MPE Description",
+            "id": "3278063b6f3d479dafdfafcd00d42f86",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/e89be413e21140199bd1afcd00d4ea5c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/e89be413e21140199bd1afcd00d4ea5c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_description_pod",
+            "label": "MPE Description POD",
+            "id": "e89be413e21140199bd1afcd00d4ea5c",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/c32495fe1e2c44a1bc2fafcd00e0714a"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/c32495fe1e2c44a1bc2fafcd00e0714a",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_title",
+            "label": "MPE Title",
+            "id": "c32495fe1e2c44a1bc2fafcd00e0714a",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/a5fb160dd93442478921afcd01016d03"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/a5fb160dd93442478921afcd01016d03",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "mpe_img_type_hawera",
+            "label": "MPE IMG_Type Hawera",
+            "id": "a5fb160dd93442478921afcd01016d03",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/b374e64b713141f68a5dafcd0100a664"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/b374e64b713141f68a5dafcd0100a664",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "mpe_img_type",
+            "label": "MPE IMG_Type",
+            "id": "b374e64b713141f68a5dafcd0100a664",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/dd08f9a7240048cb8445afcd010335ed"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/dd08f9a7240048cb8445afcd010335ed",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_photographer",
+            "label": "MPE Photographer",
+            "id": "dd08f9a7240048cb8445afcd010335ed",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/7e44ff8960ce47a8b2e4afcd01045a30"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/7e44ff8960ce47a8b2e4afcd01045a30",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_symbolimg_description",
+            "label": "MPE SYMBOLIMG_DESCRIPTION",
+            "id": "7e44ff8960ce47a8b2e4afcd01045a30",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/a0248389325a4d7f9831afcd01059ab5"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/a0248389325a4d7f9831afcd01059ab5",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_trade_label_ean",
+            "label": "MPE TRADE_LABEL_EAN",
+            "id": "a0248389325a4d7f9831afcd01059ab5",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d48a05b41b794828b4d7afcd01051392"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d48a05b41b794828b4d7afcd01051392",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_trade_label_contact",
+            "label": "MPE TRADE_LABEL_CONTACT",
+            "id": "d48a05b41b794828b4d7afcd01051392",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/6927983b9a134b4a96d0afcf004c0d7b"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/6927983b9a134b4a96d0afcf004c0d7b",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_trade_label_brand",
+            "label": "MPE Trade Label Brand",
+            "id": "6927983b9a134b4a96d0afcf004c0d7b",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/0440e7e4774e41428632afce00bac8fb"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/0440e7e4774e41428632afce00bac8fb",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_brand",
+            "label": "MPE Brand",
+            "id": "0440e7e4774e41428632afce00bac8fb",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/db874fb931194a9eb259afcf00584a32"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/db874fb931194a9eb259afcf00584a32",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_trade_label_perspective",
+            "label": "MPE Trade Label Perspective",
+            "id": "db874fb931194a9eb259afcf00584a32",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5037a53c81414262a207afcf0048dd4d"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5037a53c81414262a207afcf0048dd4d",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_perspective",
+            "label": "MPE Perspective",
+            "id": "5037a53c81414262a207afcf0048dd4d",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/498205f055904fbf8655afcf004ad258"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/498205f055904fbf8655afcf004ad258",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_production_agency",
+            "label": "MPE Production Agency",
+            "id": "498205f055904fbf8655afcf004ad258",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5cd97c18df4c48c58b34afd200f3fa81"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5cd97c18df4c48c58b34afd200f3fa81",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Html",
+            "fieldName": "Languages_TESTField",
+            "label": "Languages_TESTField",
+            "id": "5cd97c18df4c48c58b34afd200f3fa81",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/78286f911c134551839daff8004e5b7c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/78286f911c134551839daff8004e5b7c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_job_id",
+            "label": "MPE_JOB_ID",
+            "id": "78286f911c134551839daff8004e5b7c",
+            "localizedValues": [
+                {
+                    "value": "job_999999999",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T07:03:24.267Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/e7183cbe53114f2a8b8eaff800c19de9"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/e7183cbe53114f2a8b8eaff800c19de9",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "NewAssetType",
+            "label": "New Asset Type",
+            "id": "e7183cbe53114f2a8b8eaff800c19de9",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/57ee8e170c544f799eafaffd00a1cdfe"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/57ee8e170c544f799eafaffd00a1cdfe",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "Checksum",
+            "label": "Checksum",
+            "id": "57ee8e170c544f799eafaffd00a1cdfe",
+            "localizedValues": [
+                {
+                    "value": "2023826681",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-05-12T11:22:04.773Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d948171369fe49f4a1d2afff008428a3"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d948171369fe49f4a1d2afff008428a3",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "OptionList",
+            "fieldName": "mpe_img_type_simone_wrongly_done",
+            "label": "MPE Image Type",
+            "id": "d948171369fe49f4a1d2afff008428a3",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/cc629ccba9d3423babf9b005009a198c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/cc629ccba9d3423babf9b005009a198c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "MPE_Language",
+            "label": "Language",
+            "id": "cc629ccba9d3423babf9b005009a198c",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/8f93cb45c29c44509f31b00500eb38d1"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/8f93cb45c29c44509f31b00500eb38d1",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "checksum2",
+            "label": "checksum2",
+            "id": "8f93cb45c29c44509f31b00500eb38d1",
+            "localizedValues": [
+                {
+                    "value": "2023826681",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-07T05:30:43.793Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/76041e91693d4b30b0dfb01200896c11"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/76041e91693d4b30b0dfb01200896c11",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "Bosch_Availability_Scope",
+            "label": "Availability Scope",
+            "id": "76041e91693d4b30b0dfb01200896c11",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/bdd33ed2d44f4e5fabb1b00c009d2073"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/bdd33ed2d44f4e5fabb1b00c009d2073",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "ClassificationList",
+            "fieldName": "New_MAM_Languages",
+            "label": "New Languages",
+            "id": "bdd33ed2d44f4e5fabb1b00c009d2073",
+            "localizedValues": [
+                {
+                    "values": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/0d36b42563ee42eeb6d5b00c009e47e6"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/0d36b42563ee42eeb6d5b00c009e47e6",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_subheadline",
+            "label": "MPE Subheadline",
+            "id": "0d36b42563ee42eeb6d5b00c009e47e6",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "c2bd4f9bbb954bcb80c31e924c9c26dc",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/d7349f0a722d4d5bbe8bb00e00a67c16"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/d7349f0a722d4d5bbe8bb00e00a67c16",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_URL",
+            "label": "MPE URL",
+            "id": "d7349f0a722d4d5bbe8bb00e00a67c16",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "c2bd4f9bbb954bcb80c31e924c9c26dc",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/5d00620a59a441b1b837b00c009db68e"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/5d00620a59a441b1b837b00c009db68e",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "mpe_headline",
+            "label": "MPE Headline",
+            "id": "5d00620a59a441b1b837b00c009db68e",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "aiInfluenced": false,
+                    "languageId": "c2bd4f9bbb954bcb80c31e924c9c26dc",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/6556bf5d11214088bf49b00e00be744c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/6556bf5d11214088bf49b00e00be744c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "deepak_Reference_TEST",
+            "label": "deepak_Reference_TEST",
+            "id": "6556bf5d11214088bf49b00e00be744c",
+            "localizedValues": [
+                {
+                    "value": "{ \"title\" : \"Template Asset For Import\",  \"PageNumber\": \"\", \"Relation2SBT\" : \"\", \"Relation2HotSpot\" : \"\", \"masterFile\": {         \"id\": \"b053c764-6ddc-4029-9c88-b00000bab160\",         \"filename\": \"BOEWMDB5_o100823v85_AC_PRO.jpg\",         \"extension\": \"jpg\",         \"filetype\": \"jpg\",         \"filesize\": \"90435\",         \"versionnumber\": \"1\",         \"versionlabel\": \"Uploaded by Script\",         \"versionId\": \"9c9e8df2-39d8-4cc0-9112-b00000bab160\" }, \"ASCMVersion\":{ 'id\" :       } }",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-07T05:30:43.793Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/e5cd30edd520419cb04bb021009b343c"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/e5cd30edd520419cb04bb021009b343c",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "Date",
+            "fieldName": "ASCM_CommissioningDate",
+            "label": "Commissioning date",
+            "id": "e5cd30edd520419cb04bb021009b343c",
+            "localizedValues": [
+                {
+                    "value": null,
+                    "hasDay": null,
+                    "hasMonth": null,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-08T10:50:33.187Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/record/bd3d5324b3ca4b69899bb00000bab0c4/field/48b7a5b795024dbbabfab03700858525"
+                },
+                "definition": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/fielddefinition/48b7a5b795024dbbabfab03700858525",
+                    "select-key": "definition"
+                }
+            },
+            "dataType": "SingleLineText",
+            "fieldName": "MPE_AssetOwner",
+            "label": "MPE Asset Owner",
+            "id": "48b7a5b795024dbbabfab03700858525",
+            "localizedValues": [
+                {
+                    "value": "Nidhi",
+                    "aiInfluenced": false,
+                    "languageId": "00000000000000000000000000000000",
+                    "readOnly": null,
+                    "modifiedOn": "2023-07-07T05:30:43.793Z"
+                }
+            ],
+            "inheritanceState": null,
+            "inheritable": null
+        }
+    ]
+}

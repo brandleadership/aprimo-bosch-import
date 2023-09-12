@@ -1,0 +1,2758 @@
+{
+    "asset": [
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c2bd4f9bbb954bcb80c31e924c9c26dc"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c2bd4f9bbb954bcb80c31e924c9c26dc/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c2bd4f9bbb954bcb80c31e924c9c26dc",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "English (US English)",
+            "culture": "en-US",
+            "createdOn": "2021-01-21T13:54:07.843Z",
+            "modifiedOn": "2021-01-21T13:54:07.843Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/18ca1f440c214eedaeccb98f0ae65a81"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/18ca1f440c214eedaeccb98f0ae65a81/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/401a291f50a6407c92ffacb700f01cc7",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "18ca1f440c214eedaeccb98f0ae65a81",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "French (France)",
+            "culture": "fr-FR",
+            "createdOn": "2021-01-21T13:54:07.85Z",
+            "modifiedOn": "2023-07-03T07:25:08.95Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/691a7c8657dc4330a512c616db954d6a"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/691a7c8657dc4330a512c616db954d6a/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "691a7c8657dc4330a512c616db954d6a",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "German",
+            "culture": "de-DE",
+            "createdOn": "2021-01-21T13:54:07.853Z",
+            "modifiedOn": "2023-05-24T08:49:03.517Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5ec554421cac4734a0ede1d01cd1e49f"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5ec554421cac4734a0ede1d01cd1e49f/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/401a291f50a6407c92ffacb700f01cc7",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "5ec554421cac4734a0ede1d01cd1e49f",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "Italiano (Italian)",
+            "culture": "it-IT",
+            "createdOn": "2021-01-21T13:54:07.86Z",
+            "modifiedOn": "2023-07-03T07:26:23.503Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bcda9deff15e4ab290d199f2d0428f5e"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bcda9deff15e4ab290d199f2d0428f5e/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/401a291f50a6407c92ffacb700f01cc7",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "bcda9deff15e4ab290d199f2d0428f5e",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "Chinese (VRC)",
+            "culture": "zh-CN",
+            "createdOn": "2021-01-21T13:54:07.863Z",
+            "modifiedOn": "2023-07-03T07:26:46.117Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e6665327131443c0924f9366e77064d7"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e6665327131443c0924f9366e77064d7/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/401a291f50a6407c92ffacb700f01cc7",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e6665327131443c0924f9366e77064d7",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "Japanese",
+            "culture": "ja-JP",
+            "createdOn": "2021-01-21T13:54:07.87Z",
+            "modifiedOn": "2023-07-03T07:27:06.01Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4877d795541c4fac86b99a06830b08ee"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4877d795541c4fac86b99a06830b08ee/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "4877d795541c4fac86b99a06830b08ee",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "Español (Spanish)",
+            "culture": "es-ES",
+            "createdOn": "2021-01-21T13:54:07.873Z",
+            "modifiedOn": "2023-05-24T08:24:50.687Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1e498386288d41d09e5bbeb8580ffd73"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1e498386288d41d09e5bbeb8580ffd73/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/00000000000000000000000000000000",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/401a291f50a6407c92ffacb700f01cc7",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "1e498386288d41d09e5bbeb8580ffd73",
+            "isEnabledForFields": true,
+            "isEnabledForUI": true,
+            "name": "Português (Brazilian Portuguese)",
+            "culture": "pt-BR",
+            "createdOn": "2021-01-21T13:54:07.877Z",
+            "modifiedOn": "2023-07-03T07:28:38.03Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4968de1c432e4b22ac56b00c008db87f"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4968de1c432e4b22ac56b00c008db87f/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "4968de1c432e4b22ac56b00c008db87f",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Algeria)",
+            "culture": "ar-DZ",
+            "createdOn": "2023-05-24T08:35:59.353Z",
+            "modifiedOn": "2023-05-24T08:36:38.023Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/352826bde7d045bb8e1db00c008f04bf"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/352826bde7d045bb8e1db00c008f04bf/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "352826bde7d045bb8e1db00c008f04bf",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Egypt)",
+            "culture": "ar-AG",
+            "createdOn": "2023-05-24T08:40:42.877Z",
+            "modifiedOn": "2023-05-24T08:40:57.46Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/150821eb071f4c53a492b00c008f37df"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/150821eb071f4c53a492b00c008f37df/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "150821eb071f4c53a492b00c008f37df",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Iraq)",
+            "culture": "ar-IQ",
+            "createdOn": "2023-05-24T08:41:26.503Z",
+            "modifiedOn": "2023-05-24T08:41:32.553Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1ca676b8532d4d14a579b00c008f5803"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1ca676b8532d4d14a579b00c008f5803/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "1ca676b8532d4d14a579b00c008f5803",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Jordan)",
+            "culture": "ar-JO",
+            "createdOn": "2023-05-24T08:41:53.927Z",
+            "modifiedOn": "2023-05-24T08:41:58.477Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5e4fafdf733f4b0893eeb00c008f6d78"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5e4fafdf733f4b0893eeb00c008f6d78/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "5e4fafdf733f4b0893eeb00c008f6d78",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Kuwait)",
+            "culture": "ar-KW",
+            "createdOn": "2023-05-24T08:42:12.24Z",
+            "modifiedOn": "2023-05-24T08:42:16.953Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/17d60af1c2fc4f1eaa90b00c008f826a"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/17d60af1c2fc4f1eaa90b00c008f826a/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "17d60af1c2fc4f1eaa90b00c008f826a",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Lebanon)",
+            "culture": "ar-LB",
+            "createdOn": "2023-05-24T08:42:30.113Z",
+            "modifiedOn": "2023-05-24T08:42:40.19Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/d8bbebd7eb934a04b649b00c008fe73e"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/d8bbebd7eb934a04b649b00c008fe73e/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "d8bbebd7eb934a04b649b00c008fe73e",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Middle East)",
+            "culture": "ar-ME",
+            "createdOn": "2023-05-24T08:43:56.15Z",
+            "modifiedOn": "2023-05-24T08:44:02.12Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/75d873c54cfe46e0a343b00c008fff8d"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/75d873c54cfe46e0a343b00c008fff8d/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "75d873c54cfe46e0a343b00c008fff8d",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Moroccan)",
+            "culture": "ar-MA",
+            "createdOn": "2023-05-24T08:44:16.893Z",
+            "modifiedOn": "2023-05-24T08:44:21.293Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e61728ebb9a7414ea0c5b00c0090135d"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e61728ebb9a7414ea0c5b00c0090135d/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e61728ebb9a7414ea0c5b00c0090135d",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Oman)",
+            "culture": "ar-OM",
+            "createdOn": "2023-05-24T08:44:33.8Z",
+            "modifiedOn": "2023-05-24T08:44:38.21Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/8448eff1a2ae4ed7a742b00c00902a96"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/8448eff1a2ae4ed7a742b00c00902a96/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "8448eff1a2ae4ed7a742b00c00902a96",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Quatar)",
+            "culture": "ar-QA",
+            "createdOn": "2023-05-24T08:44:53.62Z",
+            "modifiedOn": "2023-05-24T08:45:06.693Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6c6eefe464af4961aa36b00c00904891"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6c6eefe464af4961aa36b00c00904891/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "6c6eefe464af4961aa36b00c00904891",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Saudi Arabia)",
+            "culture": "ar-SA",
+            "createdOn": "2023-05-24T08:45:19.203Z",
+            "modifiedOn": "2023-05-24T08:45:29.283Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1c6e391cc63a4455b050b00c00906523"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1c6e391cc63a4455b050b00c00906523/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "1c6e391cc63a4455b050b00c00906523",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (South Africa)",
+            "culture": "ar-AF",
+            "createdOn": "2023-05-24T08:45:43.583Z",
+            "modifiedOn": "2023-05-24T08:45:52.89Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/445f3056d8374edab501b00c00908143"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/445f3056d8374edab501b00c00908143/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "445f3056d8374edab501b00c00908143",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (Tunesia)",
+            "culture": "ar-TN",
+            "createdOn": "2023-05-24T08:46:07.583Z",
+            "modifiedOn": "2023-05-24T08:46:12.063Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/139025e19b374d628f1bb00c009098e3"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/139025e19b374d628f1bb00c009098e3/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "139025e19b374d628f1bb00c009098e3",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Arabic (U.A.E)",
+            "culture": "ar-AE",
+            "createdOn": "2023-05-24T08:46:27.74Z",
+            "modifiedOn": "2023-05-24T08:46:34.583Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/b1ca6c1eb54e41eba66bb00c0090b2ce"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/b1ca6c1eb54e41eba66bb00c0090b2ce/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "b1ca6c1eb54e41eba66bb00c0090b2ce",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Bulgarian",
+            "culture": "bg-BG",
+            "createdOn": "2023-05-24T08:46:49.86Z",
+            "modifiedOn": "2023-05-24T08:46:54.31Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a32e3cd2dac7478bab87b00c0090c3a6"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a32e3cd2dac7478bab87b00c0090c3a6/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "a32e3cd2dac7478bab87b00c0090c3a6",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Russian",
+            "culture": "be-BY",
+            "createdOn": "2023-05-24T08:47:04.23Z",
+            "modifiedOn": "2023-05-24T08:47:11.173Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e673be020afc4ce8a197b00c0090fedb"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e673be020afc4ce8a197b00c0090fedb/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e673be020afc4ce8a197b00c0090fedb",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Czech",
+            "culture": "cs-CZ",
+            "createdOn": "2023-05-24T08:47:54.757Z",
+            "modifiedOn": "2023-05-24T08:47:59.883Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/55149d8924cf403ba4ddb00c009117a7"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/55149d8924cf403ba4ddb00c009117a7/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "55149d8924cf403ba4ddb00c009117a7",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Danish",
+            "culture": "da-DK",
+            "createdOn": "2023-05-24T08:48:15.917Z",
+            "modifiedOn": "2023-05-24T08:48:20.94Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7cd33fb7abf94675a05db00c00917be0"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7cd33fb7abf94675a05db00c00917be0/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "7cd33fb7abf94675a05db00c00917be0",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Estonian",
+            "culture": "et-EE",
+            "createdOn": "2023-05-24T08:49:41.44Z",
+            "modifiedOn": "2023-05-24T08:50:02.347Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/50b64ba55fcb41ec8fd0b00c0091aacc"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/50b64ba55fcb41ec8fd0b00c0091aacc/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "50b64ba55fcb41ec8fd0b00c0091aacc",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Greek (Greece)",
+            "culture": "el-GR",
+            "createdOn": "2023-05-24T08:50:21.48Z",
+            "modifiedOn": "2023-05-24T08:50:26.153Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/18afdd17bf694bb9af72b00c0091c8f8"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/18afdd17bf694bb9af72b00c0091c8f8/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "18afdd17bf694bb9af72b00c0091c8f8",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Englisch (GB)",
+            "culture": "en-GB",
+            "createdOn": "2023-05-24T08:50:47.223Z",
+            "modifiedOn": "2023-05-24T08:50:51.907Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/73f00316d26c4f239556b00c0091e0a2"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/73f00316d26c4f239556b00c0091e0a2/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "73f00316d26c4f239556b00c0091e0a2",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (South Africa)",
+            "culture": "en-AF",
+            "createdOn": "2023-05-24T08:51:07.417Z",
+            "modifiedOn": "2023-05-24T08:51:12.88Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c21f8aff91aa45659f32b00c00920116"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c21f8aff91aa45659f32b00c00920116/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c21f8aff91aa45659f32b00c00920116",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Algeria)",
+            "culture": "en-DZ",
+            "createdOn": "2023-05-24T08:51:35.11Z",
+            "modifiedOn": "2023-05-24T08:51:40.46Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/de02a19f81dd45bca224b00c00921135"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/de02a19f81dd45bca224b00c00921135/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "de02a19f81dd45bca224b00c00921135",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Angola)",
+            "culture": "en-AO",
+            "createdOn": "2023-05-24T08:51:48.87Z",
+            "modifiedOn": "2023-05-24T08:51:53.09Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a230808bf3ed42038220b00c00921f82"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a230808bf3ed42038220b00c00921f82/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "a230808bf3ed42038220b00c00921f82",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Australia)",
+            "culture": "en-AU",
+            "createdOn": "2023-05-24T08:52:01.07Z",
+            "modifiedOn": "2023-05-24T08:52:05.69Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2a6ba5e612fc4faeace7b00c00922d55"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2a6ba5e612fc4faeace7b00c00922d55/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "2a6ba5e612fc4faeace7b00c00922d55",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Egypt)",
+            "culture": "en-EG",
+            "createdOn": "2023-05-24T08:52:12.867Z",
+            "modifiedOn": "2023-05-24T08:52:19.84Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c92b9e5b296349f1bd80b00c00923f26"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c92b9e5b296349f1bd80b00c00923f26/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c92b9e5b296349f1bd80b00c00923f26",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Iraq)",
+            "culture": "en-IQ",
+            "createdOn": "2023-05-24T08:52:28.073Z",
+            "modifiedOn": "2023-05-24T08:52:32.637Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a2d332d5ea674718a6aeb00c00925162"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a2d332d5ea674718a6aeb00c00925162/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "a2d332d5ea674718a6aeb00c00925162",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Ireland)",
+            "culture": "en-IE",
+            "createdOn": "2023-05-24T08:52:43.633Z",
+            "modifiedOn": "2023-05-24T08:52:50.127Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/ce8b9de12c0742839b62b00c0092628b"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/ce8b9de12c0742839b62b00c0092628b/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "ce8b9de12c0742839b62b00c0092628b",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Jordan)",
+            "culture": "en-JO",
+            "createdOn": "2023-05-24T08:52:58.273Z",
+            "modifiedOn": "2023-05-24T08:53:02.237Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9de138d89c044ff2aaadb00c00927045"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9de138d89c044ff2aaadb00c00927045/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "9de138d89c044ff2aaadb00c00927045",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Kuwait)",
+            "culture": "en-KW",
+            "createdOn": "2023-05-24T08:53:09.987Z",
+            "modifiedOn": "2023-05-24T08:53:14.573Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e44d687eb8b544939270b00c00929a1d"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e44d687eb8b544939270b00c00929a1d/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e44d687eb8b544939270b00c00929a1d",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Morocco)",
+            "culture": "en-MA",
+            "createdOn": "2023-05-24T08:53:45.697Z",
+            "modifiedOn": "2023-05-24T08:53:52.523Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c35a05f3f2cb46698beeb00c0092b377"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c35a05f3f2cb46698beeb00c0092b377/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c35a05f3f2cb46698beeb00c0092b377",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Mozambique)",
+            "culture": "en-MZ",
+            "createdOn": "2023-05-24T08:54:07.327Z",
+            "modifiedOn": "2023-05-24T08:54:14.203Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2e6f657dc9934ee2bd9fb00c0092c858"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2e6f657dc9934ee2bd9fb00c0092c858/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "2e6f657dc9934ee2bd9fb00c0092c858",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Montenegro)",
+            "culture": "en-ME",
+            "createdOn": "2023-05-24T08:54:25.147Z",
+            "modifiedOn": "2023-05-24T08:54:31.59Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/ae19e8e851bf43e5a936b00c0092e3b0"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/ae19e8e851bf43e5a936b00c0092e3b0/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "ae19e8e851bf43e5a936b00c0092e3b0",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Qatar)",
+            "culture": "en-QA",
+            "createdOn": "2023-05-24T08:54:48.48Z",
+            "modifiedOn": "2023-05-24T08:54:55.99Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/fc561efa8a1640e99927b00c0092fa0f"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/fc561efa8a1640e99927b00c0092fa0f/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "fc561efa8a1640e99927b00c0092fa0f",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Oman)",
+            "culture": "en-OM",
+            "createdOn": "2023-05-24T08:55:07.57Z",
+            "modifiedOn": "2023-05-24T08:55:12.003Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/60d0f856ca71458ba49ab00c009313e9"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/60d0f856ca71458ba49ab00c009313e9/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "60d0f856ca71458ba49ab00c009313e9",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Pakistan)",
+            "culture": "en-PK",
+            "createdOn": "2023-05-24T08:55:29.63Z",
+            "modifiedOn": "2023-05-24T08:55:33.74Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bff91be0781e4893afbdb00c00932626"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bff91be0781e4893afbdb00c00932626/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "bff91be0781e4893afbdb00c00932626",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Lebanon)",
+            "culture": "en-LB",
+            "createdOn": "2023-05-24T08:55:45.19Z",
+            "modifiedOn": "2023-05-24T08:55:49.57Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6d3483f13fe94ad09e65b00c0093387f"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6d3483f13fe94ad09e65b00c0093387f/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "6d3483f13fe94ad09e65b00c0093387f",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Malaisia)",
+            "culture": "en-MY",
+            "createdOn": "2023-05-24T08:56:00.85Z",
+            "modifiedOn": "2023-05-24T08:56:05.55Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/70af975f27964d6a97d7b00c00934d6a"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/70af975f27964d6a97d7b00c00934d6a/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "70af975f27964d6a97d7b00c00934d6a",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Saudi Arabia))",
+            "culture": "en-SA",
+            "createdOn": "2023-05-24T08:56:18.7Z",
+            "modifiedOn": "2023-05-24T08:56:28.917Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/36a4107db3c14ea78378b00c009383d5"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/36a4107db3c14ea78378b00c009383d5/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "36a4107db3c14ea78378b00c009383d5",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Tanzania)",
+            "culture": "en-TZ",
+            "createdOn": "2023-05-24T08:57:05.133Z",
+            "modifiedOn": "2023-05-24T08:57:09.05Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/21bc63a7f0eb475da2fab00c0093912b"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/21bc63a7f0eb475da2fab00c0093912b/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "21bc63a7f0eb475da2fab00c0093912b",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Tunisia)",
+            "culture": "en-TN",
+            "createdOn": "2023-05-24T08:57:16.513Z",
+            "modifiedOn": "2023-05-24T08:57:20.773Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5124b63625fc4898ba22b00c00939e2d"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5124b63625fc4898ba22b00c00939e2d/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "5124b63625fc4898ba22b00c00939e2d",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (U.A.E)",
+            "culture": "en-AE",
+            "createdOn": "2023-05-24T08:57:27.617Z",
+            "modifiedOn": "2023-05-24T08:57:31.65Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/3bdb08eb4411406282c0b00c0093b03e"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/3bdb08eb4411406282c0b00c0093b03e/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "3bdb08eb4411406282c0b00c0093b03e",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Singapore)",
+            "culture": "en-SG",
+            "createdOn": "2023-05-24T08:57:43.03Z",
+            "modifiedOn": "2023-05-24T08:57:47.267Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/3d32b3dbfd1b46d5884bb00c0093c21d"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/3d32b3dbfd1b46d5884bb00c0093c21d/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "3d32b3dbfd1b46d5884bb00c0093c21d",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Philipines)",
+            "culture": "en-PH",
+            "createdOn": "2023-05-24T08:57:58.283Z",
+            "modifiedOn": "2023-05-24T08:58:02.257Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/0aaf4efbd8f14d018f3cb00c0093d2da"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/0aaf4efbd8f14d018f3cb00c0093d2da/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "0aaf4efbd8f14d018f3cb00c0093d2da",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (India)",
+            "culture": "en-IN",
+            "createdOn": "2023-05-24T08:58:12.567Z",
+            "modifiedOn": "2023-05-24T08:58:17.56Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/109d7c12097442c3a79bb00c0093f011"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/109d7c12097442c3a79bb00c0093f011/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "109d7c12097442c3a79bb00c0093f011",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Kenya)",
+            "culture": "en-KE",
+            "createdOn": "2023-05-24T08:58:37.497Z",
+            "modifiedOn": "2023-05-24T08:58:41.953Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c0c55b35a94849de8319b00c00940785"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c0c55b35a94849de8319b00c00940785/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c0c55b35a94849de8319b00c00940785",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (New Zealand)",
+            "culture": "en-NZ",
+            "createdOn": "2023-05-24T08:58:57.51Z",
+            "modifiedOn": "2023-05-24T08:59:02.16Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/26a46a77461b4dcbb853b00c009417b6"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/26a46a77461b4dcbb853b00c009417b6/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "26a46a77461b4dcbb853b00c009417b6",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "English (Nigeria)",
+            "culture": "en-NG",
+            "createdOn": "2023-05-24T08:59:11.323Z",
+            "modifiedOn": "2023-05-24T08:59:16.547Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/54c90afb981743e3a3e3b00c00942ed8"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/54c90afb981743e3a3e3b00c00942ed8/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "54c90afb981743e3a3e3b00c00942ed8",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Spain)",
+            "culture": "es-ES",
+            "createdOn": "2023-05-24T08:59:31.063Z",
+            "modifiedOn": "2023-05-24T08:59:35.33Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2350df3cd82b449eb4b3b00c0098907f"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2350df3cd82b449eb4b3b00c0098907f/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "2350df3cd82b449eb4b3b00c0098907f",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Argentina)",
+            "culture": "es-AR",
+            "createdOn": "2023-05-24T09:15:28.21Z",
+            "modifiedOn": "2023-05-24T09:15:34.287Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c5d3d701b2174276a1a0b00c0098fbc5"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c5d3d701b2174276a1a0b00c0098fbc5/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c5d3d701b2174276a1a0b00c0098fbc5",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Bolivia)",
+            "culture": "es-BO",
+            "createdOn": "2023-05-24T09:16:59.75Z",
+            "modifiedOn": "2023-05-24T09:17:05.043Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/767c46d5c3f94716ab01b00c00991517"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/767c46d5c3f94716ab01b00c00991517/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "767c46d5c3f94716ab01b00c00991517",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Central America)",
+            "culture": "es-419",
+            "createdOn": "2023-05-24T09:17:21.353Z",
+            "modifiedOn": "2023-05-24T09:17:59.84Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bb06cbb77c4246e195c4b00c00994d6a"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bb06cbb77c4246e195c4b00c00994d6a/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "bb06cbb77c4246e195c4b00c00994d6a",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Chile)",
+            "culture": "es-CL",
+            "createdOn": "2023-05-24T09:18:09.42Z",
+            "modifiedOn": "2023-05-24T09:18:13.553Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6ca1cf4ed835452b9a20b00c00995d22"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6ca1cf4ed835452b9a20b00c00995d22/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "6ca1cf4ed835452b9a20b00c00995d22",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Colombia)",
+            "culture": "es-CO",
+            "createdOn": "2023-05-24T09:18:22.83Z",
+            "modifiedOn": "2023-05-24T09:18:29.323Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e27acd4937b249ebbe39b00c009971d2"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e27acd4937b249ebbe39b00c009971d2/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e27acd4937b249ebbe39b00c009971d2",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Peru)",
+            "culture": "es-PE",
+            "createdOn": "2023-05-24T09:18:40.483Z",
+            "modifiedOn": "2023-05-24T09:18:44.86Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/88595e7f147147abade2b00c00998193"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/88595e7f147147abade2b00c00998193/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "88595e7f147147abade2b00c00998193",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Ecuador)",
+            "culture": "es-EC",
+            "createdOn": "2023-05-24T09:18:53.93Z",
+            "modifiedOn": "2023-05-24T09:18:57.783Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e4fd34ab1ebf468589c1b00c00998f49"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e4fd34ab1ebf468589c1b00c00998f49/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e4fd34ab1ebf468589c1b00c00998f49",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Mexico)",
+            "culture": "es-MX",
+            "createdOn": "2023-05-24T09:19:05.627Z",
+            "modifiedOn": "2023-05-24T09:19:11.08Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/09898772ce2446c0a67ab00c00999dfd"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/09898772ce2446c0a67ab00c00999dfd/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "09898772ce2446c0a67ab00c00999dfd",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Panama)",
+            "culture": "es-PA",
+            "createdOn": "2023-05-24T09:19:18.177Z",
+            "modifiedOn": "2023-05-24T09:19:23.883Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a07cf0a367ea4aa2a1a8b00c0099aee0"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/a07cf0a367ea4aa2a1a8b00c0099aee0/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "a07cf0a367ea4aa2a1a8b00c0099aee0",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Paraguai)",
+            "culture": "es-PY",
+            "createdOn": "2023-05-24T09:19:32.583Z",
+            "modifiedOn": "2023-05-24T09:19:36.377Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c2dcb43a97194cdb8a2ab00c0099dab7"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/c2dcb43a97194cdb8a2ab00c0099dab7/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "c2dcb43a97194cdb8a2ab00c0099dab7",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Uruguay)",
+            "culture": "es-UY",
+            "createdOn": "2023-05-24T09:20:09.993Z",
+            "modifiedOn": "2023-05-24T09:20:14.033Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/b20d8c73a3294c15a7efb00c0099f565"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/b20d8c73a3294c15a7efb00c0099f565/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "b20d8c73a3294c15a7efb00c0099f565",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Spanish (Venezuela)",
+            "culture": "es-VE",
+            "createdOn": "2023-05-24T09:20:32.76Z",
+            "modifiedOn": "2023-05-24T09:20:40.52Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/888209aba4d948ea8379b00c009a1704"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/888209aba4d948ea8379b00c009a1704/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "888209aba4d948ea8379b00c009a1704",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Farsi (Iran)",
+            "culture": "fa-IR",
+            "createdOn": "2023-05-24T09:21:01.45Z",
+            "modifiedOn": "2023-05-24T09:21:05.333Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/d449d43fb2ad42258dc4b00c009ab1a0"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/d449d43fb2ad42258dc4b00c009ab1a0/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "d449d43fb2ad42258dc4b00c009ab1a0",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Finnish",
+            "culture": "fi-FI",
+            "createdOn": "2023-05-24T09:23:13.383Z",
+            "modifiedOn": "2023-05-24T09:23:18.307Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/94598b12876344ca857ab00c009ad27c"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/94598b12876344ca857ab00c009ad27c/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "94598b12876344ca857ab00c009ad27c",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "French (Central African Republic)",
+            "culture": "fr-CF",
+            "createdOn": "2023-05-24T09:23:41.423Z",
+            "modifiedOn": "2023-05-24T09:23:47.107Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5e4e7950df57455db748b00c009af113"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5e4e7950df57455db748b00c009af113/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "5e4e7950df57455db748b00c009af113",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "French (Algeria)",
+            "culture": "fr-DZ",
+            "createdOn": "2023-05-24T09:24:07.527Z",
+            "modifiedOn": "2023-05-24T09:24:11.193Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7bbbae97dc6e41378a97b00c009afbe9"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7bbbae97dc6e41378a97b00c009afbe9/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "7bbbae97dc6e41378a97b00c009afbe9",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "French (Morocco)",
+            "culture": "fr-MA",
+            "createdOn": "2023-05-24T09:24:16.777Z",
+            "modifiedOn": "2023-05-24T09:24:21.037Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1d4cfc58f0514ae28124b00c009b093a"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1d4cfc58f0514ae28124b00c009b093a/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "1d4cfc58f0514ae28124b00c009b093a",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "French (Tunisia)",
+            "culture": "fr-TN",
+            "createdOn": "2023-05-24T09:24:28.137Z",
+            "modifiedOn": "2023-05-24T09:24:34.077Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/11dde11de901427c81d6b00c009b15c3"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/11dde11de901427c81d6b00c009b15c3/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "11dde11de901427c81d6b00c009b15c3",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Hebrew",
+            "culture": "he-IL",
+            "createdOn": "2023-05-24T09:24:38.833Z",
+            "modifiedOn": "2023-05-24T09:24:42.733Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2c270203b2214d07adcbb00c009b1e93"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/2c270203b2214d07adcbb00c009b1e93/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "2c270203b2214d07adcbb00c009b1e93",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Croatian",
+            "culture": "hr-HR",
+            "createdOn": "2023-05-24T09:24:46.357Z",
+            "modifiedOn": "2023-05-24T09:24:50.183Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/f8523ebc0ccf47c89a1cb00c009b29b6"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/f8523ebc0ccf47c89a1cb00c009b29b6/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "f8523ebc0ccf47c89a1cb00c009b29b6",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Hungarian",
+            "culture": "hu-HU",
+            "createdOn": "2023-05-24T09:24:55.857Z",
+            "modifiedOn": "2023-05-24T09:24:59.683Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/3ac48210f7104299ac78b00c009b32f5"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/3ac48210f7104299ac78b00c009b32f5/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "3ac48210f7104299ac78b00c009b32f5",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Indonesian",
+            "culture": "id-ID",
+            "createdOn": "2023-05-24T09:25:03.747Z",
+            "modifiedOn": "2023-05-24T09:25:07.703Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/96aa49f3e1d745cd8ffeb00c009b3bb8"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/96aa49f3e1d745cd8ffeb00c009b3bb8/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "96aa49f3e1d745cd8ffeb00c009b3bb8",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Italian",
+            "culture": "it-IT",
+            "createdOn": "2023-05-24T09:25:11.223Z",
+            "modifiedOn": "2023-05-24T09:25:14.717Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9c35241c7d984f738a3ab00c009b5273"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9c35241c7d984f738a3ab00c009b5273/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "9c35241c7d984f738a3ab00c009b5273",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Kazakh (Kazahgstan)",
+            "culture": "kk-KZ",
+            "createdOn": "2023-05-24T09:25:30.623Z",
+            "modifiedOn": "2023-05-24T09:25:34.89Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5197af99e7ba417da2fdb00c009b5daa"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/5197af99e7ba417da2fdb00c009b5daa/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "5197af99e7ba417da2fdb00c009b5daa",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Korean",
+            "culture": "ko-KR",
+            "createdOn": "2023-05-24T09:25:40.193Z",
+            "modifiedOn": "2023-05-24T09:25:44.407Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9a88a5fb632941418734b00c009b6858"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9a88a5fb632941418734b00c009b6858/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "9a88a5fb632941418734b00c009b6858",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Lithuanian",
+            "culture": "lt-LT",
+            "createdOn": "2023-05-24T09:25:49.307Z",
+            "modifiedOn": "2023-05-24T09:25:52.877Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7d7584ea182049ca813eb00c009b7203"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7d7584ea182049ca813eb00c009b7203/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "7d7584ea182049ca813eb00c009b7203",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Latvian",
+            "culture": "lv-LV",
+            "createdOn": "2023-05-24T09:25:57.553Z",
+            "modifiedOn": "2023-05-24T09:26:01.147Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9a26651f97e1497585abb00c009b7eed"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9a26651f97e1497585abb00c009b7eed/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "9a26651f97e1497585abb00c009b7eed",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Macedonian ( North Macedonia)",
+            "culture": "mk-MK",
+            "createdOn": "2023-05-24T09:26:08.577Z",
+            "modifiedOn": "2023-05-24T09:26:12.433Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1c3fde614e8a46549fe4b00c009b8ba5"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/1c3fde614e8a46549fe4b00c009b8ba5/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "1c3fde614e8a46549fe4b00c009b8ba5",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Dutch (Netherlands)",
+            "culture": "nl-NL",
+            "createdOn": "2023-05-24T09:26:19.427Z",
+            "modifiedOn": "2023-05-24T09:26:22.84Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/cfdb488d96d047afa60cb00c009b9a07"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/cfdb488d96d047afa60cb00c009b9a07/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "cfdb488d96d047afa60cb00c009b9a07",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Norwegian (Bokmål)",
+            "culture": "nb-NO",
+            "createdOn": "2023-05-24T09:26:31.7Z",
+            "modifiedOn": "2023-05-24T09:26:35.81Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e9757f3e92b545a1857bb00c009ba4ea"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e9757f3e92b545a1857bb00c009ba4ea/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e9757f3e92b545a1857bb00c009ba4ea",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Polish",
+            "culture": "pl-PL",
+            "createdOn": "2023-05-24T09:26:40.99Z",
+            "modifiedOn": "2023-05-24T09:26:44.717Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/d246e556222f4b678b06b00c009bcfb9"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/d246e556222f4b678b06b00c009bcfb9/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "d246e556222f4b678b06b00c009bcfb9",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Portuguese (Angolan)",
+            "culture": "pt-AO",
+            "createdOn": "2023-05-24T09:27:17.52Z",
+            "modifiedOn": "2023-05-24T09:27:21.863Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/60f89c91a7d8406da64ab00c009bda00"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/60f89c91a7d8406da64ab00c009bda00/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "60f89c91a7d8406da64ab00c009bda00",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Portuguese (Brazil)",
+            "culture": "pt-BR",
+            "createdOn": "2023-05-24T09:27:26.293Z",
+            "modifiedOn": "2023-05-24T09:27:30.013Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/78637b0532394f7684fab00c009be31e"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/78637b0532394f7684fab00c009be31e/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "78637b0532394f7684fab00c009be31e",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Portuguese (Portugal)",
+            "culture": "pt-PT",
+            "createdOn": "2023-05-24T09:27:34.07Z",
+            "modifiedOn": "2023-05-24T09:28:09.73Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/12764951ea844a758448b00c009c113f"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/12764951ea844a758448b00c009c113f/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "12764951ea844a758448b00c009c113f",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Romanian",
+            "culture": "ro-RO",
+            "createdOn": "2023-05-24T09:28:13.433Z",
+            "modifiedOn": "2023-05-24T09:28:18.057Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9fb94b29e100488fb4bfb00c009c2024"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/9fb94b29e100488fb4bfb00c009c2024/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "9fb94b29e100488fb4bfb00c009c2024",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Slovak",
+            "culture": "sk-SK",
+            "createdOn": "2023-05-24T09:28:26.147Z",
+            "modifiedOn": "2023-05-24T09:28:30.343Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4fa21965ee014be0ae51b00c009c2d06"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4fa21965ee014be0ae51b00c009c2d06/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "4fa21965ee014be0ae51b00c009c2d06",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Slovenian",
+            "culture": "sl-SI",
+            "createdOn": "2023-05-24T09:28:37.137Z",
+            "modifiedOn": "2023-05-24T09:28:40.527Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7fc4c6178a454be09f6fb00c009c35d7"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/7fc4c6178a454be09f6fb00c009c35d7/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "7fc4c6178a454be09f6fb00c009c35d7",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Serbian (Latin)",
+            "culture": "sr-RS",
+            "createdOn": "2023-05-24T09:28:44.66Z",
+            "modifiedOn": "2023-05-24T09:28:48.927Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/37555ed2d1e54b539b99b00c009c42f8"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/37555ed2d1e54b539b99b00c009c42f8/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "37555ed2d1e54b539b99b00c009c42f8",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Swedish",
+            "culture": "sv-SE",
+            "createdOn": "2023-05-24T09:28:55.867Z",
+            "modifiedOn": "2023-05-24T09:28:59.497Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bf035545b75e44659796b00c009c4cd3"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/bf035545b75e44659796b00c009c4cd3/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "bf035545b75e44659796b00c009c4cd3",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Thai",
+            "culture": "th-TH",
+            "createdOn": "2023-05-24T09:29:04.273Z",
+            "modifiedOn": "2023-05-24T09:29:08.28Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6f8e4239c8784f5ba587b00c009c577a"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/6f8e4239c8784f5ba587b00c009c577a/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "6f8e4239c8784f5ba587b00c009c577a",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Turkish",
+            "culture": "tr-TR",
+            "createdOn": "2023-05-24T09:29:13.363Z",
+            "modifiedOn": "2023-05-24T09:29:16.937Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/eef7811559894c6daae5b00c009c6143"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/eef7811559894c6daae5b00c009c6143/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "eef7811559894c6daae5b00c009c6143",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Ukrainian",
+            "culture": "uk-UA",
+            "createdOn": "2023-05-24T09:29:21.713Z",
+            "modifiedOn": "2023-05-24T09:29:25.637Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4ba7036c30a1442eb7c1b00c009c6acc"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/4ba7036c30a1442eb7c1b00c009c6acc/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "4ba7036c30a1442eb7c1b00c009c6acc",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Vietnamese",
+            "culture": "vi-VN",
+            "createdOn": "2023-05-24T09:29:29.85Z",
+            "modifiedOn": "2023-05-24T09:29:33.513Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e35dd861f0d046aab60fb00c009ce2f9"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/e35dd861f0d046aab60fb00c009ce2f9/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "e35dd861f0d046aab60fb00c009ce2f9",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Chinese (Hong Kong)",
+            "culture": "zh-HK",
+            "createdOn": "2023-05-24T09:31:12.4Z",
+            "modifiedOn": "2023-05-24T09:31:17.193Z",
+            "tag": null
+        },
+        {
+            "_links": {
+                "self": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/ebf58de3661341939e38b00c009cedbb"
+                },
+                "image": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/language/ebf58de3661341939e38b00c009cedbb/image",
+                    "select-key": "image"
+                },
+                "createdby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "createdby"
+                },
+                "modifiedby": {
+                    "href": "https://boschpowertools-sb1.dam.aprimo.com/api/core/user/76746a6d9e704eddb266aed600bf7cd8",
+                    "select-key": "modifiedby"
+                }
+            },
+            "id": "ebf58de3661341939e38b00c009cedbb",
+            "isEnabledForFields": true,
+            "isEnabledForUI": false,
+            "name": "Chinese (Taiwan)",
+            "culture": "zh-TW",
+            "createdOn": "2023-05-24T09:31:21.58Z",
+            "modifiedOn": "2023-05-24T09:31:26.59Z",
+            "tag": null
+        }
+    ]
+}

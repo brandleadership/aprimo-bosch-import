@@ -22,6 +22,9 @@ const splitFile = require("split-file");
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
+const axiosRetry = require('axios-retry');
+axiosRetry(axios, { retries: 3 });
+
 const db = new JsonDB(new Config("fieldIDs", false, true, '/'));
 const dbtoken = new JsonDB(new Config("apitoken", false, true, '/'));
 const kMap = new JsonDB(new Config("keymapping", false, true, '/'));
@@ -226,11 +229,13 @@ searchAsset = async (recordsCollection) => {
         // If Total Count Zero Then Record Needs to Create
         logger.info(new Date() + logRowInfo + ' INFO : Records Creating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields("null", recordsCollection);
+        await db.save();
         return getFieldsResult;
       } else if (itemsObj.totalCount === 1) {
         // If Total Count One Then Record Needs to Update Meta Information
         logger.info(new Date() + logRowInfo  + ' INFO : Records Updating: -- OBJ_ID: ' + recordsCollection.OBJ_ID + ' LV_ID: ' + recordsCollection.LV_ID);
         getFieldsResult = await getFields(itemsObj.items[0].id, recordsCollection);
+        await db.save();
         return getFieldsResult;
       }else{
         // If More Than One Record Found Then Log in Error
@@ -1475,7 +1480,7 @@ createMeta = async (assetID, data, ImgToken) => {
   // Get Token For API
   let token = await getObjectDefault("/token", "null");
 
-  if (assetID === "null") {
+  if (assetID === "null" && ImgToken !== "null" && ImgToken !== undefined) {
     // Create Record API
     let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
@@ -1727,7 +1732,7 @@ getObjectDefault = async(key, defval) => {
   let data = defval;
   try {
     if(key === '/token'){
-      //await dbtoken.reload();
+      await dbtoken.reload();
       data = await dbtoken.getData(key);
     } else if (key.includes('/mapping')){
       //await kMap.reload();
@@ -1743,21 +1748,21 @@ getObjectDefault = async(key, defval) => {
     if(innerError.message.includes("find dataPath")){
       return data;
     }else if(innerError.message.includes("Load Database")){
-      logger.error(new Date() + logRowInfo + ' DATABASE ERROR : ' + innerError.message);
       // Retry If Fail to Load Local Database
       if (retries < maxRetries) {
         retries++;
         logger.info(new Date() + logRowInfo + ' DATABASE Retrying: ' + retries);
-        setTimeout(async function() {
-          await getObjectDefault(key, defval);
-        }, retryDelay);
+        data = await getObjectDefault(key, defval);
+        return data;
       } else {
+        logger.error(new Date() + logRowInfo + ' DATABASE ERROR : key: ' + key + ' val: ' + defval + ' Error: ' + innerError.message);
         logger.info(new Date() + logRowInfo + ' DATABASE Max retries exceeded. Unable to load database. ');
         fs.unlink('./fieldIDs.json', (err) => {
           if (err){
             logger.error(new Date() + ' : ERROR IN RESET LOCAL DB : ');
           }
         });
+        return data;
       }
     }
   }
@@ -2332,7 +2337,6 @@ module.exports = async (rowdata) => {
     rowdata.startTime = timeStampStart.toLocaleString();
     rowdata.endTime = timeStampEnd.toLocaleString();
     rowdata.message = RecordID.message;
-    await db.save();
     return Promise.resolve(rowdata);
   } else if(rowdata.mode === 'linkRecords'){
     logRowInfo = ' : PID: ' + process.pid + ' : JobID: '+ rowdata.rowdata.masterData["JOB_ID"] +  ': OBJ_ID: '+ rowdata.rowdata.masterData["OBJ_ID"]  + '_' + rowdata.rowdata.masterData["LV_ID"] +  ' : MasterRecordID: '+ rowdata.rowdata.masterRecordID +  ': ChildRecordID: '+ rowdata.rowdata.childRecordID;

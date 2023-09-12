@@ -6,23 +6,32 @@
         "86": "094a459294f84f1b9481afbd0062b440",
         "12793": "2ff6d0ec1e14486389f2afd401148b02",
         "14047": "fddc5d297372493299c2afd4011bc4f7",
+        "15502": "648924771a3740a3a356afd401212ac4",
         "18806": "c91e054a7c6b457cb19bafd4011b2d92",
         "24057": "6bf8ea767fa649da8185af62010ce4de",
         "24058": "7822b0d7f61242489631af63008132a6",
+        "574600": "3592f5cb9df1498f90fdafd40120e93c",
         "982890": "06222eecf03e4281af57afd401151aa3",
+        "1959307": "b6d8e895d66d435881c7afd40118ddf4",
+        "2475655": "d58cfe49b24a4ec6805eafd40124dbee",
         "2475884": "83aedbe771984624b54aafd4012762ad",
         "2478174": "99bad8d78d1d4e6c8faeb02e0065dfa0",
         "2478220": "f11e76ac41c442059742afd40124f26d",
         "2607245": "4ac38883247f43c8a43bafd40120783a",
         "2607256": "b66ad5790b0f4774a765b00600753d20",
         "2607263": "da306a43a1164240b2e1afd401203833",
+        "2607268": "1972ede045854f559e5eaf630081ba9d",
         "2607275": "d4b8fe1bd2254b68a632b006007533a9",
         "2607299": "c3581ec3e747474b8d29b00600753902",
         "2607309": "c8bee4d2fdd94a8eb0d3afd40120acb8",
         "2607311": "9bf671d3d12440108a70afd40120ae3f",
         "2607326": "2fc1905779d74b68a262b0060075368a",
         "2608823": "8890c2bf66c948449784afd40115603b",
+        "2608918": "0531d12450184d7db1c9afd40117b348",
+        "2608922": "ae2254519d75450bb10dafd40118be55",
+        "2702092": "4999a50ba76e4c9d8394afd401183921",
         "2702124": "0a95ae0110974a0394deafd40111e57d",
+        "2856439": "3b3000600aa04811bb81afd40120ed88",
         "2908148": "da878eeda24b4783bdb6afd401256ee9",
         "2908244": "48c1c85fbb3e46ad8b6eb0060075958e",
         "3012627": "1d5b80bffe0f451c8af0afd40118df60",
@@ -31,6 +40,7 @@
         "3012662": "c6832e0458c24a8bbd5fafd401176e3b",
         "3012663": "2c21b69c565b4c018180afd401176e91",
         "3012664": "b34326b983d446799daeafd401176f52",
+        "3012699": "9e081fe593094ec58a25afd40115ba08",
         "3012710": "ccc03269affc42dfbf98afd40124e7f7",
         "3013851": "fca7ffc5b47e47f2b0d8afd401152ce0",
         "3013852": "c188ead325aa49889d36afd401133c27",
@@ -42,10 +52,19 @@
         "3013862": "fe1d4d26c3f44b17a770afd401183169",
         "3013875": "59a90b6398104a108758afd40111c015",
         "3013894": "3bb0271be19f40169a74afd40118e190",
+        "3013909": "7d3ce492d75a450aad0dafd40111cc93",
+        "3013913": "c43009c5e5b44213a3f3afd40111d7f0",
+        "3013915": "762cfff464644cef9decafd40112e9e3",
         "3014778": "ec396166401d470f9af1afd4011839e0",
         "3014780": "5b3c07560f0a4c67bc48afd401183984",
         "3014935": "b785815afd04445bae7aafd4011cf520",
+        "3016418": "37f82c4eabf14cc9baddafd40117a0d5",
+        "3016419": "b3b0d2b95a4842c29265afd40117a131",
+        "3016421": "770abac4ec0149209680afd40118ad30",
+        "3016422": "4cbd5cb350dd40d4ba36afd40118ad8b",
         "3016573": "636ec7a4b9f14b93a8e1afd4011831c6",
+        "3038075": "79cfc8252734494c93baafd40118c94b",
+        "3039192": "d221a8eced5846869be4afd40117bf33",
         "7270349": "c7cadb6a24cb498a9cfaafd401153f3e",
         "7903929": "1415db13e714463bbd28afd401173e8d",
         "AssetType_ProductMarketingLabel": "d7f5e7f3f42142aca113aff800723995",
@@ -65,13 +84,18 @@
         "AGENCY": {
             "Fotostudio Bursch": "aab07f12a2f1465eac97afce01190bdf",
             "Netzwerk P": "15729300b71649408011afce01190bdf",
-            "Fotostudio Jeker GmbH": "9f27d288dfb54469a43bafce01190bdf"
+            "Fotostudio Jeker GmbH": "9f27d288dfb54469a43bafce01190bdf",
+            "Hössler & Hössler": "a619aded1d034bc9b016afce01190bdf"
         },
         "BRAND": {
             "Bosch": "e3e0826420124ce6b047afcf00471456"
         },
         "DEPT": {
-            "PT-AC": "fef6abf931a94e989387afcf00487208"
+            "PT-AC": "fef6abf931a94e989387afcf00487208",
+            "PT ": {
+                " BEU": "bc5d32df27ee4446b75fafcf00487208",
+                " LG": "27eeae4eedba4bd49ac3afcf00487208"
+            }
         },
         "PERSPECTIVE": {
             "angle": "187fc562ed6948c3bf4fafcf004929e0",
@@ -191,6 +215,14 @@
         "Authorized_GH": "fb901941ecd54060a741b00000a0103c",
         "Authorized_NG": "fd0460e1477e40438389b00000a01506",
         "Authorized_AO": "1fc15a5fb279481b9530b00000a00aab",
-        "Authorized_TN": "2e2cd7ec9b774293b380b00000a018ba"
+        "Authorized_TN": "2e2cd7ec9b774293b380b00000a018ba",
+        "Ownership_CORPORATE": "ef76fde5bd544a818bfdb00400d60367",
+        "Authorized_Corporate": "85c2b1ddf633420dbf81b00e006c39a9",
+        "MPE Migration": {
+            "IMG_TYPE_PT": {
+                "Product image": "ab16cb77673245c2bb26afbd007ee07f",
+                "Product image dynamic": "f7cab84d6cc34511bf2fafbd007ee0d9"
+            }
+        }
     }
 }
