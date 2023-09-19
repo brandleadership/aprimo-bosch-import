@@ -1480,7 +1480,7 @@ createMeta = async (assetID, data, ImgToken) => {
   // Get Token For API
   let token = await getObjectDefault("/token", "null");
 
-  if (assetID === "null" && ImgToken !== "null" && ImgToken !== undefined) {
+  if (assetID === "null") {
     // Create Record API
     let reqCreatRequest = await axios
       .post(APR_CREDENTIALS.CreateRecord, JSON.stringify(updateObj), {
@@ -1843,7 +1843,7 @@ searchClassificationName = async (ClassID, key, ClassPath) => {
  * Search for Classification ID
  * @param {*} ClassID, Key
  */ 
-searchClassificationID = async (ClassID, data, key) => {
+searchClassificationID = async (ClassID, key) => {
   // Get Token For API
   let token = await getObjectDefault("/token", "null");
   let fieldData = await getObjectDefault("/fieldIDs/"+ ClassID, "null");
