@@ -203,5 +203,10 @@
     "OTYPE_ID": "64",
     "NAME": "Others",
     "id": "AssetType_Others"
+  },
+  {
+    "OTYPE_ID": "127",
+    "NAME": "Product",
+    "id": "AssetType_Product"
   }
 ]
