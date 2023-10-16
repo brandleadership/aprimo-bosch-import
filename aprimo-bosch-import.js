@@ -31,6 +31,7 @@ const kMap = new JsonDB(new Config("keymapping", false, true, '/'));
 const langMap = new JsonDB(new Config("languagemapping", false, true, '/'));
 const templateAsset = new JsonDB(new Config("template", false, true, '/'));
 const langAsset = new JsonDB(new Config("languages", false, true, '/'));
+const oTypes = new JsonDB(new Config("otypes-mapping", false, true, '/'));
 const maxRetries = 3;
 const retryDelay = 1000;
 let retries = 0;
@@ -40,7 +41,6 @@ let dataFlag = true;
 // Config file for Aprimo Credentials, API Path, Other Settings
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 // Asset Type Mapping Files for OTYPE_ID to Asset Type
-const oTypes = JSON.parse(fs.readFileSync("otypes-mapping.json"));
 
 // Build Proxy URL With or Without Username
 var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
@@ -1067,9 +1067,20 @@ createMeta = async (assetID, data, ImgToken) => {
           }
         }
 
-        let AssetTypeKey = findObject(oTypes, 'OTYPE_ID', data[key]);
-        if (NewAssetTypeID.hasOwnProperty('0') && AssetTypeKey.hasOwnProperty('0')) {
-          APIResult = await searchClassificationID(AssetTypeKey[0].id, key);
+        //let AssetTypeKey = findObject(oTypes, 'OTYPE_ID', data[key]);
+        let AssetTypeKey = "AssetType_Others";
+        if(data['IMG_TYPE'] !== null && data['IMG_TYPE'] !== ''){
+          logger.info(new Date() + logRowInfo  + ': DATA INFO : ' + "/oTypes/" + data[key] + "/" + data['IMG_TYPE']);
+          AssetTypeKey = await getObjectDefault("/oTypes/" + data[key] + "/" + data['IMG_TYPE'], "AssetType_Others");
+          logger.info(new Date() + logRowInfo  + ': DATA INFO : AssetTypeKey: ' + AssetTypeKey);
+        } else {
+          logger.info(new Date() + logRowInfo  + ': DATA INFO : ' + "/oTypes/" + data[key] + "/0");
+          AssetTypeKey = await getObjectDefault("/oTypes/" + data[key] + "/0", "AssetType_Others");
+          logger.info(new Date() + logRowInfo  + ': DATA INFO : AssetTypeKey: ' + AssetTypeKey);
+        }
+
+        if (NewAssetTypeID.hasOwnProperty('0')) {
+          APIResult = await searchClassificationID(AssetTypeKey, key);
           //console.log("APIResult", APIResult);
           if (APIResult !== 'null') {
             ClassID.push(APIResult);
@@ -1133,6 +1144,21 @@ createMeta = async (assetID, data, ImgToken) => {
         }
         break;
       case 'INIT_DATE':
+        let INIT_DATE_VAR = new Date();
+        ObjectID = findObject(tempAssetObj, 'fieldName', 'CreationDate');
+        if (ObjectID.hasOwnProperty('0')) {
+          updateObj.fields.addOrUpdate.push({
+            "id": ObjectID[0].id,
+            "localizedValues": [{
+              "value": INIT_DATE_VAR,
+              "languageId": "00000000000000000000000000000000"
+            }]
+          });
+        }else{
+          dataFlag = false;
+          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
+        }
+        break;
         // Skip Block
         break;
       case 'DOUBLE_WIDTH':
@@ -1439,6 +1465,22 @@ createMeta = async (assetID, data, ImgToken) => {
     }
   }
 
+  /*
+  if((data['BINARY_FILENAME'] === null || data['BINARY_FILENAME'] === '') && (data['TITLE'] !== null || data['TITLE'] !== '')){
+    ObjectID = findObject(tempAssetObj, 'fieldName', 'Title');
+    console.log("BINARY_FILENAME 002: ", ObjectID);
+    if (ObjectID.hasOwnProperty('0')) {
+      updateObj.fields.addOrUpdate.push({
+        "id": ObjectID[0].id,
+        "localizedValues": [{
+          "value": data['TITLE'],
+          "languageId": "00000000000000000000000000000000"
+        }]
+      });
+    }
+  }
+  */
+
   //Security Authorized Code Start
   if (CSORELEASE.length > 0) {
     let CSOArray = [];
@@ -1740,6 +1782,9 @@ getObjectDefault = async(key, defval) => {
     } else if (key.includes('/languagemapping')){
       //await langMap.reload();
       data = await langMap.getData(key);
+    } else if (key.includes('/oTypes')){
+      //await langMap.reload();
+      data = await oTypes.getData(key);
     } else {
       //await dbtoken.reload();
       data = await db.getData(key);

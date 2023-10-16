@@ -14,6 +14,9 @@ const { JsonDB, Config } = require('node-json-db');
 const dbtoken = new JsonDB(new Config("apitoken", false, true, '/'));
 const templateAsset = new JsonDB(new Config("template", false, true, '/'));
 const langAsset = new JsonDB(new Config("languages", false, true, '/'));
+const kMap = new JsonDB(new Config("keymapping", false, true, '/'));
+const langMap = new JsonDB(new Config("languagemapping", false, true, '/'));
+const oTypes = new JsonDB(new Config("otypes-mapping", false, true, '/'));
 const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
@@ -628,14 +631,11 @@ async function writeExcel(jsonArray, jobID) {
 }
 
 /**
- * Search for Template Record with JOB-ID: job_999999999 and KBObjectID: 999999999 
- * @param {*} File Name, CSV Row Data, token
+ * Search for Asset 
+ * @param {*} token, queryString, strLabel
  */
-searchTemplateAsset = async (token) => {
-  let queryString = '';
-  queryString = "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'";
-
-  logger.info(new Date() + ': SearchTemplateAsset: ');
+searchAsset = async (token, queryString, strLabel) => {
+  logger.info(new Date() + ': Search Asset ' + strLabel);
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
     { 
@@ -652,17 +652,17 @@ searchTemplateAsset = async (token) => {
       const itemsObj = resp.data;
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+        logger.info(new Date() + ': ERROR: Search Asset '+strLabel+' Not Found ');
       } else if (itemsObj.totalCount === 1) {
-          logger.info(new Date() + ': SearchTemplateAsset ID:'+ itemsObj.items[0].id );
+          logger.info(new Date() + ': Search Asset ID:'+ itemsObj.items[0].id );
           getFieldsResult = itemsObj.items[0].id;
       }else{
-        logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+        logger.info(new Date() + ': ERROR: Search Asset '+strLabel+' Not Found ');
       }
       return getFieldsResult;
     })
     .catch(async (err) => {
-      logger.info(new Date() + ': ERROR: SearchTemplateAsset Not Found ');
+      logger.info(new Date() + ': ERROR: Search Asset '+strLabel+' Not Found ');
       return 0;
     });
   return APIResult;
@@ -676,7 +676,8 @@ searchTemplateAsset = async (token) => {
 checkTempAsset = async () => {
   await dbtoken.reload();
   let token = await dbtoken.getObjectDefault("/token", "null");
-  let tempAssetID = await searchTemplateAsset(token);
+  let tempAssetID = await searchAsset(token, "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'", 'Template Asset');
+
   if(tempAssetID !== 0){
 
   let getFieldsResult = await axios
@@ -811,6 +812,31 @@ let task = cron.schedule("*/5 * * * *", async () => {
 
 /**
  * 
+ * @param {*} obj 
+ * @param {*} key 
+ * @param {*} value 
+ * @returns 
+ * Function to Serch Multi Dimission Array
+ */
+const findObject = (obj = {}, key, value) => {
+  const result = [];
+  const recursiveSearch = (obj = {}) => {
+    if (!obj || typeof obj !== 'object') {
+      return;
+    };
+    if (obj[key] === value) {
+      result.push(obj);
+    };
+    Object.keys(obj).forEach(function (k) {
+      recursiveSearch(obj[k]);
+    });
+  }
+  recursiveSearch(obj);
+  return result;
+}
+
+/**
+ * 
  * main function
  */
 main = async () => {
@@ -820,6 +846,29 @@ main = async () => {
   let getTempAsset = await checkTempAsset();
   let getLangAsset = await checkLangAsset();
   if(getTempAsset !== false && getLangAsset !== false){
+
+    let tempAssetObj = await templateAsset.getData("/asset");
+    let config_key_mapping_obj = findObject(tempAssetObj, 'fieldName', 'config_key_mapping');
+    let config_language_mapping_obj = findObject(tempAssetObj, 'fieldName', 'config_language_mapping');
+    let config_otype_mapping_obj = findObject(tempAssetObj, 'fieldName', 'config_otype_mapping');
+    
+
+
+    if(config_key_mapping_obj.hasOwnProperty('0') && config_key_mapping_obj[0].localizedValues.hasOwnProperty('0')){
+      await kMap.push("/", JSON.parse(config_key_mapping_obj[0].localizedValues[0].value));
+      await kMap.save();  
+    }
+
+    if(config_language_mapping_obj.hasOwnProperty('0') && config_language_mapping_obj[0].localizedValues.hasOwnProperty('0')){
+      await langMap.push("/", JSON.parse(config_language_mapping_obj[0].localizedValues[0].value));
+      await langMap.save();  
+    }
+
+    if(config_otype_mapping_obj.hasOwnProperty('0') && config_otype_mapping_obj[0].localizedValues.hasOwnProperty('0')){
+      await oTypes.push("/", JSON.parse(config_otype_mapping_obj[0].localizedValues[0].value));
+      await oTypes.save();  
+    }
+
       logger.info('####### '+ ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
       if (fs.existsSync(APR_CREDENTIALS.checkin)) {
         let REprocess = await readExcel(0);
@@ -849,7 +898,7 @@ main = async () => {
       }
 
       logger.info('####### '+ ' ' + process.pid + ': Import Ended at ' + new Date() + ' #########');
-  }else{
+  }else{    
     logger.error('####### Sample Asset Not Found ' + new Date() + ' #########');
     logger.error('####### Stop Further Processing ' + new Date() + ' #########');
     terminate('Normal Close');
