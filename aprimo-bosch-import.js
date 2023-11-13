@@ -654,7 +654,7 @@ createMeta = async (assetID, data, ImgToken) => {
           // code block
           break;
       case 'KEYWORDS': // Comma Separated Values
-	      let KeyWordObj = data[key].split(',');
+	      let KeyWordObj = data[key].split(',').slice(0, 75);
         if (KeyWordObj.length > 0) {
           ObjectID = findObject(tempAssetObj, 'fieldName', 'Keywords');
           if (ObjectID.hasOwnProperty('0')) {
