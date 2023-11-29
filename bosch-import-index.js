@@ -277,7 +277,7 @@ async function readExcel(reTryIndex) {
             rowdata: row,
             mode: 'createRecords'
           }, options));
-          if (cpuIndex === APR_CREDENTIALS.worker * 5) {
+          if (cpuIndex === APR_CREDENTIALS.worker) {
             const result = await Promise.all(poolArray)
             cpuIndex = 0;
             poolArray = [];
@@ -376,7 +376,7 @@ async function createRelation() {
               mode: 'linkRecords'
             }, options));
           }
-          if (cpuIndex === APR_CREDENTIALS.worker * 5) {
+          if (cpuIndex === APR_CREDENTIALS.worker) {
             const result = await Promise.all(poolArray);
             cpuIndex = 0;
             poolArray = [];
@@ -435,7 +435,7 @@ async function createLanguageRelationParent() {
             mode: 'LanguageRelationParent'
           }, options));
         }
-        if (cpuIndex === APR_CREDENTIALS.worker * 5) {
+        if (cpuIndex === APR_CREDENTIALS.worker) {
           const result = await Promise.all(poolArray);
           cpuIndex = 0;
           poolArray = [];
@@ -495,7 +495,7 @@ async function createLanguageRelationChild() {
               mode: 'LanguageRelationChild'
             }, options));
           }
-          if (cpuIndex === APR_CREDENTIALS.worker * 5) {
+          if (cpuIndex === APR_CREDENTIALS.worker) {
             const result = await Promise.all(poolArray);
             cpuIndex = 0;
             poolArray = [];
@@ -522,10 +522,11 @@ async function createLanguageRelationChild() {
 async function endProcess(jobID, pStatus) {
   try {
     let statusLabel = 'error';
+    let src = APR_CREDENTIALS.targetPath;
+    let dst = APR_CREDENTIALS.sourcePath;
+    fs.openSync(src + '/' + jobID  + '.importFinished', 'w');
+
     if(pStatus){
-      let src = APR_CREDENTIALS.targetPath;
-      let dst = APR_CREDENTIALS.sourcePath;
-      fs.openSync(src + '/' + jobID  + '.importFinished', 'w');
       const csvfile = XLSX.readFile(APR_CREDENTIALS.checkin);
       const sheets = csvfile.SheetNames;
       let sftpEP = new Client();
@@ -555,6 +556,17 @@ async function endProcess(jobID, pStatus) {
             logger.info(new Date() + ': ERROR: Updating File Name in FTP Server ' + e);
         }); 
       }
+      sftpEP.end();
+    }else{
+      let sftpEP = new Client();
+      await sftpEP.connect(ftpConfig).then(async () => {
+        await sftpEP.put(APR_CREDENTIALS.checkin, dst + '/' + jobID  + '/checkindata.xlsx');
+        await sftpEP.put(src + '/' + jobID  + '.importFinished', dst + '/' + jobID  + '.importFinished');
+        statusLabel = 'error';
+        await sftpEP.put(src + '/' + jobID  + '.error', dst + '/' + jobID  + '.error');
+      }).catch(async (e) => {
+          logger.info(new Date() + ': ERROR: Updating File Name in FTP Server ' + e);
+      });
       sftpEP.end();
     }
 
