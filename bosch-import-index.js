@@ -1,12 +1,17 @@
-const Piscina = require('piscina')
+/**
+ * 
+ * Main file to read CSV and provide row data to workers.
+ * 
+ */
+require('winston-daily-rotate-file');
 var path = require("path");
+var fs = require("fs");
 let Client = require("ssh2-sftp-client");
+const Piscina = require('piscina')
 const csv = require("csvtojson");
 const XLSX = require('xlsx');
-var fs = require("fs");
 const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 const winston = require("winston");
-require('winston-daily-rotate-file');
 const arrayApp = require('lodash');
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
@@ -23,18 +28,18 @@ const cpus = os.cpus();
 const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3 });
 
+// Default JobID to protect any processing error
 let pJobID = 'job_000000';
 const {
   v4: uuidv4
 } = require('uuid');
-
+// Read default configuration
 const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
 var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
 if(APR_CREDENTIALS.proxyServerInfo.auth.username!="")
 {
   fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+APR_CREDENTIALS.proxyServerInfo.auth.username +":"+ APR_CREDENTIALS.proxyServerInfo.auth.password+"@"+APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
 }
-
 
 // Create a new thread pool
 const pool = new Piscina(
@@ -101,12 +106,13 @@ logger.info(new Date() + '####### Worker Set: ' + APR_CREDENTIALS.worker);
 
 /**
  * 
- * Create a checkin excel file from the JSON data
+ * Create a checkin excel file from the CSV data
  * @param {*} jobID
  */
 async function JSONtoCheckInData(jobID) {
   try{
     if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+      // Return back if already running
       return true;
     }else{    
       // Get All CSV files from FTP Target Path
@@ -143,17 +149,17 @@ async function JSONtoCheckInData(jobID) {
  * Download CSV files from the FTP
  */
 downloadCSVFromFtp = async () => {
-  let ftpDirectory = APR_CREDENTIALS.targetPath;
-  // Read FTP directory for CSV files
-  fs.readdir(ftpDirectory, (err, files) => {
+  let tempDirectory = APR_CREDENTIALS.targetPath;
+  // Read CSV files from temp directories
+  fs.readdir(tempDirectory, (err, files) => {
     if (err) {
       logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING READ DIRECTORY');
     }
 
     for (const file of files) {
       if (file.match(/.+(\.csv)$/)) {
-        // Delete CSV files from FTP directory
-        fs.unlink(path.join(ftpDirectory, file), (err) => {
+        // Delete CSV files from temp directory
+        fs.unlink(path.join(tempDirectory, file), (err) => {
           if (err){
             logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING DELETE FILE');
           }
@@ -161,6 +167,7 @@ downloadCSVFromFtp = async () => {
       }
     }
   });
+  // Read binary files from local path 
   fs.readdir(APR_CREDENTIALS.imgFolderPath, (err, files) => {
     if (err){
       logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING PATH MISSING');
@@ -180,14 +187,15 @@ downloadCSVFromFtp = async () => {
   const dst = APR_CREDENTIALS.targetPath;
   const src = APR_CREDENTIALS.sourcePath;
   let sftp = new Client();
-  //connect SFTP
+  // Connect SFTP
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
       files.sort((a,b) => a.name.localeCompare(b.name));
-      //process listed files
+      // Process listed files
       sftp.end();
       for (var i = 0, len = files.length; i < len; i++) {
+        // Check for .finished file
         if (files[i].name.match(/.+(\.finished)$/)) {
           let jobID = path.parse(files[i].name).name;
           let importFinished = false;
@@ -197,9 +205,9 @@ downloadCSVFromFtp = async () => {
             }
           });
           if(!importFinished){
-            // Create .finished file for reference 
             logger.info('####### Import Started for ' + jobID + ' at ' + new Date() + ' #########');
-            let fd = fs.openSync(dst + '/' + jobID + '.finished', 'w');
+            // Create .finished file for reference 
+            fs.openSync(dst + '/' + jobID + '.finished', 'w');
             let sftpSub = new Client();
             await sftpSub.connect(ftpConfig).then(async () => {
               const csvfiles = await sftpSub.list(src + '/' + jobID + '/.');
@@ -213,6 +221,7 @@ downloadCSVFromFtp = async () => {
             });
             sftpSub.end();
 
+            // Create a reference point for each process.
             let JSONprocess = await JSONtoCheckInData(jobID);
             let REprocess = await readExcel(0);
             let CRprocess = await createRelation();
@@ -220,9 +229,11 @@ downloadCSVFromFtp = async () => {
             let CLRCprocess = await createLanguageRelationChild();
             
             if(JSONprocess && REprocess && CRprocess && CLRPprocess && CLRCprocess){
+              // End process with success reference
               await endProcess(jobID, true);
               logger.info('####### Import Ended for ' + jobID + ' at ' + new Date() + ' #########');
             }else{
+              // End process with fail reference
               await endProcess(jobID, false);
               if(!JSONprocess){
                 logger.info('####### Import Ended with ERROR in JSON Process for ' + jobID + ' at ' + new Date() + ' #########');
@@ -248,7 +259,7 @@ downloadCSVFromFtp = async () => {
 
 /**
  * 
- * readExcel to process further. 
+ * readExcel to process csv data. 
  * @param {*} reTryIndex
  */
 async function readExcel(reTryIndex) {
@@ -256,7 +267,7 @@ async function readExcel(reTryIndex) {
     logger.info('####### '+ ' ' + process.pid + ': Read Excel Started at ' + new Date() + ' #########');
     const file = XLSX.readFile(APR_CREDENTIALS.checkin);
     const sheets = file.SheetNames;
-    //Read Excel Sheets
+    //Read excel sheets
     for (let i = 0; i < sheets.length; i++) {
       const csvData = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]], {
         defval: ""
@@ -272,16 +283,18 @@ async function readExcel(reTryIndex) {
         if (row?.appstatus !== 'checkin') {
           cpuIndex++;
           row.appstatus = 'checkin';
-          // Create pool records
+          // Create pool for record
           poolArray.push(pool.run({
             rowdata: row,
-            mode: 'createRecords'
+            mode: 'createRecords' // Select mode of processing to createRecords
           }, options));
+          // Check for worker setting
           if (cpuIndex === APR_CREDENTIALS.worker) {
             const result = await Promise.all(poolArray)
             cpuIndex = 0;
             poolArray = [];
             for (let r = 0; r < result.length; r++) {
+              // Set meta information for job excelsheet
               csvData[result[r].rowdata.index].recordID = result[r].recordID;
               csvData[result[r].rowdata.index].startTime = result[r].startTime;
               csvData[result[r].rowdata.index].endTime = result[r].endTime;
@@ -352,6 +365,7 @@ async function createRelation() {
       const csvData = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]], {
         defval: ""
       });
+      // Filter master records with record ID not equal to blank and not equal to zero
       const masterData = csvData.filter((row) => row['MASTER_RECORD'] === 'x' && row['recordID'] != '' && row['recordID'] != 0);
       let index = 0;
       let cpuIndex = 0;
@@ -373,7 +387,7 @@ async function createRelation() {
                 masterData: masterDataRow,
                 childRecordID: childRecordID
               },
-              mode: 'linkRecords'
+              mode: 'linkRecords' // Select mode of processing to linkRecords
             }, options));
           }
           if (cpuIndex === APR_CREDENTIALS.worker) {
@@ -384,7 +398,7 @@ async function createRelation() {
         }
         index++;
       }
-      //Process remaining
+      // Process remaining records
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
         poolArray = [];
@@ -406,13 +420,13 @@ async function createRelation() {
  */
 async function createLanguageRelationParent() {
   try {
-
     const file = XLSX.readFile(APR_CREDENTIALS.checkin);
     const sheets = file.SheetNames;
     for (let i = 0; i < sheets.length; i++) {
       const csvData = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]], {
         defval: ""
       });
+      // Filter records with RELATED_DOCUMENT and recordID not equal to zero
       const masterData = csvData.filter((row) => row['RELATED_DOCUMENT'] != '' && row['recordID'] != 0);
       let cpuIndex = 0;
       let poolArray = [];
@@ -432,7 +446,7 @@ async function createLanguageRelationParent() {
               masterData: masterDataRow,
               childRecordID: childRecordID
             },
-            mode: 'LanguageRelationParent'
+            mode: 'LanguageRelationParent' // Select mode of processing to LanguageRelationParent
           }, options));
         }
         if (cpuIndex === APR_CREDENTIALS.worker) {
@@ -442,7 +456,7 @@ async function createLanguageRelationParent() {
         }
       }
 
-      //Process remaining
+      // Process remaining records
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
         poolArray = [];
@@ -492,7 +506,7 @@ async function createLanguageRelationChild() {
                 masterData: masterDataRow,
                 childRecordID: childRecordID
               },
-              mode: 'LanguageRelationChild'
+              mode: 'LanguageRelationChild' // Select mode of processing to LanguageRelationChild
             }, options));
           }
           if (cpuIndex === APR_CREDENTIALS.worker) {
@@ -502,7 +516,7 @@ async function createLanguageRelationChild() {
           }
         }
       }
-      //Process remaining
+      // Process remaining records
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
         poolArray = [];
@@ -524,6 +538,7 @@ async function endProcess(jobID, pStatus) {
     let statusLabel = 'error';
     let src = APR_CREDENTIALS.targetPath;
     let dst = APR_CREDENTIALS.sourcePath;
+    // Create .importFinished file
     fs.openSync(src + '/' + jobID  + '.importFinished', 'w');
 
     if(pStatus){
@@ -537,8 +552,10 @@ async function endProcess(jobID, pStatus) {
 
         const appStatus = csvData.filter((row) => row['appstatus'] === 'error');
         if(appStatus.length > 0){
+          // Create .error file
           fs.openSync(src + '/' + jobID  + '.error', 'w');
         }else{
+          // Create .completed file
           fs.openSync(src + '/' + jobID  + '.completed', 'w');
         }
 
@@ -569,7 +586,7 @@ async function endProcess(jobID, pStatus) {
       });
       sftpEP.end();
     }
-
+    // Create file name with date and time
     const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
     let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '_' + statusLabel + '.xlsx';
     await fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
@@ -578,11 +595,11 @@ async function endProcess(jobID, pStatus) {
       }
     });
 
-    let ftpDirectory = APR_CREDENTIALS.targetPath;
-    fs.readdirSync(ftpDirectory).forEach(file => {
+    let tempDirectory = APR_CREDENTIALS.targetPath;
+    fs.readdirSync(tempDirectory).forEach(file => {
       if (file.match(/.+(\.csv)$/)) {
-        // Delete CSV files from FTP directory
-        fs.unlink(path.join(ftpDirectory, file), (err) => {
+        // Delete CSV files from temp directory
+        fs.unlink(path.join(tempDirectory, file), (err) => {
           if (err){
             logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING DELETE FILE');
           }
@@ -603,9 +620,10 @@ async function writeExcel(jsonArray, jobID) {
     if(jobID !== 'null' && jsonArray.hasOwnProperty('0')){
       jsonArray[0].JOB_ID = '';
     }
-
+    // Array for column head
     let arrayKeys = [];
     jsonArray.forEach((row) => {
+      // Extract column head from row data
       arrayKeys = arrayApp.concat(arrayKeys, arrayApp.keys(row));
     });
     let keys = arrayApp.uniq(arrayKeys); 
@@ -647,6 +665,7 @@ async function writeExcel(jsonArray, jobID) {
  * @param {*} token, queryString, strLabel
  */
 searchAsset = async (token, queryString, strLabel) => {
+  // Search asset API call
   logger.info(new Date() + ': Search Asset ' + strLabel);
   let APIResult = await axios
     .get(APR_CREDENTIALS.SearchAsset + encodeURI(queryString), 
@@ -664,17 +683,17 @@ searchAsset = async (token, queryString, strLabel) => {
       const itemsObj = resp.data;
       let getFieldsResult = 0;
       if (itemsObj.totalCount === 0) {
-        logger.info(new Date() + ': ERROR: Search Asset '+strLabel+' Not Found ');
+        logger.info(new Date() + ': INFO: Search Asset '+strLabel+' Not Found ');
       } else if (itemsObj.totalCount === 1) {
           logger.info(new Date() + ': Search Asset ID:'+ itemsObj.items[0].id );
           getFieldsResult = itemsObj.items[0].id;
       }else{
-        logger.info(new Date() + ': ERROR: Search Asset '+strLabel+' Not Found ');
+        logger.info(new Date() + ': INFO: Search Asset '+strLabel+' Not Found ');
       }
       return getFieldsResult;
     })
     .catch(async (err) => {
-      logger.info(new Date() + ': ERROR: Search Asset '+strLabel+' Not Found ');
+      logger.error(new Date() + ': ERROR: Search Asset API '+strLabel+' Not Found ');
       return 0;
     });
   return APIResult;
@@ -688,10 +707,10 @@ searchAsset = async (token, queryString, strLabel) => {
 checkTempAsset = async () => {
   await dbtoken.reload();
   let token = await dbtoken.getObjectDefault("/token", "null");
+  // Search template asset
   let tempAssetID = await searchAsset(token, "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'", 'Template Asset');
 
   if(tempAssetID !== 0){
-
   let getFieldsResult = await axios
     .get(APR_CREDENTIALS.GetRecord_URL + tempAssetID + '/fields', {
       proxy: false,
@@ -705,10 +724,12 @@ checkTempAsset = async () => {
       })
     .then(async (resp) => {
       if (resp.data.items.length > 0) {
+        // Write result json in local templateAsset DB
         await templateAsset.push("/asset", resp.data.items);
         await templateAsset.save();
         return true;
       } else {
+        // Write log if template asset missing in the Aprimo
         logger.error(new Date() + ': ERROR : tempAssetID Missing --');
         return false;
       }
@@ -719,7 +740,6 @@ checkTempAsset = async () => {
       } else {
         logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
       }
-
       return false;
     });
       return getFieldsResult;
@@ -734,6 +754,7 @@ checkTempAsset = async () => {
  * @param {*} token
  */
 checkLangAsset = async () => {
+  // Check language API
   await dbtoken.reload();
   let token = await dbtoken.getObjectDefault("/token", "null");
   let getAPIResult = await axios
@@ -749,15 +770,18 @@ checkLangAsset = async () => {
       })
     .then(async (resp) => {
       if (resp.data.items.length > 0) {
+        // Write result json in local langAsset DB
         await langAsset.push("/asset", resp.data.items);
         await langAsset.save();
         return true;
       } else {
+        // Write log if language missing
         logger.error(new Date() + ': ERROR : checkLangAsset Missing --');
         return false;
       }
     })
     .catch(async (err) => {
+      // Write log for API error
       if(err.response !== undefined && err.response.data !== undefined){
         logger.error(new Date() + ': ERROR : checkLangAsset API -- ' + JSON.stringify(err.response.data));
       } else {
@@ -768,7 +792,7 @@ checkLangAsset = async () => {
     return getAPIResult;
 };
 /**
- * Generating Token
+ * Generating a token and write in the local DB
  */
 getToken = async () => {
   let resultAssets = await axios.post(APR_CREDENTIALS.API_URL, JSON.stringify('{}'),{
@@ -796,6 +820,7 @@ getToken = async () => {
     });  
 
     if(resultAssets?.accessToken !== undefined){
+      // Write result token in local DB
       await dbtoken.push("/token", resultAssets.accessToken);
       await dbtoken.save();
       return resultAssets;
@@ -804,6 +829,9 @@ getToken = async () => {
     }
 };
 
+/**
+ * Internal cron setting for generating a tokens and update in the local DB
+ */
 let task = cron.schedule("*/5 * * * *", async () => {
   await getToken();
   
@@ -849,74 +877,78 @@ const findObject = (obj = {}, key, value) => {
 
 /**
  * 
- * main function
+ * Main function
  */
 main = async () => {
   await getToken();
   task.start();
-
+  // Get template asset
   let getTempAsset = await checkTempAsset();
+  // Get languages
   let getLangAsset = await checkLangAsset();
-  if(getTempAsset !== false && getLangAsset !== false){
-
+  if (getTempAsset !== false && getLangAsset !== false) {
     let tempAssetObj = await templateAsset.getData("/asset");
+    // Read key mapping config
     let config_key_mapping_obj = findObject(tempAssetObj, 'fieldName', 'config_key_mapping');
+    // Read language mapping config
     let config_language_mapping_obj = findObject(tempAssetObj, 'fieldName', 'config_language_mapping');
+    // Read otype mapping
     let config_otype_mapping_obj = findObject(tempAssetObj, 'fieldName', 'config_otype_mapping');
-    
 
-
-    if(config_key_mapping_obj.hasOwnProperty('0') && config_key_mapping_obj[0].localizedValues.hasOwnProperty('0')){
+    if (config_key_mapping_obj.hasOwnProperty('0') && config_key_mapping_obj[0].localizedValues.hasOwnProperty('0')) {
       await kMap.push("/", JSON.parse(config_key_mapping_obj[0].localizedValues[0].value));
-      await kMap.save();  
+      await kMap.save();
     }
 
-    if(config_language_mapping_obj.hasOwnProperty('0') && config_language_mapping_obj[0].localizedValues.hasOwnProperty('0')){
+    if (config_language_mapping_obj.hasOwnProperty('0') && config_language_mapping_obj[0].localizedValues.hasOwnProperty('0')) {
       await langMap.push("/", JSON.parse(config_language_mapping_obj[0].localizedValues[0].value));
-      await langMap.save();  
+      await langMap.save();
     }
 
-    if(config_otype_mapping_obj.hasOwnProperty('0') && config_otype_mapping_obj[0].localizedValues.hasOwnProperty('0')){
+    if (config_otype_mapping_obj.hasOwnProperty('0') && config_otype_mapping_obj[0].localizedValues.hasOwnProperty('0')) {
       await oTypes.push("/", JSON.parse(config_otype_mapping_obj[0].localizedValues[0].value));
-      await oTypes.save();  
+      await oTypes.save();
     }
 
-      logger.info('####### '+ ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
-      if (fs.existsSync(APR_CREDENTIALS.checkin)) {
-        let REprocess = await readExcel(0);
-        logger.info('####### createRelation Started at ' + new Date() + ' #########');  
-        let CRprocess = await createRelation();
-        logger.info('####### createRelation Ended at ' + new Date() + ' #########');
+    logger.info('####### ' + ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
+    if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+      // Read excel file if exists
+      let REprocess = await readExcel(0);
+      logger.info('####### createRelation Started at ' + new Date() + ' #########');
+      // Create relation
+      let CRprocess = await createRelation();
+      logger.info('####### createRelation Ended at ' + new Date() + ' #########');
+      // Create language relation for parent
+      logger.info('####### createLanguageRelationParent Started at ' + new Date() + ' #########');
+      let CLRPprocess = await createLanguageRelationParent();
+      logger.info('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
+      // Create language relation for child
+      logger.info('####### createLanguageRelationChild Started at ' + new Date() + ' #########');
+      let CLRCprocess = await createLanguageRelationChild();
+      logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
 
-        logger.info('####### createLanguageRelationParent Started at ' + new Date() + ' #########');  
-        let CLRPprocess = await createLanguageRelationParent();
-        logger.info('####### createLanguageRelationParent Ended at ' + new Date() + ' #########');
-
-        logger.info('####### createLanguageRelationChild Started at ' + new Date() + ' #########');  
-        let CLRCprocess = await createLanguageRelationChild();
-        logger.info('####### createLanguageRelationChild Ended at ' + new Date() + ' #########');
-
-        if(REprocess && CRprocess && CLRPprocess && CLRCprocess){
-          await endProcess(pJobID, true);
-          logger.info('####### Import Ended for ' + pJobID + ' at ' + new Date() + ' #########');
-        }else{
-          await endProcess(pJobID, false);
-          logger.info('####### Import Ended with ERROR for ' + pJobID + ' at ' + new Date() + ' #########');
-        }
-        terminate('Normal Close');
+      if (REprocess && CRprocess && CLRPprocess && CLRCprocess) {
+        // End process with success reference
+        await endProcess(pJobID, true);
+        logger.info('####### Import Ended for ' + pJobID + ' at ' + new Date() + ' #########');
       } else {
-        await downloadCSVFromFtp();
-        terminate('Normal Close');
+        // End process with fail reference
+        await endProcess(pJobID, false);
+        logger.info('####### Import Ended with ERROR for ' + pJobID + ' at ' + new Date() + ' #########');
       }
+      terminate('Normal Close');
+    } else {
+      await downloadCSVFromFtp();
+      terminate('Normal Close');
+    }
 
-      logger.info('####### '+ ' ' + process.pid + ': Import Ended at ' + new Date() + ' #########');
-  }else{    
+    logger.info('####### ' + ' ' + process.pid + ': Import Ended at ' + new Date() + ' #########');
+  } else {
     logger.error('####### Sample Asset Not Found ' + new Date() + ' #########');
     logger.error('####### Stop Further Processing ' + new Date() + ' #########');
     terminate('Normal Close');
   }
 };
-
 
 function terminate(code){
   if(fs.existsSync(APR_CREDENTIALS.signature)){
@@ -970,15 +1002,10 @@ process.on('unhandledRejection', (reason, p) => {
 // Function to check if the file is older than 2 hours
 function isFileOlderThanHours(filePath) {
   const HoursInMilliseconds = 3 * 60 * 60 * 1000; // Convert 3 hours to milliseconds
-
   // Get the file's information
   const fileStats = fs.statSync(filePath);
-
   // Calculate the timestamp for 3 hours ago
   const HoursAgo = new Date().getTime() - HoursInMilliseconds;
-  //logger.info(new Date() + ': fileStats.mtimeMs ' + fileStats);
-  //logger.info(new Date() + ': HoursAgo ' + HoursAgo);
-
   // Compare the file's modification timestamp with the calculated timestamp
   if (fileStats.mtimeMs < HoursAgo) {
     return true; // File is older than 3 hours
