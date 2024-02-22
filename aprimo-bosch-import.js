@@ -6,7 +6,7 @@
  * Download binary file
  * Search for Record in a combination of KBObjectID and Title and Kittelberger ID
  * Search for Classification IDs
- * Create/Update Record
+ * Create/Update Records
  * 
  */
 var fs = require("fs");
