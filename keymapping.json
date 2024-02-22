@@ -27,7 +27,7 @@
         "de": "Language_de_DE",
         "ee": "Language_et_EE",
         "el": "Language_el_GR",
-        "en": "Language_en_GB",        
+        "en": "Language_en_GB",
         "en-GB": "Language_en_GB",
         "en-US": "Language_cleansing",
         "es": "Language_es_ES",
@@ -78,5 +78,231 @@
         "zh-TW": "Language_zh_HK",
         "zhs": "Language_zh_TW",
         "zht": "Language_cleansing"
+    },
+    "mpefiledmapping": {
+        "AGENCY": {
+            "type": "Option List",
+            "map": "mpe_agency"
+        },
+        "BRAND": {
+            "type": "Option List",
+            "map": "mpe_brand"
+        },
+        "BU": {
+            "type": "Classification",
+            "map": "skip"
+        },
+        "CONTACT": {
+            "type": "Text",
+            "map": "mpe_contact"
+        },
+        "DEPT": {
+            "type": "Option List",
+            "map": "ResponsibleDepartment"
+        },
+        "DESC": {
+            "type": "Text",
+            "map": "mpe_desc"
+        },
+        "DESCRIPTION": {
+            "type": "Text",
+            "map": "mpe_description"
+        },
+        "DESCRIPTION_POD": {
+            "type": "Text",
+            "map": "mpe_description_pod"
+        },
+        "FILENAME": {
+            "type": "Text",
+            "map": "skip"
+        },
+        "HEADLINE": {
+            "type": "Text",
+            "map": "mpe_headline"
+        },
+        "ILABEL": {
+            "type": "Text",
+            "map": "mpe_ilabel"
+        },
+        "IMG_TYPE": {
+            "type": "Classification",
+            "map": "mpe_img_type"
+        },
+        "IMG_TYPE_HAWERA": {
+            "type": "Classification",
+            "map": "mpe_img_type_hawera"
+        },
+        "INIT_NAME": {
+            "type": "Text",
+            "map": "MPE_AssetOwner"
+        },
+        "KEYWORDS": {
+            "type": "Text List",
+            "map": "Keywords"
+        },
+        "LAUNCH_DATE": {
+            "type": "Date",
+            "map": "LaunchDate"
+        },
+        "ORIG_BE_ID": {
+            "type": "Text",
+            "map": "mpe_orig_be_id"
+        },
+        "PERSPECTIVE": {
+            "type": "Option List",
+            "map": "mpe_perspective"
+        },
+        "PHOTOGRAPHER": {
+            "type": "Text",
+            "map": "mpe_photographer"
+        },
+        "PRODUCTION_AGENCY": {
+            "type": "Option List",
+            "map": "mpe_production_agency"
+        },
+        "STATUS": {
+            "type": "Option List",
+            "map": "Status"
+        },
+        "SYMBOLIMG_DESCRIPTION": {
+            "type": "Text",
+            "map": "mpe_symbolimg_description"
+        },
+        "TITLE": {
+            "type": "Text",
+            "map": "mpe_title"
+        },
+        "TRADE_LABEL_AGENCY": {
+            "type": "Option List",
+            "map": "mpe_trade_label_agency"
+        },
+        "TRADE_LABEL_BRAND": {
+            "type": "Option List",
+            "map": "mpe_trade_label_brand"
+        },
+        "TRADE_LABEL_CONTACT": {
+            "type": "Text",
+            "map": "mpe_trade_label_contact"
+        },
+        "TRADE_LABEL_DEPT": {
+            "type": "Option List",
+            "map": "mpe_trade_label_dept"
+        },
+        "TRADE_LABEL_EAN": {
+            "type": "Text",
+            "map": "mpe_trade_label_ean"
+        },
+        "TRADE_LABEL_KEYWORDS": {
+            "type": "Text List",
+            "map": "mpe_trade_label_keywords"
+        },
+        "TRADE_LABEL_PERSPECTIVE": {
+            "type": "Option List",
+            "map": "mpe_trade_label_perspective"
+        },
+        "CATEGORY_TREE_IDS": {
+            "type": "Text",
+            "map": "Kittelberger Category Tree Ids"
+        },
+        "CATEGORY_TREE_NAMES": {
+            "type": "Text",
+            "map": "Kittelberger Category Tree"
+        },
+        "LTYPE_ID": {
+            "type": "Text",
+            "map": "mpe_ltype_id"
+        },
+        "LTYPE_NAME": {
+            "type": "Text",
+            "map": "mpe_ltype_name"
+        },
+        "LV_ID": {
+            "type": "Text",
+            "map": "Kittelberger ID"
+        },
+        "MASTER_RECORD": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "NAME": {
+            "type": "Text",
+            "map": "Title"
+        },
+        "OBJ_ID": {
+            "type": "Text",
+            "map": "mpe_obj_id"
+        },
+        "ORIGINAL_FILENAME": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "OTYPE_ID": {
+            "type": "Text",
+            "map": "mpe_object_type"
+        },
+        "OTYPE_NAME": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "SYSTEM_STATUS": {
+            "type": "Text",
+            "map": "SystemStatus"
+        },
+        "BINARY_FILENAME": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "CSORELEASE_MASTER": {
+            "type": "Option List",
+            "map": "BI_Master"
+        },
+        "INIT_DATE": {
+            "type": "Date",
+            "map": "CreationDate"
+        },
+        "DOUBLE_WIDTH": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "HD_OBJECT": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "MISSING_TTNR": {
+            "type": "Text",
+            "map": "Missing_TTNR"
+        },
+        "AC_MAIN_USAGE": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "LINKED_PRODUCTS": {
+            "type": "Text",
+            "map": "ReferencedProductsinPIM"
+        },
+        "CLIPLISTER_LINKS": {
+            "type": "Text",
+            "map": "Skip"
+        },
+        "COLOR_SPACE": {
+            "type": "Text",
+            "map": "ColorSpace"
+        },
+        "JOB_ID": {
+            "type": "Text",
+            "map": "mpe_job_id"
+        },
+        "RESPONSIBLE_BUSINESS_UNIT": {
+            "type": "Classification",
+            "map": "New_ReleaseInfo"
+        },
+        "LANGUAGE": {
+            "type": "Classification",
+            "map": "New_MAM_Languages"
+        },
+        "LANGUAGES": {
+            "type": "Text",
+            "map": "Skip"
+        }
     }
 }

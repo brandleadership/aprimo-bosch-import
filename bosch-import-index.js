@@ -122,21 +122,33 @@ async function JSONtoCheckInData(jobID) {
 
       let csvFileData = [];
       for (var i = 0, len = csvInDir.length; i < len; i++) {
-        var file = csvInDir[i];
+        let file = csvInDir[i];
         if (file) {
-          const filePath = APR_CREDENTIALS.targetPath + "/" + file;
-          // Read CSV files
-          const csvFileDataTmp = await csv({
-            'delimiter': [';', ','],
-            'quote': '"',
-            preserveLineEndings: true
-          }).fromFile(filePath);
-          // Merge Into One Array Object
-          csvFileData = arrayApp.concat(csvFileData, csvFileDataTmp);
+          if (file === jobID + APR_CREDENTIALS.MasterDataDelta){
+            const deltaFilePath = APR_CREDENTIALS.targetPath + "/" + jobID + APR_CREDENTIALS.MasterDataDelta;
+            // Read CSV files
+            const deltaMasterData = await csv({
+              'delimiter': [';', ','],
+              'quote': '"',
+              preserveLineEndings: true
+            }).fromFile(deltaFilePath);
+            await writeExcel(deltaMasterData, jobID, APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
+          } else { 
+            const filePath = APR_CREDENTIALS.targetPath + "/" + file;
+            // Read CSV files
+            const csvFileDataTmp = await csv({
+              'delimiter': [';', ','],
+              'quote': '"',
+              preserveLineEndings: true
+            }).fromFile(filePath);
+            // Merge Into One Array Object
+            csvFileData = arrayApp.concat(csvFileData, csvFileDataTmp);
+          }
         }
       }
+      
       // Write Excel File
-      await writeExcel(csvFileData, jobID);
+      await writeExcel(csvFileData, jobID, APR_CREDENTIALS.checkin);
       return true;
     }
   } catch (e) {
@@ -191,6 +203,7 @@ downloadCSVFromFtp = async () => {
   jsonData = await sftp.connect(ftpConfig)
     .then(async () => {
       const files = await sftp.list(src + '/.');
+      // Sort files by name
       files.sort((a,b) => a.name.localeCompare(b.name));
       // Process listed files
       sftp.end();
@@ -223,6 +236,9 @@ downloadCSVFromFtp = async () => {
 
             // Create a reference point for each process.
             let JSONprocess = await JSONtoCheckInData(jobID);
+            let DEprocess = await readDeltaMasterExcel();
+            /*
+
             let REprocess = await readExcel(0);
             let CRprocess = await createRelation();
             let CLRPprocess = await createLanguageRelationParent();
@@ -246,7 +262,9 @@ downloadCSVFromFtp = async () => {
               }else if(!CLRCprocess){
                 logger.info('####### Import Ended with ERROR in Create Language Relation Child Process for ' + jobID + ' at ' + new Date() + ' #########');
               }
-            }            
+            }   
+            
+            */
           }
         }
       }
@@ -307,7 +325,7 @@ async function readExcel(reTryIndex) {
         }
         if (index % (APR_CREDENTIALS.worker * 10) === 0) {
           logger.info('####### '+ ' ' + process.pid + ': Write Excel at ' + new Date() + ' #########');
-          await writeExcel(csvData, 'null');
+          await writeExcel(csvData, 'null', APR_CREDENTIALS.checkin);
         }
         index++;
       }
@@ -326,10 +344,10 @@ async function readExcel(reTryIndex) {
         }
         poolArray = [];
         logger.info('####### '+ ' ' + process.pid + ': Write Excel at ' + new Date() + ' #########');
-        await writeExcel(csvData, 'null');
+        await writeExcel(csvData, 'null', APR_CREDENTIALS.checkin);
       }else{
         logger.info('####### '+ ' ' + process.pid + ': Write Excel at ' + new Date() + ' #########');
-        await writeExcel(csvData, 'null');
+        await writeExcel(csvData, 'null', APR_CREDENTIALS.checkin);
       }
 
       const appStatus = csvData.filter((row) => row['appstatus'] === 'error');
@@ -348,6 +366,56 @@ async function readExcel(reTryIndex) {
     logger.info('####### '+ ' ' + process.pid + ': Read Excel Ended at ' + new Date() + ' #########');
     return true;
   } catch (e) {
+    logger.info(new Date() + ': ERROR: Read Excel File: ' + e.message);
+    return false;
+  }
+}
+
+
+/**
+ * 
+ * readDeltaMasterExcel to process csv data. 
+ * @param {*} reTryIndex
+ */
+async function readDeltaMasterExcel() {
+  let tempAssetObj = await templateAsset.getData("/asset");
+  try {
+    logger.info('####### '+ ' ' + process.pid + ': Read Delta Master Excel Started at ' + new Date() + ' #########');
+    const file = XLSX.readFile(APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
+    const sheets = file.SheetNames;
+    //Read excel sheets
+    for (let i = 0; i < sheets.length; i++) {
+      const csvData = XLSX.utils.sheet_to_json(file.Sheets[file.SheetNames[i]], {
+        defval: ""
+      });
+      let index = 0;
+      for (const row of csvData) {
+        // Check checkin file.
+        csvData[index].index = index;
+        if (row?.appstatus !== 'checkin') {
+          csvData[index].appstatus = 'checkin';
+          let mapdata = await kMap.getData("/mpefiledmapping/" + row['KEY']);
+          let fieldID = findObject(tempAssetObj, 'fieldName', mapdata.map);
+          if (fieldID.hasOwnProperty('0')) {
+            if(mapdata.type === 'Option List'){
+              console.log("fieldID: ", fieldID[0].id);
+              console.log("Option List API CALL: ");
+            }else if (mapdata.type === 'Classification'){
+              console.log("fieldID: ", fieldID[0].id);
+              console.log("Classification API CALL: ");
+            }
+          }
+
+          // Create pool for record
+          //await writeExcel(csvData, 'null', APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
+        }
+        index++;
+      }
+    }
+    logger.info('####### '+ ' ' + process.pid + ': Read Delta Master Excel Ended at ' + new Date() + ' #########');
+    return true;
+  } catch (e) {
+    console.log("error: ", e);
     logger.info(new Date() + ': ERROR: Read Excel File: ' + e.message);
     return false;
   }
@@ -402,9 +470,9 @@ async function createRelation() {
       if (poolArray.length > 0) {
         const result = await Promise.all(poolArray);
         poolArray = [];
-        await writeExcel(csvData, 'null');
+        await writeExcel(csvData, 'null', APR_CREDENTIALS.checkin);
       }else{
-        await writeExcel(csvData, 'null');
+        await writeExcel(csvData, 'null', APR_CREDENTIALS.checkin);
       }
     }
     return true;
@@ -615,7 +683,7 @@ async function endProcess(jobID, pStatus) {
  * 
  * writeExcel file from the JSON object
  */  
-async function writeExcel(jsonArray, jobID) {
+async function writeExcel(jsonArray, jobID, writeFileName) {
   try {
     if(jobID !== 'null' && jsonArray.hasOwnProperty('0')){
       jsonArray[0].JOB_ID = '';
@@ -653,7 +721,7 @@ async function writeExcel(jsonArray, jobID) {
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
     // Write the workbook to a file
-    XLSX.writeFile(workbook, APR_CREDENTIALS.checkin);
+    XLSX.writeFile(workbook, writeFileName);
 
   } catch (e) {
     logger.info(new Date() + ': ERROR: writeExcel: ' + e.message);
@@ -709,7 +777,7 @@ checkTempAsset = async () => {
   let token = await dbtoken.getObjectDefault("/token", "null");
   // Search template asset
   let tempAssetID = await searchAsset(token, "'999999999'" + " and FieldName('mpe_job_id') = 'job_999999999'", 'Template Asset');
-
+  
   if(tempAssetID !== 0){
   let getFieldsResult = await axios
     .get(APR_CREDENTIALS.GetRecord_URL + tempAssetID + '/fields', {
@@ -912,6 +980,8 @@ main = async () => {
 
     logger.info('####### ' + ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
     if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+      let DEprocess = await readDeltaMasterExcel();
+      /*
       // Read excel file if exists
       let REprocess = await readExcel(0);
       logger.info('####### createRelation Started at ' + new Date() + ' #########');
@@ -936,6 +1006,7 @@ main = async () => {
         await endProcess(pJobID, false);
         logger.info('####### Import Ended with ERROR for ' + pJobID + ' at ' + new Date() + ' #########');
       }
+      */
       terminate('Normal Close');
     } else {
       await downloadCSVFromFtp();
