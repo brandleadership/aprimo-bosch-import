@@ -392,22 +392,37 @@ async function readDeltaMasterExcel() {
       for (const row of csvData) {
         // Check checkin file.
         csvData[index].index = index;
-        if (row?.appstatus !== 'checkin') {
-          csvData[index].appstatus = 'checkin';
+        if (row?.appstatus !== 'updated' && row?.appstatus !== 'error' && row?.appstatus !== 'checkin' && row?.appstatus !== 'skip') {
           let mapdata = await kMap.getData("/mpefiledmapping/" + row['KEY']);
-          let fieldID = findObject(tempAssetObj, 'fieldName', mapdata.map);
-          if (fieldID.hasOwnProperty('0')) {
-            if(mapdata.type === 'Option List'){
-              console.log("fieldID: ", fieldID[0].id);
-              console.log("Option List API CALL: ");
-            }else if (mapdata.type === 'Classification'){
-              console.log("fieldID: ", fieldID[0].id);
-              console.log("Classification API CALL: ");
+          if(mapdata.type === 'Option List'){
+            let fieldID = findObject(tempAssetObj, 'fieldName', mapdata.map);
+            if (fieldID.hasOwnProperty('0')) {
+              let optionAPI = await addOrUpdateOptionList(fieldID[0].id, row['KEY'], row['LABEL']);
+              if(optionAPI === true){
+                csvData[index].appstatus = 'updated';
+                csvData[index].message = '';
+              } else {
+                csvData[index].appstatus = 'error';
+                csvData[index].message = optionAPI;
+              }
+            } else {
+              logger.info(new Date() +  ': DATA WARNING Field Key not in the Mapping Table. KEY: ' + row['KEY'] + ' ID: ' + row['ID'] + ' LABEL: ' + row['LABEL']);
             }
+          } else if (mapdata.type === 'Classification'){
+            let classificationAPI = await addOrUpdateClassification(row, mapdata.parentpath);
+            if(classificationAPI === true){
+              csvData[index].appstatus = 'updated';
+              csvData[index].message = '';
+            } else {
+              csvData[index].appstatus = 'error';
+              csvData[index].message = classificationAPI;
+            }
+          } else {
+            csvData[index].appstatus = 'skip';
+            csvData[index].message = 'No need to update';
           }
-
-          // Create pool for record
-          //await writeExcel(csvData, 'null', APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
+          // Write in the Excel
+          await writeExcel(csvData, 'null', APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
         }
         index++;
       }
@@ -415,11 +430,185 @@ async function readDeltaMasterExcel() {
     logger.info('####### '+ ' ' + process.pid + ': Read Delta Master Excel Ended at ' + new Date() + ' #########');
     return true;
   } catch (e) {
-    console.log("error: ", e);
     logger.info(new Date() + ': ERROR: Read Excel File: ' + e.message);
     return false;
   }
 }
+
+async function getLastString(breakString) {
+  if (typeof breakString === 'string'){
+    let str_array = breakString.split('\\\\');
+    for (let splitIndex = 0; splitIndex < str_array.length; splitIndex++) {
+      // Trim the excess whitespace.
+      let treeIDs = str_array[splitIndex];
+      let pieces = treeIDs.split("||");
+      let lastValue = pieces[pieces.length - 1];
+      lastValue = lastValue.replace(/^\s*/, "").replace(/\s*$/, "");
+      if(lastValue !== null){
+        return lastValue;
+      }else{
+        return false;
+      }
+    }
+  }
+}
+
+/**
+ * 
+ * addOrUpdateClassification for new classification.
+ * @param {*} row, classParentPath
+ */
+addOrUpdateClassification = async (row, classParentPath) => {
+  let classDataID = row['ID'];
+  let classDataLabel = row['LABEL'];
+  if(classDataLabel.includes("||")){    
+    let getLastStringID = await getLastString(classDataID);    
+    if(getLastStringID !== false){
+      classDataID = getLastStringID;
+    }else{
+      logger.info(new Date() +  ': DATA WARNING Last String ID Not Found: ' + classDataID);
+      return false;  
+    }
+    let getLastStringValue = await getLastString(classDataLabel);
+
+    if(getLastStringValue !== false){
+      const splitString = classDataLabel.replace(/\//g, "\\/").replace(/\|\|/g, "/");
+      const parentPath = splitString.substring(0, splitString.lastIndexOf("/"));
+      classParentPath = classParentPath + parentPath;
+      classDataLabel = getLastStringValue;
+    }else{
+      logger.info(new Date() +  ': DATA WARNING Last String Value Not Found: ' + classDataLabel);
+      return false;  
+    }
+  }
+
+  let classLanguageAsset = await langAsset.getData("/asset");
+  let classLanguageID = findObject(classLanguageAsset, 'culture', 'en-GB');
+  if (!classLanguageID.hasOwnProperty('0')) {
+    logger.info(new Date() +  ': DATA WARNING en-GB ID not found.');
+    return false;
+  }
+
+  let updateObj = {
+    "parentNamePath": classParentPath,
+    "name": classDataLabel,
+    "identifier": classDataID,
+    "labels": [
+        {
+            "languageId": classLanguageID[0].id,
+            "value": classDataLabel
+        }
+    ]
+  };
+
+  // Log the update object
+  logger.info(new Date() +  ' INFO : addOrUpdateClassification JSON:' + JSON.stringify(updateObj));
+  // Get Token For API
+  let token = await dbtoken.getObjectDefault("/token", "null");
+
+  let reqUpdateRequest = await axios.post(APR_CREDENTIALS.CreateClass,
+      JSON.stringify(updateObj), {
+        proxy: false,
+        httpsAgent: new HttpsProxyAgent(fullProxyURL),  
+        headers: {
+            Accept: "*/*",
+            "Content-Type": "application/json",
+            "API-VERSION": APR_CREDENTIALS.Api_version,
+            'select-fileversion': 'Metadata, renditions, Content', 
+            'disable-validations': 'true', 
+            'disable-rules': 'true', 
+            'client-id': 'marketing-ops',
+            Authorization: `Bearer ${token}`,
+          },
+      }
+    )
+    .then((res) => {
+      logger.info(new Date() +  ' INFO : addOrUpdateClassification done.');
+      return true;
+    })
+    .catch((err) => {
+      logger.error(new Date() +  ' ERROR : addOrUpdateClassification API -- classParentPath: ' + classParentPath + " classDataLabel: " + classDataLabel + " classDataID: " + classDataID);
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() +  ' ERROR : addOrUpdateClassification API -- ' + JSON.stringify(err.response.data));
+        return JSON.stringify(err.response.data);
+      } else {
+        logger.error(new Date() +  ' ERROR : addOrUpdateClassification API -- ' + JSON.stringify(err));
+        return JSON.stringify(err);
+      }        
+    });
+  return reqUpdateRequest;
+};
+
+/**
+ * 
+ * addOrUpdateOptionList for new meta.
+ * @param {*} fieldID, optionName, optionLabel
+ */
+addOrUpdateOptionList = async (fieldID, optionName, optionLabel) => {
+  let optionLanguageAsset = await langAsset.getData("/asset");
+  let optionLanguageID = findObject(optionLanguageAsset, 'culture', 'en-GB');
+  if (!optionLanguageID.hasOwnProperty('0')) {
+    logger.info(new Date() +  ': DATA WARNING en-GB ID not found.');
+    return false;
+  }
+
+  let updateObj = {
+    "items": {
+      "addOrUpdate": [
+        {
+          "name": optionLabel, 
+          "label": optionLabel,
+          "labels": [
+            {
+              "languageId": optionLanguageID[0].id,
+              "value": optionLabel
+            }
+          ],
+          "tag": "<xml>Created by API Script</xml>"
+        }
+      ]
+    }
+  }
+
+  // Log the update object
+  logger.info(new Date() +  ' INFO : addOrUpdateOptionList KEY: ' + optionName + ' JSON: ' + JSON.stringify(updateObj));
+  
+  // Get Token For API
+  let token = await dbtoken.getObjectDefault("/token", "null");
+
+  // Update Option List
+  let reqUpdateRequest = await axios
+    .put(APR_CREDENTIALS.addOrUpdateOption + fieldID, JSON.stringify(updateObj), {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL),  
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          'select-fileversion': 'Metadata, renditions, Content', 
+          'disable-validations': 'true', 
+          'disable-rules': 'true', 
+          'client-id': 'marketing-ops',
+          Authorization: `Bearer ${token}`,
+        },
+    })
+    .then(async (resp) => {
+      logger.info(new Date() +  ' INFO : Option addOrUpdated done.');
+      return true;
+    })
+    .catch((err) => {
+      logger.error(new Date() +  ' ERROR : addOrUpdateOptionList API -- optionID: ' + fieldID + " optionName: " + optionName + " optionLabel: " + optionLabel);
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() +  ' ERROR : addOrUpdateOptionList API -- ' + JSON.stringify(err.response.data));
+        return JSON.stringify(err.response.data);
+      } else {
+        logger.error(new Date() +  ' ERROR : addOrUpdateOptionList API -- ' + JSON.stringify(err));
+        return JSON.stringify(err);
+      }        
+    });
+  return reqUpdateRequest;
+};
+
 
 /**
  * 
@@ -1037,17 +1226,6 @@ function terminate(code){
   task.stop();
   process.exit(0);
 }
-
-/*
-process.on('beforeExit', code => {
-	task.stop();
-})
-process.on('exit', code => {
-	task.stop();
-  //console.log('Received Exit', code);
-  //terminate("Received Exit");
-})
-*/
 
 process.on('SIGTERM', signal => {
   console.log('Received SIGTERM');
