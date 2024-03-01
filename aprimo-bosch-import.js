@@ -1053,7 +1053,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'CATEGORY_TREE_NAMES':// Text
@@ -1069,8 +1068,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }else{
               dataFlag = false;
               dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+              logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
             }
             break;
       case 'LTYPE_ID':// Text
@@ -2177,7 +2175,7 @@ getUploadTokenAndURL = async (filename) => {
 async function runAzCopyCommand(orgFileToUpload, sasUrl) {
   let out;
   const azCopyCommand = `azcopy copy "${orgFileToUpload}" "${sasUrl}"`;
-  console.log("azCopyCommand", azCopyCommand);
+  //console.log("azCopyCommand", azCopyCommand);
   try {
     out = await execShPromise(azCopyCommand, true);
     logger.info(new Date() + logRowInfo + ': runAzCopyCommand -- Stdout: ' + out.stdout);
@@ -2225,7 +2223,7 @@ async function uploadAsset(filename, processPath) {
           }
         });
         if (AzJob) {
-          console.log("blobResult.token: ", blobResult.token);
+          //console.log("blobResult.token: ", blobResult.token);
           return blobResult.token;
         } else {
           logger.error(new Date() + logRowInfo + ': API ERROR : Upload API -- runAzCopyCommand');

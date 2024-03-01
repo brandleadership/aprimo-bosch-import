@@ -26,7 +26,7 @@ const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
 const axiosRetry = require('axios-retry');
-axiosRetry(axios, { retries: 3 });
+axiosRetry(axios, { retries: 0 });
 
 // Default JobID to protect any processing error
 let pJobID = 'job_000000';
@@ -124,15 +124,18 @@ async function JSONtoCheckInData(jobID) {
       for (var i = 0, len = csvInDir.length; i < len; i++) {
         let file = csvInDir[i];
         if (file) {
-          if (file === jobID + APR_CREDENTIALS.MasterDataDelta){
-            const deltaFilePath = APR_CREDENTIALS.targetPath + "/" + jobID + APR_CREDENTIALS.MasterDataDelta;
+          const masterDeltaDataFile = jobID + APR_CREDENTIALS.masterDeltaData;
+          //console.log("File: " + file);
+          //console.log("Master Delta File: " + masterDeltaDataFile);
+          if (file == masterDeltaDataFile){
+            const deltaFilePath = APR_CREDENTIALS.targetPath + "/" + masterDeltaDataFile;
             // Read CSV files
             const deltaMasterData = await csv({
               'delimiter': [';', ','],
               'quote': '"',
               preserveLineEndings: true
             }).fromFile(deltaFilePath);
-            await writeExcel(deltaMasterData, jobID, APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
+            await writeExcel(deltaMasterData, jobID, APR_CREDENTIALS.checkInDelta);
           } else { 
             const filePath = APR_CREDENTIALS.targetPath + "/" + file;
             // Read CSV files
@@ -236,9 +239,9 @@ downloadCSVFromFtp = async () => {
 
             // Create a reference point for each process.
             let JSONprocess = await JSONtoCheckInData(jobID);
-            let DEprocess = await readDeltaMasterExcel();
-            /*
-
+            if (fs.existsSync(APR_CREDENTIALS.checkInDelta)) {
+              await readDeltaMasterExcel();
+            }
             let REprocess = await readExcel(0);
             let CRprocess = await createRelation();
             let CLRPprocess = await createLanguageRelationParent();
@@ -264,7 +267,6 @@ downloadCSVFromFtp = async () => {
               }
             }   
             
-            */
           }
         }
       }
@@ -307,8 +309,10 @@ async function readExcel(reTryIndex) {
             mode: 'createRecords' // Select mode of processing to createRecords
           }, options));
           // Check for worker setting
+          console.log("index: " + index);
           if (cpuIndex === APR_CREDENTIALS.worker) {
             const result = await Promise.all(poolArray)
+            console.log("Result: " + result);
             cpuIndex = 0;
             poolArray = [];
             for (let r = 0; r < result.length; r++) {
@@ -381,7 +385,7 @@ async function readDeltaMasterExcel() {
   let tempAssetObj = await templateAsset.getData("/asset");
   try {
     logger.info('####### '+ ' ' + process.pid + ': Read Delta Master Excel Started at ' + new Date() + ' #########');
-    const file = XLSX.readFile(APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
+    const file = XLSX.readFile(APR_CREDENTIALS.checkInDelta);
     const sheets = file.SheetNames;
     //Read excel sheets
     for (let i = 0; i < sheets.length; i++) {
@@ -389,43 +393,71 @@ async function readDeltaMasterExcel() {
         defval: ""
       });
       let index = 0;
+      let writeIndex = 0;
       for (const row of csvData) {
         // Check checkin file.
         csvData[index].index = index;
+        //console.log("Index Row: " + index);
         if (row?.appstatus !== 'updated' && row?.appstatus !== 'error' && row?.appstatus !== 'checkin' && row?.appstatus !== 'skip') {
-          let mapdata = await kMap.getData("/mpefiledmapping/" + row['KEY']);
-          if(mapdata.type === 'Option List'){
-            let fieldID = findObject(tempAssetObj, 'fieldName', mapdata.map);
-            if (fieldID.hasOwnProperty('0')) {
-              let optionAPI = await addOrUpdateOptionList(fieldID[0].id, row['KEY'], row['LABEL']);
-              if(optionAPI === true){
+          let mapdata = await kMap.getObjectDefault("/mpefiledmapping/" + row['KEY'], "null");
+          if(mapdata === 'null'){
+            logger.info(new Date() +  ': DATA WARNING Key not in the Mapping Table. KEY: ' + row['KEY'] + ' ID: ' + row['ID'] + ' LABEL: ' + row['LABEL']);
+          } else{
+            if(mapdata.type === 'Option List'){
+              let fieldID = findObject(tempAssetObj, 'fieldName', mapdata.map);
+              if (fieldID.hasOwnProperty('0')) {
+                let tempOptionObj = await templateAsset.getData("/" + mapdata.map + "/items");
+                let optionValueID = findObject(tempOptionObj, 'label', row['LABEL']);
+                let optionAPI = await addOrUpdateOptionList(fieldID[0].id, row['KEY'], row['LABEL'], optionValueID);
+                if(optionAPI === true){
+                  if(optionValueID !== false){
+                    csvData[index].appstatus = 'updated';
+                    csvData[index].message = optionValueID;
+                  } else {
+                    csvData[index].appstatus = 'added';
+                    csvData[index].message = '';
+                  }
+                } else {
+                  csvData[index].appstatus = 'error';
+                  csvData[index].message = optionAPI;
+                }
+              } else {
+                logger.info(new Date() +  ': DATA WARNING Field Key not in the Mapping Table. KEY: ' + row['KEY'] + ' ID: ' + row['ID'] + ' LABEL: ' + row['LABEL']);
+              }
+            } else if (mapdata.type === 'Classification'){
+              let classDataID = row['ID'];
+              let classDataLabel = row['LABEL'];
+            
+              let classificationAPI = await addOrUpdateClassification(mapdata.parentpath, row['ID'], row['LABEL']);
+              if (classDataLabel.includes("The object cannot be saved because it already exists.")) {
+                logger.info(new Date() +  ': DATA WARNING The object cannot be saved because it already exists. So we are duplicate as fallback');
+                classificationAPI = await addOrUpdateClassification(mapdata.parentpath,  row['ID'], row['LABEL'] + '#');
+              }
+
+              if(classificationAPI === true){
                 csvData[index].appstatus = 'updated';
                 csvData[index].message = '';
               } else {
                 csvData[index].appstatus = 'error';
-                csvData[index].message = optionAPI;
+                csvData[index].message = classificationAPI;
               }
             } else {
-              logger.info(new Date() +  ': DATA WARNING Field Key not in the Mapping Table. KEY: ' + row['KEY'] + ' ID: ' + row['ID'] + ' LABEL: ' + row['LABEL']);
+              csvData[index].appstatus = 'skip';
+              csvData[index].message = 'No need to update';
             }
-          } else if (mapdata.type === 'Classification'){
-            let classificationAPI = await addOrUpdateClassification(row, mapdata.parentpath);
-            if(classificationAPI === true){
-              csvData[index].appstatus = 'updated';
-              csvData[index].message = '';
-            } else {
-              csvData[index].appstatus = 'error';
-              csvData[index].message = classificationAPI;
-            }
-          } else {
-            csvData[index].appstatus = 'skip';
-            csvData[index].message = 'No need to update';
           }
-          // Write in the Excel
-          await writeExcel(csvData, 'null', APR_CREDENTIALS.targetPath + "/" + 'deltaMasterData.xlsx');
         }
         index++;
+        writeIndex++
+        if (writeIndex === 500) {
+          // Write in the Excel
+          logger.info('####### '+ ' ' + process.pid + ': Write Delta Master Excel at ' + new Date() + ' #########');
+          await writeExcel(csvData, 'null', APR_CREDENTIALS.checkInDelta);
+          writeIndex = 0;
+        }
       }
+      // Write in the Excel
+      await writeExcel(csvData, 'null', APR_CREDENTIALS.checkInDelta);
     }
     logger.info('####### '+ ' ' + process.pid + ': Read Delta Master Excel Ended at ' + new Date() + ' #########');
     return true;
@@ -458,9 +490,12 @@ async function getLastString(breakString) {
  * addOrUpdateClassification for new classification.
  * @param {*} row, classParentPath
  */
-addOrUpdateClassification = async (row, classParentPath) => {
-  let classDataID = row['ID'];
-  let classDataLabel = row['LABEL'];
+addOrUpdateClassification = async (classParentPath, classDataID, classDataLabel) => {
+  // Remove new line from string
+  if (typeof classDataLabel === 'string') {
+    classDataLabel =  classDataLabel.replace(/\n/g, '').replace(/\r/g, '');
+  }
+
   if(classDataLabel.includes("||")){    
     let getLastStringID = await getLastString(classDataID);    
     if(getLastStringID !== false){
@@ -469,14 +504,12 @@ addOrUpdateClassification = async (row, classParentPath) => {
       logger.info(new Date() +  ': DATA WARNING Last String ID Not Found: ' + classDataID);
       return false;  
     }
-    let getLastStringValue = await getLastString(classDataLabel);
-
+    let getLastStringValue = await getLastString(classDataLabel);    
     if(getLastStringValue !== false){
-      const splitString = classDataLabel.replace(/\//g, "\\/").replace(/\|\|/g, "/");
-      const parentPath = splitString.substring(0, splitString.lastIndexOf("/"));
-      classParentPath = classParentPath + parentPath;
+      classDataLabel = classDataLabel.substring(0, classDataLabel.lastIndexOf(getLastStringValue));
+      classParentPath = classParentPath + classDataLabel.replace(/\//g, "\\/").replace(/\|\|/g, "/");
       classDataLabel = getLastStringValue;
-    }else{
+    } else {
       logger.info(new Date() +  ': DATA WARNING Last String Value Not Found: ' + classDataLabel);
       return false;  
     }
@@ -544,12 +577,16 @@ addOrUpdateClassification = async (row, classParentPath) => {
  * addOrUpdateOptionList for new meta.
  * @param {*} fieldID, optionName, optionLabel
  */
-addOrUpdateOptionList = async (fieldID, optionName, optionLabel) => {
+addOrUpdateOptionList = async (fieldID, optionName, optionLabel, optionValueID) => {
   let optionLanguageAsset = await langAsset.getData("/asset");
   let optionLanguageID = findObject(optionLanguageAsset, 'culture', 'en-GB');
   if (!optionLanguageID.hasOwnProperty('0')) {
     logger.info(new Date() +  ': DATA WARNING en-GB ID not found.');
     return false;
+  }
+
+  if (typeof optionLabel === 'string') {
+    optionLabel =  optionLabel.replace(/\n/g, '');
   }
 
   let updateObj = {
@@ -568,6 +605,10 @@ addOrUpdateOptionList = async (fieldID, optionName, optionLabel) => {
         }
       ]
     }
+  }
+
+  if (optionValueID.hasOwnProperty('0')) { 
+    updateObj.items.addOrUpdate[0].id = optionValueID[0].id;
   }
 
   // Log the update object
@@ -817,7 +858,10 @@ async function endProcess(jobID, pStatus) {
         }
 
         await sftpEP.connect(ftpConfig).then(async () => {
-          await sftpEP.put(APR_CREDENTIALS.checkin, dst + '/' + jobID  + '/checkindata.xlsx');
+          await sftpEP.put(APR_CREDENTIALS.checkin, dst + '/' + jobID  + '/' + path.basename(APR_CREDENTIALS.checkin));
+          if (fs.existsSync(APR_CREDENTIALS.checkInDelta)) {
+            await sftpEP.put(APR_CREDENTIALS.checkInDelta, dst + '/' + jobID  + '/' + path.basename(APR_CREDENTIALS.checkInDelta));
+          }
           await sftpEP.put(src + '/' + jobID  + '.importFinished', dst + '/' + jobID  + '.importFinished');
           if(appStatus.length > 0){
             statusLabel = 'error';
@@ -834,7 +878,10 @@ async function endProcess(jobID, pStatus) {
     }else{
       let sftpEP = new Client();
       await sftpEP.connect(ftpConfig).then(async () => {
-        await sftpEP.put(APR_CREDENTIALS.checkin, dst + '/' + jobID  + '/checkindata.xlsx');
+        await sftpEP.put(APR_CREDENTIALS.checkin, dst + '/' + jobID  + '/' + path.basename(APR_CREDENTIALS.checkin));
+        if (fs.existsSync(APR_CREDENTIALS.checkInDelta)) {
+          await sftpEP.put(APR_CREDENTIALS.checkInDelta, dst + '/' + jobID  + '/' + path.basename(APR_CREDENTIALS.checkInDelta));
+        }
         await sftpEP.put(src + '/' + jobID  + '.importFinished', dst + '/' + jobID  + '.importFinished');
         statusLabel = 'error';
         await sftpEP.put(src + '/' + jobID  + '.error', dst + '/' + jobID  + '.error');
@@ -847,6 +894,11 @@ async function endProcess(jobID, pStatus) {
     const fileNameDatetime = new Date().toISOString().replace(/:/g, "-").replace(/\./g, "-").replace("T", "_").replace("Z", "");
     let fileName = APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '_' + statusLabel + '.xlsx';
     await fs.rename(APR_CREDENTIALS.checkin, fileName, function (err) {
+      if (err){
+        logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN RENAME');
+      }
+    });
+    await fs.rename(APR_CREDENTIALS.checkInDelta, APR_CREDENTIALS.targetPath + '/' + jobID + '_' + fileNameDatetime + '_' + path.basename(APR_CREDENTIALS.checkInDelta), function (err) {
       if (err){
         logger.error(new Date() + ' JobID: ' + jobID + ' : ERROR IN RENAME');
       }
@@ -984,6 +1036,7 @@ checkTempAsset = async () => {
         // Write result json in local templateAsset DB
         await templateAsset.push("/asset", resp.data.items);
         await templateAsset.save();
+        await genrateOptionList();
         return true;
       } else {
         // Write log if template asset missing in the Aprimo
@@ -1003,6 +1056,52 @@ checkTempAsset = async () => {
     }else{
       return false;
     }  
+};
+
+/**
+ * 
+ * genrateOptionList and store in localDB.
+ */
+genrateOptionList = async () => {
+  // Get Token For API
+  let tempAssetObj = await templateAsset.getData("/asset");
+  let option_obj = findObject(tempAssetObj, 'dataType', 'OptionList');
+  logger.info(new Date() + ': INFO : Option List Start');
+  arrayApp.forEach(option_obj, async (option) => {
+    let token = await dbtoken.getObjectDefault("/token", "null");
+    await axios
+    .get(option['_links'].definition.href, {
+      proxy: false,
+      httpsAgent: new HttpsProxyAgent(fullProxyURL), 
+      headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "API-VERSION": APR_CREDENTIALS.Api_version,
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    .then(async (resp) => {
+      if (resp.data.items.length > 0) {
+        // Write result json in local templateAsset DB
+        await templateAsset.push("/" + option.fieldName, {id: option.id, items: resp.data.items});
+        await templateAsset.save();
+        return true;
+      } else {
+        // Write log if error in genrateOptionList
+        logger.error(new Date() + ': ERROR : genrateOptionList --');
+        return false;
+      }
+    })
+    .catch(async (err) => {
+      if(err.response !== undefined && err.response.data !== undefined){
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err.response.data));
+      } else {
+        logger.error(new Date() + ': ERROR : getFieldIDs API -- ' + JSON.stringify(err));
+      }
+      return false;
+    });
+  });
+  logger.info(new Date() + ': INFO : Option List Generated');
 };
 
 /**
@@ -1093,6 +1192,7 @@ let task = cron.schedule("*/5 * * * *", async () => {
   await getToken();
   
   if (fs.existsSync(APR_CREDENTIALS.checkin)) {
+    /*
     if(isFileOlderThanHours(APR_CREDENTIALS.checkin)){
       // Delete checkindata file to restart process.
       fs.unlink(APR_CREDENTIALS.checkin, (err) => {
@@ -1100,10 +1200,15 @@ let task = cron.schedule("*/5 * * * *", async () => {
           logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE: ' + APR_CREDENTIALS.checkin);
         }
       });
-
+      fs.unlink(APR_CREDENTIALS.checkInDelta, (err) => {
+        if (err){
+          logger.info(new Date() + ' JobID: ' + jobID + ' : WARNING IN DELETE FILE: ' + APR_CREDENTIALS.checkInDelta);
+        }
+      });
       logger.info(new Date() + ': ' + process.pid + ': Restart Process :');
       terminate("Received Exit");
     }
+    */
   }
 });
 
@@ -1140,7 +1245,7 @@ main = async () => {
   await getToken();
   task.start();
   // Get template asset
-  let getTempAsset = await checkTempAsset();
+  let getTempAsset = await checkTempAsset();  
   // Get languages
   let getLangAsset = await checkLangAsset();
   if (getTempAsset !== false && getLangAsset !== false) {
@@ -1169,8 +1274,9 @@ main = async () => {
 
     logger.info('####### ' + ' ' + process.pid + ': Import Started at ' + new Date() + ' #########');
     if (fs.existsSync(APR_CREDENTIALS.checkin)) {
-      let DEprocess = await readDeltaMasterExcel();
-      /*
+      if (fs.existsSync(APR_CREDENTIALS.checkInDelta)) {
+        await readDeltaMasterExcel();
+      }
       // Read excel file if exists
       let REprocess = await readExcel(0);
       logger.info('####### createRelation Started at ' + new Date() + ' #########');
@@ -1195,7 +1301,7 @@ main = async () => {
         await endProcess(pJobID, false);
         logger.info('####### Import Ended with ERROR for ' + pJobID + ' at ' + new Date() + ' #########');
       }
-      */
+      
       terminate('Normal Close');
     } else {
       await downloadCSVFromFtp();
