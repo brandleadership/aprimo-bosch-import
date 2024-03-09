@@ -25,13 +25,13 @@ const { JsonDB, Config } = require('node-json-db');
 const axiosRetry = require('axios-retry');
 axiosRetry(axios, { retries: 3 });
 
-const db = new JsonDB(new Config("fieldIDs", false, true, '/'));
-const dbtoken = new JsonDB(new Config("apitoken", false, true, '/'));
-const kMap = new JsonDB(new Config("keymapping", false, true, '/'));
-const langMap = new JsonDB(new Config("languagemapping", false, true, '/'));
-const templateAsset = new JsonDB(new Config("template", false, true, '/'));
-const langAsset = new JsonDB(new Config("languages", false, true, '/'));
-const oTypes = new JsonDB(new Config("otypes-mapping", false, true, '/'));
+const db = new JsonDB(new Config("fieldIDs-prod", false, true, '/'));
+const dbtoken = new JsonDB(new Config("apitoken-prod", false, true, '/'));
+const kMap = new JsonDB(new Config("keymapping-prod", false, true, '/'));
+const langMap = new JsonDB(new Config("languagemapping-prod", false, true, '/'));
+const templateAsset = new JsonDB(new Config("template-prod", false, true, '/'));
+const langAsset = new JsonDB(new Config("languages-prod", false, true, '/'));
+const oTypes = new JsonDB(new Config("otypes-mapping-prod", false, true, '/'));
 const execShPromise = require("exec-sh").promise;
 const maxRetries = 3;
 let retries = 0;
@@ -39,7 +39,7 @@ let logRowInfo = '';
 let dataFlag = true;
 
 // Config file for Aprimo Credentials, API Path, Other Settings
-const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
+const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials-prod.json"));
 // Asset Type Mapping Files for OTYPE_ID to Asset Type
 
 // Build Proxy URL With or Without Username
@@ -53,7 +53,7 @@ if(APR_CREDENTIALS.proxyServerInfo.auth.username!="")
 let imgFolderPath = APR_CREDENTIALS.imgFolderPath;
 
 // sFTP Credential
-const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
+const ftpConfig = JSON.parse(fs.readFileSync("ftp-prod.json"));
 
 /**
  * Log Files
@@ -62,9 +62,9 @@ const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
 var appError = new winston.transports.DailyRotateFile({
   level: 'error',
   name: 'error',
-  filename: './logs/bosch-app-error.log',
+  filename: './logs/bosch-app-error-prod.log',
   createSymlink: true,
-  symlinkName: 'bosch-app-error',
+  symlinkName: 'bosch-app-error-prod.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
@@ -72,9 +72,9 @@ var appError = new winston.transports.DailyRotateFile({
 // To Store All Classification Errors.
 var appClassification = new winston.transports.DailyRotateFile({
   level: 'info',
-  filename: './logs/bosch-app-classification-error.log',
+  filename: './logs/bosch-app-classification-error-prod.log',
   createSymlink: true,
-  symlinkName: 'bosch-app-classification-error',
+  symlinkName: 'bosch-app-classification-error-prod.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
@@ -82,18 +82,18 @@ var appClassification = new winston.transports.DailyRotateFile({
 // To Store All Information.
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
-  filename: './logs/bosch-app-combined.log',
+  filename: './logs/bosch-app-combined-prod.log',
   createSymlink: true,
-  symlinkName: 'bosch-app-combined.log',
+  symlinkName: 'bosch-app-combined-prod.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 // To Store All Tokens.
 var tokensLogs = new winston.transports.DailyRotateFile({
-  filename: './logs/bosch-app-uploaded-file-tokens.log',
+  filename: './logs/bosch-app-uploaded-file-tokens-prod.log',
   createSymlink: true,
-  symlinkName: 'bosch-app-uploaded-file-tokens.log',
+  symlinkName: 'bosch-app-uploaded-file-tokens-prod.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m',
@@ -2058,7 +2058,7 @@ searchClassificationID = async (ClassID, key) => {
   // Get Token For API
   let token = await getObjectDefault("/token", "null");
   let fieldData = await getObjectDefault("/fieldIDs/"+ ClassID, "null");
-  logger.error(new Date() + logRowInfo + ': INFO : Search Classification ID URL: ' + APR_CREDENTIALS.GetClassificationByID + "'" + encodeURI(ClassID) + "'");
+
   if (fieldData === 'null') {
   // Get Value From API
   let resultID = await axios

@@ -10,18 +10,18 @@ let Client = require("ssh2-sftp-client");
 const Piscina = require('piscina')
 const csv = require("csvtojson");
 const XLSX = require('xlsx');
-const ftpConfig = JSON.parse(fs.readFileSync("ftp.json"));
+const ftpConfig = JSON.parse(fs.readFileSync("ftp-prod.json"));
 const winston = require("winston");
 const arrayApp = require('lodash');
 const axios = require("axios").default;
 const HttpsProxyAgent = require('https-proxy-agent');
 const { JsonDB, Config } = require('node-json-db');
-const dbtoken = new JsonDB(new Config("apitoken", false, true, '/'));
-const templateAsset = new JsonDB(new Config("template", false, true, '/'));
-const langAsset = new JsonDB(new Config("languages", false, true, '/'));
-const kMap = new JsonDB(new Config("keymapping", false, true, '/'));
-const langMap = new JsonDB(new Config("languagemapping", false, true, '/'));
-const oTypes = new JsonDB(new Config("otypes-mapping", false, true, '/'));
+const dbtoken = new JsonDB(new Config("apitoken-prod", false, true, '/'));
+const templateAsset = new JsonDB(new Config("template-prod", false, true, '/'));
+const langAsset = new JsonDB(new Config("languages-prod", false, true, '/'));
+const kMap = new JsonDB(new Config("keymapping-prod", false, true, '/'));
+const langMap = new JsonDB(new Config("languagemapping-prod", false, true, '/'));
+const oTypes = new JsonDB(new Config("otypes-mapping-prod", false, true, '/'));
 const cron = require('node-cron');
 const os = require('os');
 const cpus = os.cpus();
@@ -34,7 +34,7 @@ const {
   v4: uuidv4
 } = require('uuid');
 // Read default configuration
-const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials.json"));
+const APR_CREDENTIALS = JSON.parse(fs.readFileSync("aprimo-credentials-prod.json"));
 var fullProxyURL=APR_CREDENTIALS.proxyServerInfo.protocol+"://"+ APR_CREDENTIALS.proxyServerInfo.host +':'+APR_CREDENTIALS.proxyServerInfo.port;
 if(APR_CREDENTIALS.proxyServerInfo.auth.username!="")
 {
@@ -48,7 +48,7 @@ const pool = new Piscina(
     maxQueue: 'auto'
   })
 const options = {
-  filename: 'aprimo-bosch-import.js'
+  filename: 'aprimo-bosch-prod-import.js'
 }
 
 /**
@@ -57,18 +57,18 @@ const options = {
 var appError = new winston.transports.DailyRotateFile({
   level: 'error',
   name: 'error',
-  filename: './logs/bosch-app-error.log',
+  filename: './logs/bosch-app-error-prod.log',
   createSymlink: true,
-  symlinkName: 'bosch-app-error',
+  symlinkName: 'bosch-app-error-prod.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
 });
 var appCombined = new winston.transports.DailyRotateFile({
   name: 'info',
-  filename: './logs/bosch-app-combined.log',
+  filename: './logs/bosch-app-combined-prod.log',
   createSymlink: true,
-  symlinkName: 'bosch-app-combined.log',
+  symlinkName: 'bosch-app-combined-prod.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '20m'
@@ -417,13 +417,13 @@ async function readDeltaMasterExcel() {
               let classDataID = row['ID'];
               let classDataLabel = row['LABEL'];
             
-              let classificationAPI = await addOrUpdateClassification(mapdata.parentpath, classDataID, classDataLabel, false);
-              if (classificationAPI.includes("The object cannot be saved because it already exists.")) {
+              let classificationAPI = await addOrUpdateClassification(mapdata.parentpath, classDataID, classDataLabel);
+              if (classDataLabel.includes("The object cannot be saved because it already exists.")) {
                 logger.info(new Date() +  ': DATA WARNING The object cannot be saved because it already exists. So we are duplicate as fallback');
-                classificationAPI = await addOrUpdateClassification(mapdata.parentpath, classDataID, classDataLabel, true);
+                classificationAPI = await addOrUpdateClassification(mapdata.parentpath, classDataID, classDataLabel + '#');
               }
 
-              if(classificationAPI === 'true'){
+              if(classificationAPI === true){
                 csvData[index].appstatus = 'updated';
                 csvData[index].message = '';
               } else {
@@ -477,9 +477,9 @@ async function getLastString(breakString) {
 /**
  * 
  * addOrUpdateClassification for new classification.
- * @param {*} row, classParentPath, dflag
+ * @param {*} row, classParentPath
  */
-addOrUpdateClassification = async (classParentPath, classDataID, classDataLabel, dflag) => {
+addOrUpdateClassification = async (classParentPath, classDataID, classDataLabel) => {
   // Remove new line from string
   if (typeof classDataLabel === 'string') {
     classDataLabel =  classDataLabel.replace(/\n/g, '').replace(/\r/g, '');
@@ -523,21 +523,6 @@ addOrUpdateClassification = async (classParentPath, classDataID, classDataLabel,
     ]
   };
 
-  // Update Object for duplicate
-  if(dflag === true){
-    updateObj = {
-      "parentNamePath": classParentPath,
-      "name": classDataLabel + '-' + classDataID,
-      "identifier": classDataID,
-      "labels": [
-          {
-              "languageId": classLanguageID[0].id,
-              "value": classDataLabel + '-' + classDataID
-          }
-      ]
-    };
-  }
-
   // Log the update object
   logger.info(new Date() +  ' INFO : addOrUpdateClassification JSON:' + JSON.stringify(updateObj));
   // Get Token For API
@@ -560,7 +545,7 @@ addOrUpdateClassification = async (classParentPath, classDataID, classDataLabel,
     )
     .then((res) => {
       logger.info(new Date() +  ' INFO : addOrUpdateClassification done.');
-      return 'true';
+      return true;
     })
     .catch((err) => {
       logger.error(new Date() +  ' ERROR : addOrUpdateClassification API -- classParentPath: ' + classParentPath + " classDataLabel: " + classDataLabel + " classDataID: " + classDataID);
