@@ -405,7 +405,7 @@ createMeta = async (assetID, data, ImgToken) => {
 
     // Check Key And Build Meta Object 
     switch (key) {
-      case 'AGENCY':
+      case 'AGENCY':// Option List
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_agency');
         if (ObjectID.hasOwnProperty('0')) {
           APIResult = await getfielddefinitionID(ObjectID[0]['_links']['definition']['href'], data[key], key)
@@ -449,7 +449,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
-
         }
         break;
       case 'BU': // Classification (Hierarchical)
@@ -491,7 +490,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'DEPT':// Option List
@@ -531,7 +529,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'DESCRIPTION':// Text
@@ -548,7 +545,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'DESCRIPTION_POD':// Text
@@ -565,11 +561,9 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
-      case 'FILENAME':
-        // Skip Block
+      case 'FILENAME':// Skip Block
         break;
       case 'HEADLINE':// Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_headline');
@@ -585,10 +579,9 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;  
-      case 'ILABEL':
+      case 'ILABEL':// Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'mpe_ilabel');
         if (ObjectID.hasOwnProperty('0')) {
           updateObj.fields.addOrUpdate.push({
@@ -602,7 +595,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'IMG_TYPE': // Classification (Hierarchical)        
@@ -621,8 +613,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }            
         }else{
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
@@ -644,15 +635,13 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }else{
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
         }
         break;        
       case 'INIT_NAME':
-          // ObjectID = findObject(tempAssetObj, 'fieldName', 'Init Name');
           ObjectID = findObject(tempAssetObj, 'fieldName', 'MPE_AssetOwner');          
           if (ObjectID.hasOwnProperty('0')) {
             updateObj.fields.addOrUpdate.push({
@@ -661,41 +650,13 @@ createMeta = async (assetID, data, ImgToken) => {
                 "value": data[key],
                 "languageId": "00000000000000000000000000000000"
               }]
-            });
-            
-          /* 
-          var firstName = data[key].substring(0, data[key].lastIndexOf(" ") + 1);
-          var lastName = data[key].substring(data[key].lastIndexOf(" ") + 1, data[key].length);
-  
-          APIResult = await searchUser(firstName, lastName);
-          if(APIResult !== '0'){
-            ObjectID = findObject(tempAssetObj, 'fieldName', 'MPE_AssetOwner');
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": [APIResult],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });          
-          } else {
-            ObjectID = findObject(tempAssetObj, 'fieldName', 'MPE_AssetOwner');
-            updateObj.fields.addOrUpdate.push({
-              "id": ObjectID[0].id,
-              "localizedValues": [{
-                "values": [APR_CREDENTIALS.defaultAssetOwner],
-                "languageId": "00000000000000000000000000000000"
-              }]
-            });
-          }*/
-  
+            });  
         }else{
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
-          // code block
-          break;
+        break;
       case 'KEYWORDS': // Comma Separated Values
 	      let KeyWordObj = data[key].split(',').slice(0, 75);
         if (KeyWordObj.length > 0) {
@@ -711,8 +672,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
       break;    
@@ -731,7 +691,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'ORIG_BE_ID':// Text
@@ -748,7 +707,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'PERSPECTIVE':// Option List
@@ -772,7 +730,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
-
         }
         break;
       case 'PHOTOGRAPHER':// Text
@@ -789,7 +746,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'PRODUCTION_AGENCY':// Option List
@@ -813,10 +769,9 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue;
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
-
         }
         break;
-      case 'STATUS':
+      case 'STATUS'://classification
           APIResult = await searchClassificationName(tmpDataValue, key, '');
           if (APIResult !== 'null') {
             ClassID.push(APIResult);
@@ -832,8 +787,7 @@ createMeta = async (assetID, data, ImgToken) => {
             }else{
               dataFlag = false;
               dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+              logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
             }
           }else{
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
@@ -852,8 +806,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
       case 'TITLE':// Text
@@ -869,8 +822,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
       case 'TRADE_LABEL_AGENCY':// Option List
@@ -893,8 +845,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue;
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
           }
           break;
       case 'TRADE_LABEL_BRAND':// Option List
@@ -917,8 +868,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue;
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
           }
           break;
       case 'TRADE_LABEL_CONTACT':// Text
@@ -934,8 +884,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
       case 'TRADE_LABEL_DEPT':// Option List
@@ -958,8 +907,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue;
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + optionListValue);
           }
           break;      
       case 'TRADE_LABEL_EAN':// Text
@@ -975,8 +923,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
       case 'TRADE_LABEL_KEYWORDS':// Text
@@ -992,8 +939,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
       case 'TRADE_LABEL_PERSPECTIVE':// Option List
@@ -1085,7 +1031,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'LTYPE_NAME':// Text
@@ -1102,7 +1047,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'LV_ID':// Text
@@ -1118,12 +1062,10 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
           break;
-      case 'MASTER_RECORD':
-          // Skip Block
+      case 'MASTER_RECORD': // Skip Block
           break;
       case 'NAME':// Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Title');
@@ -1139,7 +1081,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'OBJ_ID':// Text
@@ -1156,11 +1097,9 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
-      case 'ORIGINAL_FILENAME':
-        // Skip Block
+      case 'ORIGINAL_FILENAME': // Skip Block
         break;
       case 'OTYPE_ID':
         APIResult = await searchClassificationID(data[key], key);
@@ -1218,10 +1157,9 @@ createMeta = async (assetID, data, ImgToken) => {
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
         }
         break;
-      case 'OTYPE_NAME':
-        // Skip Block
+      case 'OTYPE_NAME':// Skip Block
         break;
-      case 'SYSTEM_STATUS':
+      case 'SYSTEM_STATUS'://classification
         APIResult = await searchClassificationID('mpe_' + data[key], key);
         if (APIResult !== 'null') {
           ClassID.push(APIResult);
@@ -1237,15 +1175,13 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }else{
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
         }
         break;
-      case 'BINARY_FILENAME':
-        // Skip Block
+      case 'BINARY_FILENAME':// Skip Block
         break;
       case 'CSORELEASE_MASTER':
         if (data[key] === 'x') {
@@ -1271,7 +1207,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       case 'INIT_DATE':
@@ -1289,18 +1224,13 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
-        // Skip Block
+      case 'DOUBLE_WIDTH':// Skip Block
         break;
-      case 'DOUBLE_WIDTH':
-        // Skip Block
+      case 'HD_OBJECT':// Skip Block
         break;
-      case 'HD_OBJECT':
-        // Skip Block
-        break;
-      case 'MISSING_TTNR':
+      case 'MISSING_TTNR':// Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'Missing_TTNR');
         if (ObjectID.hasOwnProperty('0')) {
           updateObj.fields.addOrUpdate.push({
@@ -1314,13 +1244,11 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
-      case 'AC_MAIN_USAGE':
-        // Skip Block
+      case 'AC_MAIN_USAGE':// Skip Block
         break;
-      case 'LINKED_PRODUCTS':
+      case 'LINKED_PRODUCTS':// Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ReferencedProductsinPIM');
         if (ObjectID.hasOwnProperty('0')) {
           updateObj.fields.addOrUpdate.push({
@@ -1334,13 +1262,11 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
-      case 'CLIPLISTER_LINKS':
-        // Skip Block
+      case 'CLIPLISTER_LINKS':// Skip Block
         break;
-      case 'COLOR_SPACE':
+      case 'COLOR_SPACE':// Text
         ObjectID = findObject(tempAssetObj, 'fieldName', 'ColorSpace');
         if (ObjectID.hasOwnProperty('0')) {
           updateObj.fields.addOrUpdate.push({
@@ -1354,7 +1280,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }     
         break;
       case 'JOB_ID':// Text
@@ -1371,7 +1296,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;  
       case 'PRIMEMEDIAPOOL$DEFAULT$RELATED_COUNTRIES':
@@ -1417,7 +1341,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }
         }
         break;
-      case 'RESPONSIBLE_BUSINESS_UNIT':
+      case 'RESPONSIBLE_BUSINESS_UNIT': //Classification
         if(data['RESPONSIBLE_BUSINESS_UNIT'] !== '' && data['RESPONSIBLE_BUSINESS_UNIT'] !== null){
           APIResult = await searchClassificationID('Ownership_' + data['RESPONSIBLE_BUSINESS_UNIT'], key);
         }else{
@@ -1489,8 +1413,7 @@ createMeta = async (assetID, data, ImgToken) => {
           }else{
             dataFlag = false;
             dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
-          logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
+            logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
           }
         }
         break;
@@ -1588,7 +1511,6 @@ createMeta = async (assetID, data, ImgToken) => {
           dataFlag = false;
           dataFlagValue = ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key];
           logger.error(new Date() + logRowInfo  + ': DATA ERROR : Meta Key: ' + key + ' Value: ' + data[key]);
-
         }
         break;
       default:
@@ -1622,22 +1544,6 @@ createMeta = async (assetID, data, ImgToken) => {
       }
     }
   }
-
-  /*
-  if((data['BINARY_FILENAME'] === null || data['BINARY_FILENAME'] === '') && (data['TITLE'] !== null || data['TITLE'] !== '')){
-    ObjectID = findObject(tempAssetObj, 'fieldName', 'Title');
-    console.log("BINARY_FILENAME 002: ", ObjectID);
-    if (ObjectID.hasOwnProperty('0')) {
-      updateObj.fields.addOrUpdate.push({
-        "id": ObjectID[0].id,
-        "localizedValues": [{
-          "value": data['TITLE'],
-          "languageId": "00000000000000000000000000000000"
-        }]
-      });
-    }
-  }
-  */
 
   //Security Authorized Code Start
   if (CSORELEASE.length > 0) {
